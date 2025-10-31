@@ -69,7 +69,9 @@ function render_styles()
 {
 
     $styles = [
-        base_url() . 'assets/css/all-tailwind-classes-full-min.css'
+        base_url() . 'assets/css/all-tailwind-classes-full-min.css',
+        base_url() . 'assets/css/all.min.css'
+
     ];
 
     foreach ($styles as $style) {
