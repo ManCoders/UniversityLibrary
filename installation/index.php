@@ -57,142 +57,115 @@
         }
     </style>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        // Library/Academic Colors
-                        'primary': '#1a476f', // Deep Navy Blue (Authority)
-                        'primaryHover': '#11304d',
-                        'accent': '#cc9900', // Muted Gold (Classic Accent)
-                        'background': '#fcfcf0', // Light Ivory/Paper
-                        'card': '#ffffff', // White
-                    }
-                }
+tailwind.config = {
+    theme: {
+        extend: {
+            fontFamily: {
+                sans: ['Inter', 'sans-serif'],
+            },
+            colors: {
+                'primary': '#1a476f', // Deep Navy Blue
+                'primaryHover': '#11304d',
+                'accent': '#cc9900', // Muted Gold
+                'background': '#fcfcf0', // Light Ivory
+                'card': '#ffffff', // White
             }
         }
+    }
+}
 
-        let currentStep = 1;
+$(document).ready(function () {
+    let currentStep = 1;
+    let adminProfileBase64 = '';
 
-        function updateStepUI() {
-            // Hide all steps
-            document.querySelectorAll('.install-step').forEach(step => step.classList.add('hidden'));
+    function updateStepUI() {
+        $('.install-step').addClass('hidden');
+        $(`#step-${currentStep}`).removeClass('hidden');
 
-            // Show the current step
-            document.getElementById(`step-${currentStep}`).classList.remove('hidden');
-
-            // Update the progress bar
-            document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
-                indicator.classList.remove('step-active-color', 'step-inactive-color');
-                if (index + 1 <= currentStep) {
-                    indicator.classList.add('step-active-color');
-                } else {
-                    indicator.classList.add('step-inactive-color');
-                }
-            });
-
-            // Update navigation buttons
-            document.getElementById('prev-button').classList.toggle('hidden', currentStep === 1);
-
-            const nextButton = document.getElementById('next-button');
-            const installButton = document.getElementById('install-button');
-
-            if (currentStep < 3) {
-                nextButton.classList.remove('hidden');
-                installButton.classList.add('hidden');
-            } else {
-                nextButton.classList.add('hidden');
-                installButton.classList.remove('hidden');
-                updateReviewData();
-            }
-        }
-
-        function updateReviewData() {
-            // Update the review step content with collected data
-            const form = document.getElementById('install-form');
-            const data = {
-                title: form.system_title.value || '[Not Set]',
-                description: form.system_description.value || '[Not Set]',
-                name: `${form.firstname.value} ${form.lastname.value}` || '[Not Set]',
-                email: form.email.value || '[Not Set]',
-                username: form.username.value || '[Not Set]',
-            };
-
-            document.getElementById('review-title').textContent = data.title;
-            document.getElementById('review-description').textContent = data.description;
-            document.getElementById('review-name').textContent = data.name;
-            document.getElementById('review-email').textContent = data.email;
-            document.getElementById('review-username').textContent = data.username;
-        }
-
-        function nextStep() {
-            // Simple validation before moving forward
-            const currentFormSection = document.getElementById(`step-${currentStep}`);
-            const requiredFields = currentFormSection.querySelectorAll('[required]');
-            let allValid = true;
-
-            requiredFields.forEach(field => {
-                if (!field.value) {
-                    field.classList.add('ring-2', 'ring-red-500', 'border-red-500');
-                    field.focus();
-                    allValid = false;
-                } else {
-                    field.classList.remove('ring-2', 'ring-red-500', 'border-red-500');
-                }
-            });
-
-            if (allValid && currentStep < 3) {
-                currentStep++;
-                updateStepUI();
-            }
-        }
-
-        function prevStep() {
-            if (currentStep > 1) {
-                currentStep--;
-                updateStepUI();
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            updateStepUI(); // Initialize UI
-
-            // Logo upload logic
-            const logoPreview = document.getElementById('systemLogoPreview');
-            const logoInput = document.getElementById('systemLogo');
-
-            logoPreview.onclick = function () {
-                logoInput.click();
-            };
-            logoInput.onchange = function (event) {
-                const [file] = event.target.files;
-                if (file) {
-                    logoPreview.src = URL.createObjectURL(file);
-                }
-            };
-
-            // Handle form submission (only on final step)
-            document.getElementById('install-form').addEventListener('submit', function (e) {
-                e.preventDefault();
-                if (currentStep === 3) {
-                    // Display success message
-                    document.getElementById('main-card').innerHTML = `
-                        <div class="p-10 text-center">
-                            <svg class="mx-auto h-16 w-16 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <h2 class="text-3xl font-bold text-gray-800 mt-4">Installation Complete!</h2>
-                            <p class="text-gray-500 mt-2">The '${document.getElementById('review-title').textContent}' system has been successfully cataloged.</p>
-                            <a href="./" class="inline-block mt-6 bg-primary hover:bg-primaryHover text-white font-bold py-2 px-6 rounded-lg transition duration-200 shadow-md">Proceed to Library System</a>
-                        </div>
-                    `;
-                }
-            });
+        $('.step-indicator').each(function (index) {
+            $(this).removeClass('step-active-color step-inactive-color');
+            if (index + 1 <= currentStep) $(this).addClass('step-active-color');
+            else $(this).addClass('step-inactive-color');
         });
-    </script>
+
+        $('#prev-button').toggle(currentStep !== 1);
+        $('#next-button').toggle(currentStep < 3);
+        $('#install-button').toggle(currentStep === 3);
+
+        if (currentStep === 3) updateReviewData();
+    }
+
+    function validateStep() {
+        let allValid = true;
+        $(`#step-${currentStep} [required]`).each(function () {
+            if (!$(this).val()) {
+                $(this).addClass('ring-2 ring-red-500 border-red-500');
+                allValid = false;
+            } else {
+                $(this).removeClass('ring-2 ring-red-500 border-red-500');
+            }
+        });
+        return allValid;
+    }
+
+    function nextStep() {
+        if (validateStep() && currentStep < 3) {
+            currentStep++;
+            updateStepUI();
+        }
+    }
+
+    function prevStep() {
+        if (currentStep > 1) {
+            currentStep--;
+            updateStepUI();
+        }
+    }
+
+    window.nextStep = nextStep;
+    window.prevStep = prevStep;
+
+    // Logo upload preview
+    $('#systemLogoPreview').click(() => $('#systemLogo').click());
+    $('#systemLogo').change(function () {
+        const file = this.files[0];
+        if (file) $('#systemLogoPreview').attr('src', URL.createObjectURL(file));
+    });
+
+    // Admin profile picture preview
+    $('#adminProfilePreview').click(() => $('#adminProfilePic').click());
+    $('#adminProfilePic').change(function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                $('#adminProfilePreview').attr('src', e.target.result);
+                adminProfileBase64 = e.target.result; // Save Base64 for backend
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Update review step
+    function updateReviewData() {
+        $('#review-title').text($('#system_title').val() || '[Not Set]');
+        $('#review-description').text($('#system_description').val() || '[Not Set]');
+        const fullName = $('#firstname').val() + ' ' + ($('#middlename').val() ? $('#middlename').val() + ' ' : '') + $('#lastname').val();
+        $('#review-name').text(fullName || '[Not Set]');
+        $('#review-email').text($('#email').val() || '[Not Set]');
+        $('#review-username').text($('#username').val() || '[Not Set]');
+
+        // Show admin profile in review if needed
+        if (adminProfileBase64) {
+            $('#review-admin-pic').attr('src', adminProfileBase64).removeClass('hidden');
+        }
+    }
+
+    
+    updateStepUI();
+});
+</script>
+
 </head>
 
 <body class="bg-background font-sans min-h-screen text-gray-800">
@@ -239,7 +212,7 @@
 
                 <!-- Card Body -->
                 <div class="p-6 md:p-10">
-                    <form id="install-form">
+                    <form id="install-form" enctype="multipart/form-data">
 
                         <!-- STEP 1: LIBRARY PROFILE -->
                         <div id="step-1" class="install-step">
@@ -289,30 +262,45 @@
 
                         <!-- STEP 2: CHIEF LIBRARIAN (ADMIN ACCOUNT) SETUP -->
                         <div id="step-2" class="install-step hidden">
-                            <h5 class="text-center font-bold text-primary mb-8 text-2xl font-serif">2. Chief Librarian
-                                Account Enrollment</h5>
+                            <h5 class="text-center font-bold text-primary mb-8 text-2xl font-serif">
+                                2. Chief Librarian Account Enrollment
+                            </h5>
+
+                            <!-- Admin Profile Picture Upload -->
+                            <div class="text-center mb-8">
+                                <h5 class="font-bold text-gray-700 mb-4 text-lg">Upload Admin Profile Picture</h5>
+                                <div
+                                    class="logo-upload-container mx-auto inline-block p-4 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 max-w-xs transition duration-300">
+                                    <img src="https://placehold.co/150x150/ffffff/1a476f?text=PROFILE"
+                                        class="logo-preview w-[150px] h-[150px] rounded-full mx-auto block border-2 shadow-lg"
+                                        alt="Admin Profile Preview" id="adminProfilePreview"
+                                        title="Click to Upload Profile Picture">
+                                    <small class="text-gray-500 mt-3 block text-sm font-medium">
+                                        Click to upload profile picture
+                                    </small>
+                                    <input type="file" name="admin_profile_pic" class="hidden" accept="image/*"
+                                        id="adminProfilePic">
+                                </div>
+                            </div>
 
                             <!-- Name Fields -->
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                                 <div>
                                     <label for="firstname" class="text-gray-700 block mb-2 font-medium">First
                                         Name</label>
-                                    <input type="text"
-                                        class="w-full px-5 py-3 bg-white text-gray-800 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-primary focus:border-primary transition duration-200 shadow-sm"
-                                        id="firstname" name="firstname" placeholder="First Name" required>
+                                    <input type="text" id="firstname" name="firstname" placeholder="First Name" required
+                                        class="w-full px-5 py-3 bg-white text-gray-800 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-primary focus:border-primary transition duration-200 shadow-sm">
                                 </div>
                                 <div>
                                     <label for="middlename" class="text-gray-700 block mb-2 font-medium">Middle Name
                                         (Optional)</label>
-                                    <input type="text"
-                                        class="w-full px-5 py-3 bg-gray-50 text-gray-800 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-primary focus:border-primary transition duration-200 shadow-sm"
-                                        id="middlename" name="middlename" placeholder="Middle Name">
+                                    <input type="text" id="middlename" name="middlename" placeholder="Middle Name"
+                                        class="w-full px-5 py-3 bg-gray-50 text-gray-800 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-primary focus:border-primary transition duration-200 shadow-sm">
                                 </div>
                                 <div>
                                     <label for="lastname" class="text-gray-700 block mb-2 font-medium">Last Name</label>
-                                    <input type="text"
-                                        class="w-full px-5 py-3 bg-white text-gray-800 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-primary focus:border-primary transition duration-200 shadow-sm"
-                                        id="lastname" name="lastname" placeholder="Last Name" required>
+                                    <input type="text" id="lastname" name="lastname" placeholder="Last Name" required
+                                        class="w-full px-5 py-3 bg-white text-gray-800 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-primary focus:border-primary transition duration-200 shadow-sm">
                                 </div>
                             </div>
 
@@ -321,26 +309,27 @@
                                 <div>
                                     <label for="email" class="text-gray-700 block mb-2 font-medium">Institutional
                                         Email</label>
-                                    <input type="email"
-                                        class="w-full px-5 py-3 bg-white text-gray-800 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-primary focus:border-primary transition duration-200 shadow-sm"
-                                        id="email" name="email" placeholder="chief.librarian@uni.edu" required>
+                                    <input type="email" id="email" name="email" placeholder="chief.librarian@uni.edu"
+                                        required
+                                        class="w-full px-5 py-3 bg-white text-gray-800 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-primary focus:border-primary transition duration-200 shadow-sm">
                                 </div>
                                 <div>
                                     <label for="username" class="text-gray-700 block mb-2 font-medium">Librarian
                                         ID/Username</label>
-                                    <input type="text"
-                                        class="w-full px-5 py-3 bg-white text-gray-800 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-primary focus:border-primary transition duration-200 shadow-sm"
-                                        id="username" name="username" placeholder="e.g. jdoe_admin" required>
+                                    <input type="text" id="username" name="username" placeholder="e.g. jdoe_admin"
+                                        required
+                                        class="w-full px-5 py-3 bg-white text-gray-800 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-primary focus:border-primary transition duration-200 shadow-sm">
                                 </div>
                                 <div>
                                     <label for="password" class="text-gray-700 block mb-2 font-medium">Access Key
                                         (Password)</label>
-                                    <input type="password"
-                                        class="w-full px-5 py-3 bg-white text-gray-800 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-primary focus:border-primary transition duration-200 shadow-sm"
-                                        id="password" name="password" placeholder="Secure Key" required>
+                                    <input type="password" id="password" name="password" placeholder="Secure Key"
+                                        required
+                                        class="w-full px-5 py-3 bg-white text-gray-800 border border-gray-300 rounded-lg placeholder-gray-400 focus:ring-primary focus:border-primary transition duration-200 shadow-sm">
                                 </div>
                             </div>
                         </div>
+
 
                         <!-- STEP 3: REVIEW & INSTALL -->
                         <div id="step-3" class="install-step hidden">
@@ -389,7 +378,7 @@
                             </button>
 
                             <button type="button" id="next-button" onclick="nextStep()"
-                                class="bg-primary hover:bg-primaryHover text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 active:scale-95">
+                                class="bg-primary hover:bg-primary text-white font-bold py-3 px-8 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105 active:scale-95">
                                 Continue to Enrollment
                             </button>
 

@@ -63,7 +63,7 @@ class Action
             session_start();
         }
 
-        $username = $_POST['username'] ?? '';
+        $username = trim($_POST['username'] ?? '');
         $password = $_POST['password'] ?? '';
 
         if (empty($username) || empty($password)) {
@@ -71,163 +71,186 @@ class Action
         }
 
         try {
-            // ==== Admin Login ====
-            $stmtAdmin = $this->db->prepare("
-            SELECT * FROM admin WHERE JSON_EXTRACT(authentication_data, '$.username') = ? 
-            OR JSON_EXTRACT(authentication_data, '$.email') = ? LIMIT 1
+            // Admin login
+            $stmt = $this->db->prepare("
+            SELECT * FROM admin 
+            WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) = ? 
+               OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ? 
+            LIMIT 1
         ");
-            $stmtAdmin->execute([$username, $username]);
-            $admin = $stmtAdmin->fetch(PDO::FETCH_ASSOC);
+            $stmt->execute([$username, $username]);
+            $admin = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($admin) {
-                $authAdmin = json_decode($admin['authentication_data'], true);
-
-                if (is_array($authAdmin) && password_verify($password, $authAdmin['password'])) {
+                $auth = json_decode($admin['authentication_data'], true);
+                if (password_verify($password, $auth['password'] ?? '')) {
                     $_SESSION['admin'] = [
                         'firstname' => $admin['firstname'] ?? '',
                         'middlename' => $admin['middlename'] ?? '',
                         'lastname' => $admin['lastname'] ?? '',
-                        'email' => $authAdmin['email'] ?? '',
+                        'email' => $auth['email'] ?? '',
+                        'username' => $auth['username'] ?? '',
                         'user_role' => 'Admin',
-                        'username' => $authAdmin['username'] ?? '',
                         'admin_id' => $admin['admin_id'] ?? null,
-                        'created_date' => $admin['created_date'] ?? ''
+                        'created_date' => $admin['created_date'] ?? '',
+                        'profile_pic' => $auth['admin_profile_pic'] ?? null  // <-- added profile pic
                     ];
-
                     return json_encode([
                         'status' => 1,
-                        'message' => 'Admin login success',
+                        'message' => 'Admin login successful',
                         'redirect_url' => 'src/admin/index.php',
                         'user_data' => $_SESSION['admin']
                     ]);
-                } else {
-                    return json_encode(['status' => 2, 'message' => 'Incorrect password.']);
                 }
+                return json_encode(['status' => 2, 'message' => 'Incorrect password.']);
             }
 
-            // ==== Senior Citizen / Employee Login ====
-            $stmtCitizen = $this->db->prepare("
+            // Senior citizen login
+            $stmt = $this->db->prepare("
             SELECT * FROM civil_data 
-            WHERE JSON_EXTRACT(authentication_data, '$.username') = ? 
-            OR JSON_EXTRACT(authentication_data, '$.email') = ? LIMIT 1
+            WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) = ? 
+               OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ? 
+            LIMIT 1
         ");
-            $stmtCitizen->execute([$username, $username]);
-            $row = $stmtCitizen->fetch(PDO::FETCH_ASSOC);
+            $stmt->execute([$username, $username]);
+            $citizen = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($row) {
-                $authCitizen = json_decode($row['authentication_data'], true);
-
-                if (
-                    is_array($authCitizen) &&
-                    ($username === $authCitizen['username'] || $username === $authCitizen['email']) &&
-                    password_verify($password, $authCitizen['password'])
-                ) {
-
-                    $_SESSION['citizen'] = [
-                        'firstname' => $row['firstname'] ?? '',
-                        'middlename' => $row['middlename'] ?? '',
-                        'lastname' => $row['lastname'] ?? '',
-                        'email' => $authCitizen['email'] ?? '',
-                        'user_role' => $row['user_role'] ?? 'unknown',
-                        'username' => $authCitizen['username'] ?? '',
-                        'civil_id' => $row['civil_id'] ?? null,
-                        'created_date' => $row['created_date'] ?? ''
-                    ];
-
-                    if (($row['user_role'] ?? '') !== 'senior-citizen') {
-                        return json_encode([
-                            'status' => 4,
-                            'message' => 'User role not matched'
-                        ]);
+            if ($citizen) {
+                $auth = json_decode($citizen['authentication_data'], true);
+                if (password_verify($password, $auth['password'] ?? '')) {
+                    if (($citizen['user_role'] ?? '') !== 'senior-citizen') {
+                        return json_encode(['status' => 4, 'message' => 'User role not permitted.']);
                     }
-
+                    $_SESSION['citizen'] = [
+                        'firstname' => $citizen['firstname'] ?? '',
+                        'middlename' => $citizen['middlename'] ?? '',
+                        'lastname' => $citizen['lastname'] ?? '',
+                        'email' => $auth['email'] ?? '',
+                        'username' => $auth['username'] ?? '',
+                        'user_role' => $citizen['user_role'] ?? '',
+                        'civil_id' => $citizen['civil_id'] ?? null,
+                        'created_date' => $citizen['created_date'] ?? '',
+                        'profile_pic' => $auth['user_profile_pic'] ?? null  // <-- added profile pic
+                    ];
                     return json_encode([
                         'status' => 1,
                         'redirect_url' => 'src/citizen/',
-                        'user_name' => trim(($row['firstname'] ?? '') . " " . ($row['lastname'] ?? '')),
+                        'user_name' => trim($citizen['firstname'] . ' ' . $citizen['lastname']),
                         'user_data' => $_SESSION['citizen']
                     ]);
-                } else {
-                    return json_encode([
-                        'status' => 2,
-                        'message' => 'Incorrect username or password.'
-                    ]);
                 }
+                return json_encode(['status' => 2, 'message' => 'Incorrect username or password.']);
             }
 
-            return json_encode([
-                'status' => 4,
-                'message' => 'User not found. Please check your username or email.'
-            ]);
+            return json_encode(['status' => 4, 'message' => 'User not found.']);
 
         } catch (Exception $e) {
-            return json_encode([
-                'status' => 500,
-                'message' => 'Server error: ' . $e->getMessage()
-            ]);
+            return json_encode(['status' => 500, 'message' => 'Server error: ' . $e->getMessage()]);
         }
     }
+
 
 
 
     function installation()
     {
-        $firstname = htmlspecialchars($_POST['firstname'] ?? '');
-        $middlename = htmlspecialchars($_POST['middlename'] ?? '');
-        $lastname = htmlspecialchars($_POST['lastname'] ?? '');
-        $email = htmlspecialchars($_POST['email'] ?? '');
-        $username = htmlspecialchars($_POST['username'] ?? '');
-        $password = password_hash($_POST['password'] ?? '', PASSWORD_DEFAULT);
-        $system_title = htmlspecialchars($_POST['system_title'] ?? '');
-        $system_description = htmlspecialchars($_POST['system_description'] ?? '');
-
-        if (!isset($_FILES['system_logo']) || $_FILES['system_logo']['error'] !== 0) {
-            return json_encode(['status' => 2, 'message' => 'Logo file is required.']);
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!$input || !isset($input['system_details'], $input['admin_details'])) {
+            return json_encode(['status' => 2, 'message' => 'Invalid input data.']);
         }
 
-        $logo = $_FILES['system_logo'];
-        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+        $system = $input['system_details'];
+        $admin = $input['admin_details'];
 
-        if ($logo['size'] > 10 * 1024 * 1024) {
-            return json_encode(['status' => 2, 'message' => 'Logo file size exceeds 2MB.']);
+        // Validate required fields
+        $required_system = ['system_title', 'system_description'];
+        $required_admin = ['firstname', 'lastname', 'email', 'username', 'password'];
+
+        foreach ($required_system as $field) {
+            if (empty($system[$field]))
+                return json_encode(['status' => 2, 'message' => "System field '$field' is required."]);
+        }
+        foreach ($required_admin as $field) {
+            if (empty($admin[$field]))
+                return json_encode(['status' => 2, 'message' => "Admin field '$field' is required."]);
         }
 
-        if (!in_array($logo['type'], $allowed_types)) {
-            return json_encode(['status' => 2, 'message' => 'Invalid logo file type.']);
+        // Handle system logo
+        if (!empty($system['system_logo'])) {
+            $system['system_logo'] = $this->saveBase64Image($system['system_logo'], 'logo_');
         }
 
-        $upload_dir = '../assets/image/';
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
+        // Handle admin profile picture
+        if (!empty($admin['admin_profile_pic'])) {
+            $admin['admin_profile_pic'] = $this->saveBase64Image($admin['admin_profile_pic'], 'admin_');
         }
 
-        $logo_name = uniqid('logo_');
-        $upload_path = $upload_dir . $logo_name;
-        if (!move_uploaded_file($logo['tmp_name'], $upload_path)) {
-            return json_encode(['status' => 2, 'message' => 'Failed to upload logo file.']);
-        }
+        // Hash password
+        $admin['password'] = password_hash($admin['password'], PASSWORD_BCRYPT);
 
         try {
-            $stmt1 = $this->db->prepare("INSERT INTO admin_data (firstname, middlename, lastname, email, username, password, user_role) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $adminInsert = $stmt1->execute([$firstname, $middlename, $lastname, $email, $username, $password, 'Admin']);
+            $this->db->beginTransaction();
 
-            if ($adminInsert) {
-                $stmt2 = $this->db->prepare("INSERT INTO system (system_title, system_description, system_logo) VALUES (?, ?, ?)");
-                $systemInsert = $stmt2->execute([$system_title, $system_description, $logo_name]);
+            // Insert admin
+            $stmt1 = $this->db->prepare(
+                "INSERT INTO admin (personal_details, authentication_data, admin_book_data) VALUES (?, ?, ?)"
+            );
+            $stmt1->execute([
+                json_encode([
+                    'firstname' => $admin['firstname'],
+                    'middlename' => $admin['middlename'] ?? '',
+                    'lastname' => $admin['lastname'],
+                    'email' => $admin['email'],
+                    'admin_profile_pic' => $admin['admin_profile_pic'] ?? ''
+                ]),
+                json_encode([
+                    'username' => $admin['username'],
+                    'password' => $admin['password'],
+                    'user_role' => 'Admin'
+                ]),
+                json_encode([]) // Empty admin_book_data
+            ]);
 
-                if ($systemInsert) {
-                    return json_encode(['status' => 1, 'message' => 'Installation data saved successfully.']);
-                } else {
-                    return json_encode(['status' => 2, 'message' => 'Failed to save system data.']);
-                }
-            } else {
-                return json_encode(['status' => 2, 'message' => 'Failed to save admin data.']);
-            }
+            // Insert system
+            $stmt2 = $this->db->prepare(
+                "INSERT INTO system (system_details) VALUES (?)"
+            );
+            $stmt2->execute([
+                json_encode($system)
+            ]);
+
+            $this->db->commit();
+            return json_encode(['status' => 1, 'message' => 'Installation completed successfully.', 'url' => '../']);
         } catch (Exception $e) {
-
-            return json_encode(['status' => 2, 'message' => 'An error occurred: ' . $e->getMessage()]);
+            $this->db->rollBack();
+            return json_encode(['status' => 2, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
+
+
+    private function saveBase64Image($base64, $prefix)
+    {
+        if (!preg_match('/^data:image\/(\w+);base64,/', $base64, $type))
+            return '';
+        $data = substr($base64, strpos($base64, ',') + 1);
+        $data = base64_decode($data);
+        if ($data === false)
+            return '';
+
+        $ext = strtolower($type[1]);
+        if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif']))
+            return '';
+
+        $upload_dir = '../assets/image/';
+        if (!is_dir($upload_dir))
+            mkdir($upload_dir, 0777, true);
+
+        $filename = $prefix . uniqid() . '.' . $ext;
+        file_put_contents($upload_dir . $filename, $data);
+        return $filename;
+    }
+
+
 
     function admin_staff_register()
     {

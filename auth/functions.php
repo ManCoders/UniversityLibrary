@@ -9,27 +9,22 @@ function initInstaller()
 
     try {
         // Check if admin exists
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin WHERE personal_details = ?");
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin WHERE JSON_EXTRACT(personal_details, '$.user_role') = ?");
         $stmt->execute(['Admin']);
         $adminCount = $stmt->fetchColumn();
 
-        // Get clean current path
+        // Current request path
         $currentPath = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-        $installerPath = '/installation';
+        $installerPath = 'installation'; // no leading slash, match after trim
 
         if ($adminCount > 0) {
+            // Admin exists → block access to installer
             if (strpos($currentPath, $installerPath) === 0) {
-                header("Location: " . base_url() . "src/");
+                header("Location: " . base_url() . "/");
                 exit;
             }
-        } elseif ($adminCount > 0) {
-            /* OPTION BUT SOLID FOR SECURITY */
-            if (strpos($currentPath, "/") === 0) {
-                header("Location: " . base_url() . "src/");
-                exit;
-            }
-        }
-        else {
+        } else {
+            // No admin → force installer page
             if (strpos($currentPath, $installerPath) !== 0) {
                 header("Location: " . base_url() . "installation/");
                 exit;
@@ -39,9 +34,10 @@ function initInstaller()
     } catch (PDOException $e) {
         die("Installer check failed: " . $e->getMessage());
     }
-    
+
     $pdo = null;
 }
+
 
 
 
@@ -49,21 +45,16 @@ function base_url()
 {
     // Detect protocol (HTTP or HTTPS)
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-
-    // Local IPs for development
     $local_ips = ['127.0.0.1', '::1', '192.168.1.117'];
 
     // If running locally
-    if (in_array($_SERVER['REMOTE_ADDR'], haystack: $local_ips)) {
-        return $protocol . "://localhost/UNIVERSITYLIBRARY/";
+    if (in_array($_SERVER['REMOTE_ADDR'], $local_ips)) {
+        return $protocol . "://localhost/UniversityLibrary/";
     }
 
-    // ✅ LIVE SITE PATH (InfinityFree)
-    return $protocol . "://campus-chat-rooms.gamer.gd/UNIVERSITYLIBRARY/";
+    // ✅ LIVE SITE PATH
+    return $protocol . "://campus-chat-rooms.gamer.gd/UniversityLibrary/";
 }
-
-
-
 
 function get_current_page()
 {
@@ -109,7 +100,8 @@ function render_scripts()
         base_url() . 'assets/js/main.js',
         base_url() . 'assets/js/tailwind.js',
         base_url() . 'assets/js/tailwindcss.js',
-        base_url() . 'assets/js/landingpage.js'
+        base_url() . 'assets/js/landingpage.js',
+        base_url() . 'assets/js/lucide.js'
     ];
 
     foreach ($scripts as $script) {
@@ -123,21 +115,30 @@ function get_option($key)
     try {
         $pdo = db_connect();
 
-        $stmt = $pdo->prepare("SELECT * FROM system ");
+        // Fetch the system JSON column
+        $stmt = $pdo->prepare("SELECT system_details FROM system LIMIT 1");
         $stmt->execute();
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($row) {
-            return $row['' . $key . ''];
+        if ($row && !empty($row['system_details'])) {
+            // Decode JSON to array
+            $details = json_decode($row['system_details'], true);
+
+            // Return the requested key if it exists
+            if (isset($details[$key])) {
+                return $details[$key];
+            }
         }
-        return '';
+
+        return ''; // Key not found or no system data
 
     } catch (PDOException $e) {
         error_log("Database error in get_option(): " . $e->getMessage());
         return '';
     }
 }
+
 
 
 function get_unique_routes()
