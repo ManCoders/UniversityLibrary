@@ -1,5 +1,7 @@
 <?php include '../../header.php'; ?>
 <?php
+$username = "John Paul";
+$picture = "https://placehold.co/40x40/6366f1/ffffff?text=JD";
 $allowed_pages = ['dashboard', 'metadata', 'users', 'reports', 'settings'];
 $page = 'dashboard'; // default
 
@@ -17,18 +19,6 @@ if (isset($_GET['page']) && in_array($_GET['page'], $allowed_pages)) {
     <title>Modular Admin Dashboard</title>
     <script>
         tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        'indigo-700': '#4338ca',
-                        'indigo-600': '#4f46e5',
-                        'indigo-50': '#eef2ff',
-                    }
-                }
-            },
             darkMode: 'class',
             theme: {
                 extend: {
@@ -61,100 +51,94 @@ if (isset($_GET['page']) && in_array($_GET['page'], $allowed_pages)) {
 
 <body class="min-h-screen bg-gray-100 font-sans">
     <script>
-        const THEME_KEY = 'theme';
+  const THEME_KEY = 'theme';
 
-        // --- Sidebar Toggle ---
-        const initializeSidebarToggle = () => {
-            const sidebar = document.getElementById('sidebar');
-            const openBtn = document.getElementById('open-sidebar-btn');
-            const closeBtn = document.getElementById('close-sidebar-btn');
-            const overlay = document.getElementById('sidebar-overlay');
+  // --- Apply theme early (before paint)
+  (function() {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const storedTheme = localStorage.getItem(THEME_KEY);
+    const isDark =
+      storedTheme === 'dark' || (storedTheme === null && prefersDark);
 
-            if (!sidebar || !openBtn || !closeBtn || !overlay) {
-                console.error("Sidebar elements not found. Layout rendering may have failed.");
-                return;
-            }
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
 
-            const toggleSidebar = (isOpen) => {
-                if (isOpen) {
-                    sidebar.classList.remove('-translate-x-full');
-                    overlay.classList.remove('opacity-0', 'pointer-events-none');
-                    overlay.classList.add('opacity-100');
-                } else {
-                    sidebar.classList.add('-translate-x-full');
-                    overlay.classList.add('opacity-0', 'pointer-events-none');
-                    overlay.classList.remove('opacity-100');
-                }
-            };
+    // Prevent white flash
+    document.documentElement.style.visibility = 'hidden';
+    window.addEventListener('DOMContentLoaded', () => {
+      document.documentElement.style.visibility = 'visible';
+    });
+  })();
 
-            openBtn.addEventListener('click', () => toggleSidebar(true));
-            closeBtn.addEventListener('click', () => toggleSidebar(false));
-            overlay.addEventListener('click', () => toggleSidebar(false));
+  // --- Sidebar Toggle ---
+  const initializeSidebarToggle = () => {
+    const sidebar = document.getElementById('sidebar');
+    const openBtn = document.getElementById('open-sidebar-btn');
+    const closeBtn = document.getElementById('close-sidebar-btn');
+    const overlay = document.getElementById('sidebar-overlay');
 
-            document.querySelectorAll('.nav-link').forEach(link => {
-                link.addEventListener('click', () => {
-                    if (window.innerWidth < 1024) { // mobile
-                        setTimeout(() => toggleSidebar(false), 100);
-                    }
-                });
-            });
+    if (!sidebar || !openBtn || !closeBtn || !overlay) return;
 
-            // Prevent body scroll when sidebar is open on mobile
-            const observer = new MutationObserver(() => {
-                if (window.innerWidth < 1024) {
-                    document.body.style.overflow = sidebar.classList.contains('-translate-x-full') ? '' : 'hidden';
-                }
-            });
-            observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
-        };
+    const toggleSidebar = (isOpen) => {
+      sidebar.classList.toggle('-translate-x-full', !isOpen);
+      overlay.classList.toggle('opacity-0', !isOpen);
+      overlay.classList.toggle('pointer-events-none', !isOpen);
+      overlay.classList.toggle('opacity-100', isOpen);
+    };
 
-        // --- Dark Mode ---
-        const applyTheme = (isDark) => {
-            if (isDark) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-        };
+    openBtn.addEventListener('click', () => toggleSidebar(true));
+    closeBtn.addEventListener('click', () => toggleSidebar(false));
+    overlay.addEventListener('click', () => toggleSidebar(false));
 
-        const loadTheme = () => {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const storedTheme = localStorage.getItem(THEME_KEY);
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth < 1024)
+          setTimeout(() => toggleSidebar(false), 100);
+      });
+    });
 
-            let isDark;
-            if (storedTheme === 'dark') {
-                isDark = true;
-            } else if (storedTheme === 'light') {
-                isDark = false;
-            } else {
-                isDark = prefersDark;
-            }
+    const observer = new MutationObserver(() => {
+      if (window.innerWidth < 1024)
+        document.body.style.overflow =
+          sidebar.classList.contains('-translate-x-full') ? '' : 'hidden';
+    });
+    observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+  };
 
-            applyTheme(isDark);
-        };
+  // --- Dark Mode Toggle ---
+  const applyTheme = (isDark) => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
 
-        const initializeDarkModeToggle = () => {
-            const toggleButton = document.getElementById('dark-mode-toggle');
-            if (!toggleButton) return;
+  const initializeDarkModeToggle = () => {
+    const toggleButton = document.getElementById('dark-mode-toggle');
+    if (!toggleButton) return;
 
-            toggleButton.addEventListener('click', () => {
-                const isCurrentlyDark = document.documentElement.classList.contains('dark');
-                const newIsDark = !isCurrentlyDark;
-                applyTheme(newIsDark);
-                localStorage.setItem(THEME_KEY, newIsDark ? 'dark' : 'light');
-            });
-        };
+    toggleButton.addEventListener('click', () => {
+      const isCurrentlyDark = document.documentElement.classList.contains('dark');
+      const newIsDark = !isCurrentlyDark;
+      applyTheme(newIsDark);
+      localStorage.setItem(THEME_KEY, newIsDark ? 'dark' : 'light');
+    });
+  };
 
-        // --- Render App ---
-        const renderApp = () => {
-            lucide.createIcons();
-            initializeSidebarToggle();
-            loadTheme();
-            initializeDarkModeToggle();
-        };
+  // --- Initialize everything ---
+  const renderApp = () => {
+    if (window.lucide) lucide.createIcons();
+    initializeSidebarToggle();
+    initializeDarkModeToggle();
+  };
 
-        document.addEventListener('DOMContentLoaded', renderApp);
-    </script>
+  document.addEventListener('DOMContentLoaded', renderApp);
+</script>
+
 
 
     <!-- Sidebar and Overlay Containers -->

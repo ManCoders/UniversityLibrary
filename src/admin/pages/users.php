@@ -1,3 +1,8 @@
+
+
+<h1 class="text-3xl font-extrabold text-gray-800 dark:text-gray-100 mb-6 border-b dark:border-gray-700 pb-2">
+    User Management Overview
+</h1>
 <!-- Tabs for Adding Accounts / Dashboard -->
 <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
     <nav class="-mb-px flex space-x-4" aria-label="Tabs">
