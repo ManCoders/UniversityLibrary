@@ -98,121 +98,74 @@
                     <div class="border p-4 rounded-md">
                         <!-- Book Cover Image Section -->
                         <div class="mb-2 text-center">
-                            <img id="book-cover-img" src="../../../assets/image/library.png" alt="Sample Book Cover"
-                                class="w-32 h-32 object-cover mx-auto mb-2" />
+                            <img id="auto-book-cover-img" src="../../../assets/image/library.png"
+                                alt="Sample Book Cover" class="w-32 h-32 object-cover mx-auto mb-2" />
                             <p class="text-sm text-gray-500 dark:text-gray-400">Sample Book Cover</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Upload your book cover image here.
                             </p>
 
                             <!-- File Upload for Metadata -->
-                            <input type="file" id="metadata-file-upload"
+                            <input type="file" id="auto-metadata-file-upload"
                                 class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full mb-2"
                                 accept=".pdf">
+
                             <!-- Manual Metadata Fields (for user input) -->
-                            <input type="text" id="manual-book-title" placeholder="Metadata Title"
+                            <input type="text" id="auto-book-title" placeholder="Metadata Title"
                                 class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full mb-2">
-                            <textarea id="manual-book-description" placeholder="Metadata Description"
-                                class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full "
+                            <textarea id="auto-book-description" placeholder="Metadata Description"
+                                class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full"
                                 rows="3"></textarea>
-                            <input type="text" id="manual-author" placeholder="Author"
+                            <input type="text" id="auto-author" placeholder="Author"
                                 class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm mb-2">
-                            <input type="text" id="manual-publisher" placeholder="Publisher"
+                            <input type="text" id="auto-publisher" placeholder="Publisher"
                                 class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm mb-2">
-                            <input type="text" id="manual-isbn" placeholder="ISBN"
+                            <input type="text" id="auto-isbn" placeholder="ISBN"
                                 class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm mb-2">
-                            <input type="text" id="manual-category" placeholder="Category"
+                            <input type="text" id="auto-category" placeholder="Category"
                                 class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm mb-2">
 
-                            <!-- Additional Book Metadata Fields (manual entry) -->
-                            <div id="manual-book-fields" class="grid grid-cols-1 gap-2 ">
-                                <input type="text" id="manual-book-academic-year" placeholder="Academic Year"
+                            <!-- Additional Metadata Fields -->
+                            <div id="auto-book-fields" class="grid grid-cols-1 gap-2">
+                                <input type="text" id="auto-academic-year" placeholder="Academic Year"
                                     class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
-                                <input type="text" id="manual-book-course-name"
-                                    placeholder="Course Name (if applicable)"
+                                <input type="text" id="auto-course-name" placeholder="Course Name (if applicable)"
                                     class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
-                                <input type="text" id="manual-book-course-code"
-                                    placeholder="Course Code (if applicable)"
+                                <input type="text" id="auto-course-code" placeholder="Course Code (if applicable)"
                                     class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
-                                <input type="text" id="manual-keywords" placeholder="Keywords (comma separated)"
+                                <input type="text" id="auto-keywords" placeholder="Keywords (comma separated)"
                                     class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
-
-                                <input type="date" id="manual-publication-date" placeholder="Publication Date"
-                                    class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm ">
-                                <input type="text" id="manual-document-type"
+                                <input type="date" id="auto-publication-date" placeholder="Publication Date"
+                                    class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
+                                <input type="text" id="auto-document-type"
                                     placeholder="Document Type (Research Paper, Thesis, etc.)"
-                                    class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm ">
+                                    class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
                                 <button type="submit"
                                     class="mt-2 mx-auto bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600">
                                     Save Metadata
                                 </button>
                             </div>
                         </div>
-
-                        <!-- Auto-fill Metadata Fields (after file upload) -->
-                        <div id="auto-fill-fields" class="hidden">
-                            <select id="language"
-                                class="p-2 mb-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
-                                <option value="" disabled selected>Select Language</option>
-                                <option value="English">English</option>
-                                <option value="Spanish">Spanish</option>
-                                <option value="French">French</option>
-                            </select>
-                            <input type="text" id="book-title" placeholder="Metadata Title"
-                                class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full mb-2">
-                            <textarea id="book-description" placeholder="Metadata Description"
-                                class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full "
-                                rows="3"></textarea>
-                            <input type="text" id="author" placeholder="Author"
-                                class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm mb-2">
-                            <input type="text" id="publisher" placeholder="Publisher"
-                                class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm mb-2">
-                            <input type="text" id="isbn" placeholder="ISBN"
-                                class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm mb-2">
-                            <input type="text" id="category" placeholder="Category"
-                                class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm mb-2">
-
-                            <!-- Additional Book Metadata Fields -->
-                            <div id="book-fields" class="grid grid-cols-1 gap-2 ">
-                                <input type="text" id="book-academic-year" placeholder="Academic Year"
-                                    class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
-                                <input type="text" id="book-course-name" placeholder="Course Name (if applicable)"
-                                    class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
-                                <input type="text" id="book-course-code" placeholder="Course Code (if applicable)"
-                                    class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
-                                <input type="text" id="keywords" placeholder="Keywords (comma separated)"
-                                    class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
-
-                                <input type="date" id="publication-date" placeholder="Publication Date"
-                                    class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm ">
-                                <input type="text" id="document-type"
-                                    placeholder="Document Type (Research Paper, Thesis, etc.)"
-                                    class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm ">
-                            </div>
-                        </div>
-
                     </div>
                 </div>
 
                 <!-- Right Column (Manual Metadata Entry) -->
                 <div class="border p-4 rounded-md">
-                    <!-- Book Cover Image Section -->
                     <div class="text-center">
-                        <img id="manual-book-cover-img" src="../../../assets/image/library.png" alt="Sample Book Cover"
+                        <img id="manual-cover-img" src="../../../assets/image/library.png" alt="Sample Book Cover"
                             class="w-32 h-32 object-cover mx-auto mb-2" />
                         <p class="text-sm text-gray-500 dark:text-gray-400">Sample Book Cover</p>
                         <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">Upload your book cover image here.</p>
 
-                        <!-- Manual File Upload -->
-                        <input type="file" id="manual-cover-image-upload"
+                        <input type="file" id="manual-cover-upload"
                             class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full mb-2"
                             accept="image/*">
                     </div>
 
-                    <!-- Manual Metadata Fields (for user input) -->
-                    <input type="text" id="manual-book-title" placeholder="Metadata Title"
+                    <!-- Manual Metadata Fields -->
+                    <input type="text" id="manual-title" placeholder="Metadata Title"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full mb-2">
-                    <textarea id="manual-book-description" placeholder="Metadata Description"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full " rows="3" ></textarea>
+                    <textarea id="manual-description" placeholder="Metadata Description"
+                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full" rows="3"></textarea>
                     <input type="text" id="manual-author" placeholder="Author"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm mb-2">
                     <input type="text" id="manual-publisher" placeholder="Publisher"
@@ -222,22 +175,20 @@
                     <input type="text" id="manual-category" placeholder="Category"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm mb-2">
 
-                    <!-- Additional Book Metadata Fields (manual entry) -->
-                    <div id="manual-book-fields" class="grid grid-cols-1 gap-2 ">
-                        <input type="text" id="manual-book-academic-year" placeholder="Academic Year"
+                    <div id="manual-fields" class="grid grid-cols-1 gap-2">
+                        <input type="text" id="manual-academic-year" placeholder="Academic Year"
                             class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
-                        <input type="text" id="manual-book-course-name" placeholder="Course Name (if applicable)"
+                        <input type="text" id="manual-course-name" placeholder="Course Name (if applicable)"
                             class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
-                        <input type="text" id="manual-book-course-code" placeholder="Course Code (if applicable)"
+                        <input type="text" id="manual-course-code" placeholder="Course Code (if applicable)"
                             class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
                         <input type="text" id="manual-keywords" placeholder="Keywords (comma separated)"
                             class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
-
                         <input type="date" id="manual-publication-date" placeholder="Publication Date"
-                            class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm ">
+                            class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
                         <input type="text" id="manual-document-type"
                             placeholder="Document Type (Research Paper, Thesis, etc.)"
-                            class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm ">
+                            class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full text-sm">
                         <button type="submit"
                             class="mt-2 mx-auto bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600">
                             Save Metadata
@@ -246,58 +197,74 @@
                 </div>
 
 
+
             </div>
 
         </form>
     </div>
 
     <script>
-        // Handle file upload for auto-fill
-        document.getElementById('metadata-file-upload').addEventListener('change', function (event) {
+        // --- Handle file upload for auto-fill metadata (Left Column) ---
+        document.getElementById('auto-metadata-file-upload').addEventListener('change', function (event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    const metadata = JSON.parse(e.target.result); // Assuming JSON file
+                    try {
+                        const metadata = JSON.parse(e.target.result); // assuming it's JSON metadata
+                        document.getElementById('auto-book-fields').classList.remove('hidden');
 
-                    // Auto-fill metadata fields
-                    document.getElementById('auto-fill-fields').classList.remove('hidden');
-                    document.getElementById('book-title').value = metadata.title;
-                    document.getElementById('book-description').value = metadata.description;
-                    document.getElementById('author').value = metadata.author;
-                    document.getElementById('publisher').value = metadata.publisher;
-                    document.getElementById('isbn').value = metadata.isbn;
-                    document.getElementById('category').value = metadata.category;
+                        // Fill in metadata fields
+                        document.getElementById('auto-book-title').value = metadata.title || '';
+                        document.getElementById('auto-book-description').value = metadata.description || '';
+                        document.getElementById('auto-author').value = metadata.author || '';
+                        document.getElementById('auto-publisher').value = metadata.publisher || '';
+                        document.getElementById('auto-isbn').value = metadata.isbn || '';
+                        document.getElementById('auto-category').value = metadata.category || '';
 
-                    // Set additional metadata fields
-                    document.getElementById('book-academic-year').value = metadata.academicYear;
-                    document.getElementById('book-course-name').value = metadata.courseName;
-                    document.getElementById('book-course-code').value = metadata.courseCode;
-                    document.getElementById('keywords').value = metadata.keywords.join(', '); // Assuming it's an array
-                    document.getElementById('publication-date').value = metadata.publicationDate;
-                    document.getElementById('document-type').value = metadata.documentType;
+                        // Fill additional metadata
+                        document.getElementById('auto-academic-year').value = metadata.academicYear || '';
+                        document.getElementById('auto-course-name').value = metadata.courseName || '';
+                        document.getElementById('auto-course-code').value = metadata.courseCode || '';
+                        document.getElementById('auto-keywords').value = Array.isArray(metadata.keywords)
+                            ? metadata.keywords.join(', ')
+                            : (metadata.keywords || '');
+                        document.getElementById('auto-publication-date').value = metadata.publicationDate || '';
+                        document.getElementById('auto-document-type').value = metadata.documentType || '';
+                    } catch (error) {
+                        console.error('Invalid JSON file:', error);
+                        alert('Invalid metadata file. Please upload a valid JSON file.');
+                    }
                 };
                 reader.readAsText(file);
             }
         });
 
-        // Handle image upload for both left and right columns
+        // --- Handle image upload preview (reusable function) ---
         function handleImageUpload(inputId, imgId) {
-            document.getElementById(inputId).addEventListener('change', function (event) {
+            const inputEl = document.getElementById(inputId);
+            if (!inputEl) return;
+
+            inputEl.addEventListener('change', function (event) {
                 const file = event.target.files[0];
-                if (file) {
+                if (file && file.type.startsWith('image/')) {
                     const reader = new FileReader();
                     reader.onload = function (e) {
-                        document.getElementById(imgId).src = e.target.result;
+                        const imgEl = document.getElementById(imgId);
+                        if (imgEl) imgEl.src = e.target.result;
                     };
                     reader.readAsDataURL(file);
+                } else {
+                    alert('Please upload a valid image file.');
                 }
             });
         }
 
-        handleImageUpload('manual-cover-image-upload', 'manual-book-cover-img');
-        handleImageUpload('metadata-file-upload', 'book-cover-img');
+        // Initialize image upload handlers
+        handleImageUpload('manual-cover-upload', 'manual-cover-img');
+        handleImageUpload('auto-metadata-file-upload', 'auto-book-cover-img');
     </script>
+
 
 
 
