@@ -46,6 +46,21 @@ if($action === 'Regfaculty'){
 	}
 }
 
+if($action === 'Regstudent'){
+	$logout = $crud->register_student();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+if($action === 'GetFaculty'){
+	$logout = $crud->readUserDetails();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+
 
 
 /* ************** Start section ************** */

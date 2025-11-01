@@ -152,7 +152,7 @@ class Action
                 return json_encode(['status' => 2, 'message' => 'Incorrect username or password.']);
             }
 
-            // Faculty login
+            // Student login
             $stmt = $this->db->prepare("
                 SELECT * FROM user 
                 WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) = ? 
@@ -206,10 +206,6 @@ class Action
             return json_encode(['status' => 500, 'message' => 'Server error: ' . $e->getMessage()]);
         }
     }
-
-
-
-
     function installation()
     {
         $input = json_decode(file_get_contents('php://input'), true);
@@ -284,8 +280,6 @@ class Action
             return json_encode(['status' => 2, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
-
-
     private function saveBase64Image($base64, $prefix)
     {
         if (!preg_match('/^data:image\/(\w+);base64,/', $base64, $type))
@@ -307,8 +301,6 @@ class Action
         file_put_contents($upload_dir . $filename, $data);
         return $filename;
     }
-
-
     function register_faculty()
     {
         $input = json_decode(file_get_contents('php://input'), true);
@@ -317,8 +309,8 @@ class Action
         $required = ['firstname', 'lastname', 'department', 'username', 'password', 'email'];
         foreach ($required as $field) {
             if (empty($input[$field])) {
-                echo json_encode(['status' => 2, 'message' => "Missing required field: $field"]);
-                return;
+                return json_encode(['status' => 2, 'message' => "Missing required field: $field"]);
+
             }
         }
 
@@ -335,7 +327,7 @@ class Action
         // Handle Base64 image
         $profile_pic_path = null;
         if ($profilePicBase64) {
-            $uploadDir = __DIR__ . '/../uploads/faculty_profiles/'; // Make sure this folder exists and is writable
+            $uploadDir = __DIR__ . './auth/uploads/faculty_profiles/'; // Make sure this folder exists and is writable
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
@@ -346,14 +338,14 @@ class Action
                 $type = strtolower($type[1]); // jpg, png, gif
 
                 if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif'])) {
-                    echo json_encode(['status' => 2, 'message' => 'Invalid image type']);
-                    return;
+                    return json_encode(['status' => 2, 'message' => 'Invalid image type']);
+
                 }
 
                 $profilePicBase64 = base64_decode($profilePicBase64);
                 if ($profilePicBase64 === false) {
-                    echo json_encode(['status' => 0, 'message' => 'Base64 decode failed']);
-                    return;
+                    return json_encode(['status' => 0, 'message' => 'Base64 decode failed']);
+
                 }
 
                 $fileName = uniqid('faculty_') . '.' . $type;
@@ -363,12 +355,12 @@ class Action
                     // Store relative path
                     $profile_pic_path = 'uploads/faculty_profiles/' . $fileName;
                 } else {
-                    echo json_encode(['status' => 0, 'message' => 'Failed to save profile picture']);
-                    return;
+                    return json_encode(['status' => 0, 'message' => 'Failed to save profile picture']);
+
                 }
             } else {
-                echo json_encode(['status' => 2, 'message' => 'Invalid image format']);
-                return;
+                return json_encode(['status' => 2, 'message' => 'Invalid image format']);
+
             }
         }
 
@@ -393,37 +385,76 @@ class Action
 
             $stmt->execute([$personal_details, $authentication_data]);
 
-            echo json_encode(['status' => 1, 'message' => 'Faculty added successfully.', 'data' => $input]);
+            return json_encode(['status' => 1, 'message' => 'Faculty added successfully.', 'data' => $input]);
         } catch (PDOException $e) {
-            echo json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
+            return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
         }
     }
-
-
-
-
     function register_student()
     {
         $input = json_decode(file_get_contents('php://input'), true);
 
+        // Validate required fields
         if (
             !$input ||
             !isset($input['firstname'], $input['lastname'], $input['course'], $input['username'], $input['password'], $input['email'])
         ) {
-            echo json_encode(['status' => 2, 'message' => 'Invalid input data.']);
-            return;
+            return json_encode(['status' => 2, 'message' => 'Invalid input data.']);
         }
 
         $firstname = $input['firstname'];
         $lastname = $input['lastname'];
         $course = $input['course'];
+        $department = $input['department'];
         $username = $input['username'];
         $password = $input['password'];
         $email = $input['email'];
+        $profilePicBase64 = isset($input['profile_pic']) ? $input['profile_pic'] : null;
 
+        // Hash password before storing it
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
+        // Handle profile picture if it exists
+        $profile_pic_path = null;
+        if ($profilePicBase64) {
+            $uploadDir = __DIR__ . '/auth/uploads/student_profiles/'; // Make sure this directory exists and is writable
+
+            if (!is_dir($uploadDir)) {
+                if (!mkdir($uploadDir, 0755, true)) {
+                    return json_encode(['status' => 0, 'message' => 'Failed to create upload directory for student profile picture']);
+                }
+            }
+
+            // Extract base64 data from the input
+            if (preg_match('/^data:image\/(\w+);base64,/', $profilePicBase64, $type)) {
+                $profilePicBase64 = substr($profilePicBase64, strpos($profilePicBase64, ',') + 1);
+                $type = strtolower($type[1]); // jpg, png, gif
+
+                // Validate image type
+                if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif'])) {
+                    return json_encode(['status' => 2, 'message' => 'Invalid image type']);
+                }
+
+                $profilePicBase64 = base64_decode($profilePicBase64);
+                if ($profilePicBase64 === false) {
+                    return json_encode(['status' => 0, 'message' => 'Base64 decode failed']);
+                }
+                $fileName = uniqid('student_') . '.' . $type;
+                $filePath = $uploadDir . $fileName;
+
+                if (file_put_contents($filePath, $profilePicBase64) === false) {
+                    return json_encode(['status' => 0, 'message' => 'Failed to save profile picture']);
+                }
+
+                // Store the relative path to the profile picture
+                $profile_pic_path = 'uploads/student_profiles/' . $fileName;
+            } else {
+                return json_encode(['status' => 2, 'message' => 'Invalid image format']);
+            }
+        }
+
         try {
+            // Prepare the SQL query to insert the user data
             $stmt = $this->db->prepare(
                 "INSERT INTO user (personal_details, authentication_data) VALUES (?, ?)"
             );
@@ -432,7 +463,8 @@ class Action
                 'firstname' => $firstname,
                 'lastname' => $lastname,
                 'course' => $course,
-                'profile_pic' => null
+                'department' =>$department,
+                'profile_pic' => $profile_pic_path 
             ]);
 
             $authentication_data = json_encode([
@@ -444,14 +476,46 @@ class Action
 
             $stmt->execute([$personal_details, $authentication_data]);
 
-            echo json_encode(['status' => 1, 'message' => 'Student added successfully.']);
+            return json_encode(['status' => 1, 'message' => 'Student added successfully.']);
         } catch (PDOException $e) {
-            echo json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
+            // Catch any database errors
+            return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
         }
     }
 
 
+    function readUserDetails()
+    {
+        try {
+            // Fetch all faculty users
+            $stmt = $this->db->prepare("
+            SELECT 
+                user_id,
+                JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.firstname')) AS firstname,
+                JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.lastname')) AS lastname,
+                JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.profile_pic')) AS profile_pic,
+                JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.department')) AS department,
+                JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) AS email,
+                JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.user_role')) AS user_role,
+                JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) AS username
+            FROM user
+            ORDER BY user_id DESC
+        ");
+            $stmt->execute();
+            $faculties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            return json_encode([
+                'status' => 1,
+                'data' => $faculties
+            ]);
+
+        } catch (PDOException $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Database error: ' . $e->getMessage()
+            ]);
+        }
+    }
 
 
 }
