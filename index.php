@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>University Campus Library Portal</title>
+    <title><?php get_option('system_title'); ?></title>
 
     <!-- IMMEDIATE THEME LOADER (Vanilla JS to prevent FOUC) -->
     <script>
@@ -55,20 +55,39 @@
     </style>
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans min-h-screen">
+<body
+    class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans min-h-screen">
 
     <!-- Header / Fixed Navigation (Contains Main Title and Auth/Toggle) -->
     <header class="fixed top-0 w-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-md shadow-lg z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
-            <h1 class="text-xl sm:text-2xl font-extrabold text-indigo-700 dark:text-indigo-400">
-                <i data-lucide="graduation-cap" class="inline-block w-6 h-6 mr-1 align-sub"></i>Campus Library Portal
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-0 flex justify-between items-center">
+            <h1 class="flex items-center gap-2  text-indigo-700 dark:text-indigo-400">
+                <img src="./assets/image/<?php echo htmlspecialchars(get_option('system_logo')); ?>"
+                    alt="University Logo"
+                    class="w-14 sm:w-20 h-auto rounded-full border m-2 border-indigo-300 dark:border-indigo-700 shadow-md" />
+                <div class="flex flex-col leading-tight">
+                    <span class="text-lg sm:text-2xl font-extrabold">
+                        <?php echo htmlspecialchars(get_option('system_title')); ?>
+                    </span>
+                    <span
+                        class="text-sm sm:text-base font-medium text-gray-600 dark:text-gray-400 truncate max-w-[200px] sm:max-w-[300px]">
+                        <?php echo htmlspecialchars(get_option('system_description')); ?>
+                    </span>
+                </div>
+
             </h1>
+
+
             <div class="flex items-center gap-3 relative">
                 <!-- Dark Mode Toggle -->
                 <button id="dark-mode-toggle"
                     class="p-2 rounded-full text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition">
                     <!-- Icon attribute is updated dynamically by JS upon load/toggle -->
                     <i id="dark-mode-icon" data-lucide="moon" class="w-5 h-5"></i>
+                </button>
+                <button data-view="home"
+                    class="nav-link text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 font-semibold px-3 py-2 text-sm transition-colors duration-200 focus:outline-none">
+                    <i data-lucide="home" class="inline-block w-4 h-4 mr-1"></i> Home
                 </button>
 
                 <!-- User Authentication Container (Dynamically updated) -->
@@ -116,14 +135,11 @@
             </div>
         </div>
         <!-- Secondary Navigation (The Tabs) -->
-        <nav class="bg-white dark:bg-gray-800 shadow-md border-t dark:border-gray-700">
+        <!-- <nav class="bg-white dark:bg-gray-800 shadow-md border-t dark:border-gray-700">
             <div class="max-w-7xl mx-auto px-4 sm:px-6">
                 <div class="flex space-x-4 h-12">
-                    <button data-view="home"
-                        class="nav-link text-indigo-600 dark:text-indigo-400 border-b-2 border-indigo-600 dark:border-indigo-400 font-semibold px-3 py-2 text-sm transition-colors duration-200 focus:outline-none">
-                        <i data-lucide="home" class="inline-block w-4 h-4 mr-1"></i> Home
-                    </button>
-                    <!-- <button data-view="profile"
+
+                    <button data-view="profile"
                         class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 border-b-2 border-transparent hover:border-indigo-300 dark:hover:border-indigo-600 px-3 py-2 text-sm transition-colors duration-200 focus:outline-none">
                         <i data-lucide="user" class="inline-block w-4 h-4 mr-1"></i> My Profile
                     </button>
@@ -134,10 +150,10 @@
                     <button data-view="settings"
                         class="nav-link text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 border-b-2 border-transparent hover:border-indigo-300 dark:hover:border-indigo-600 px-3 py-2 text-sm transition-colors duration-200 focus:outline-none">
                         <i data-lucide="settings" class="inline-block w-4 h-4 mr-1"></i> Settings
-                    </button> -->
+                    </button>
                 </div>
             </div>
-        </nav>
+        </nav> -->
     </header>
 
     <!-- Main Content Wrapper to handle the padding for the fixed header (Approx. 110-118px height) -->
@@ -147,7 +163,7 @@
         <section id="home-section" class="view-section  overflow-hidden">
             <!-- Hero Section -->
             <section
-                class="p-12  sm:pb-20 text-center px-4 bg-gradient-to-br from-indigo-50 dark:from-gray-900 to-white dark:to-gray-800">
+                class="p-12  text-center px-4 bg-gradient-to-br from-indigo-50 dark:from-gray-900 to-white dark:to-gray-800">
                 <h2 class="text-4xl sm:text-6xl font-extrabold mb-4 text-white leading-tight">
                     <span class="text-indigo-600 dark:text-white-400">Discover</span> Your Academic World
                 </h2>
@@ -211,7 +227,8 @@
 
         <section id="profile-section" class="view-section hidden text-white pt-8 pb-20 max-w-4xl mx-auto px-6 ">
             <h2 class="text-4xl font-bold mb-6 text-indigo-600 dark:text-indigo-400">My Profile</h2>
-            <div class="border-2 border-indigo-200 dark:border-gray-700 dark:bg-gray-800 p-8 rounded-xl shadow-lg space-y-4">
+            <div
+                class="border-2 border-indigo-200 dark:border-gray-700 dark:bg-gray-800 p-8 rounded-xl shadow-lg space-y-4">
                 <p class="text-lg font-medium">Welcome back, <span id="profile-view-username"
                         class="text-indigo-600 dark:text-indigo-400">Guest</span>!</p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
@@ -226,7 +243,8 @@
                     class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition font-medium">Edit
                     Profile</button>
             </div>
-            <div class="mt-8 p-6 border-2 border-indigo-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-lg border-indigo-500">
+            <div
+                class="mt-8 p-6 border-2 border-indigo-200 dark:border-gray-700 dark:bg-gray-800 rounded-xl shadow-lg border-indigo-500">
                 <h3 class="text-xl font-semibold mb-3">Activity Log</h3>
                 <ul class="text-sm space-y-1 text-gray-700 dark:text-gray-300">
                     <li><span class="font-mono text-gray-500 mr-2">2024-10-28:</span> Renewed "Data Structures"</li>
@@ -281,8 +299,7 @@
         </section>
 
         <!-- SETTINGS SECTION -->
-        <section id="settings-section"
-            class="view-section text-white hidden pt-8 pb-20 max-w-4xl mx-auto px-6 ">
+        <section id="settings-section" class="view-section text-white hidden pt-8 pb-20 max-w-4xl mx-auto px-6 ">
             <h2 class="text-4xl font-bold mb-6 text-indigo-600 dark:text-indigo-400">Account Settings</h2>
             <div class="border-2 border-indigo-200   dark:bg-gray-800 p-8 rounded-xl shadow-lg space-y-6">
                 <!-- Theme Preferences -->
@@ -390,7 +407,8 @@
             <button id="close-search" class="absolute top-3 right-3 text-gray-500 hover:text-red-500 transition p-1">
                 <i data-lucide="x" class="w-5 h-5"></i>
             </button>
-            <h3 class="text-xl text-white font-bold mb-4 text-indigo-600 dark:text-indigo-400 border-b pb-2 dark:border-gray-700">
+            <h3
+                class="text-xl text-white font-bold mb-4 text-indigo-600 dark:text-indigo-400 border-b pb-2 dark:border-gray-700">
                 Search Results</h3>
             <div id="search-results" class="space-y-4 text-base text-gray-700 dark:text-gray-300">
                 <p class="text-gray-500 italic">No results yet...</p>
@@ -408,7 +426,7 @@
         </div>
     </footer>
 
-   
+
 </body>
 
 </html>
