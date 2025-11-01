@@ -28,7 +28,7 @@ $(document).ready(function () {
           admin_details,
         };
 
-        console.log("JSON payload ready:", payload);
+        // console.log("JSON payload ready:", payload);
 
         $.ajax({
           url: `${base_url}auth/action.php?action=installation`,
@@ -128,56 +128,71 @@ $(document).ready(function () {
     e.preventDefault();
 
     const username = $("#university-id").val().trim();
-    const password = $("#password").val();
+    const password = $("#password").val().trim();
 
     if (!username || !password) {
-      Swal.fire({
-        icon: "warning",
-        title: "Missing Info",
-        text: "Please enter your username/email and password.",
-      });
+      $("#login-message")
+        .removeClass("hidden text-green-500")
+        .addClass("text-red-500")
+        .text("Please enter both username and password.");
       return;
     }
 
     $.ajax({
-      url: `${base_url}auth/action.php?action=login`, // your PHP login endpoint
+      url: `${base_url}auth/action.php?action=login`,
       type: "POST",
       data: { username: username, password: password },
       dataType: "json",
+
       beforeSend: function () {
         $("#login button[type=submit]")
           .prop("disabled", true)
           .text("Logging in...");
+        $("#login-message")
+          .removeClass("hidden text-red-500 text-green-500")
+          .addClass("text-gray-500")
+          .text("Authenticating...");
       },
+
       success: function (res) {
-        if (res.status === 1) {
-          Swal.fire({
-            icon: "success",
-            title: "Login Successful",
-            text: "Redirecting...",
-            timer: 1500,
-            showConfirmButton: false,
-          }).then(() => {
-            window.location.href = res.redirect_url;
-          });
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Login Failed",
-            text: res.message || "Check your credentials.",
-          });
+        try {
+          // Handle plain-text JSON responses safely
+          if (typeof res === "string") res = JSON.parse(res);
+
+          if (res.status === 1) {
+            $("#login-message")
+              .removeClass("text-gray-500 text-red-500 hidden")
+              .addClass("text-green-500")
+              .text(res.message || "Login successful! Redirecting...");
+
+            setTimeout(() => {
+              window.location.href = res.redirect_url || "./dashboard.php";
+            }, 800);
+          } else {
+            $("#login-message")
+              .removeClass("text-gray-500 text-green-500 hidden")
+              .addClass("text-red-500")
+              .text(res.message || "Invalid username or password.");
+          }
+        } catch (err) {
+          console.error("JSON parse error:", err);
+          $("#login-message")
+            .removeClass("text-gray-500 text-green-500 hidden")
+            .addClass("text-red-500")
+            .text("Unexpected server response. Please try again.");
         }
       },
+
       error: function (xhr, status, error) {
         console.error("Login AJAX error:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Login Failed",
-          text: "Something went wrong. Try again.",
-        });
+        $("#login-message")
+          .removeClass("text-gray-500 text-green-500 hidden")
+          .addClass("text-red-500")
+          .text("Network error. Please try again later.");
       },
+
       complete: function () {
-        $("#login button[type=submit]").prop("disabled", false).text("Log In");
+        $("#login button[type=submit]").prop("disabled", false).text("Sign In");
       },
     });
   });
@@ -206,6 +221,4 @@ $(document).ready(function () {
     });
   });
   /* END LIBRARIAN SETTING PROFILE */
-
-  
 });

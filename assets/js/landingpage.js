@@ -1,4 +1,4 @@
-$(document).ready(function() {
+/* $(document).ready(function() {
     // --- Set current year in footer ---
     $('#current-year').text(new Date().getFullYear());
 
@@ -127,4 +127,4 @@ $(document).ready(function() {
     window.openGuideModal = openGuideModal;
     window.closeGuideModal = closeGuideModal;
     window.performSearch = performSearch;
-});
+}); */

@@ -16,7 +16,7 @@ if (isset($_GET['page']) && in_array($_GET['page'], $allowed_pages)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modular Admin Dashboard</title>
+    <title>Modular faculty Dashboard</title>
     <script>
         tailwind.config = {
             darkMode: 'class',

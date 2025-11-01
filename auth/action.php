@@ -39,34 +39,15 @@ if ($action === 'logout') {
 	}
 }
 
-if ($action === 'register-form') {
-	$registration = $crud->registration_form();
-	if ($registration) {
-		echo $registration;
-	}
-}
-
-
-if ($action === 'feedback') {
-	$logout = $crud->feedback();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if ($action === 'read_feedback') {
-	$logout = $crud->read_feedback();
+if($action === 'Regfaculty'){
+	$logout = $crud->register_faculty();
 	if ($logout) {
 		echo $logout;
 	}
 }
 
 
-if ($action === 'delete_feedback') {
-	$logout = $crud->delete_feedback();
-	if ($logout) {
-		echo $logout;
-	}
-}
 
 /* ************** Start section ************** */
+
+
