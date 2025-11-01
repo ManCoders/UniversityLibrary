@@ -157,16 +157,13 @@ class Action
                 return json_encode(['status' => 2, 'message' => 'Incorrect username or password.']);
             }
 
-            // Decode stored JSON fields
             $auth = json_decode($user['authentication_data'], true);
             $person = json_decode($user['personal_details'], true);
 
-            // Verify password
             if (!password_verify($password, $auth['password'] ?? '')) {
                 return json_encode(['status' => 2, 'message' => 'Incorrect username or password.']);
             }
 
-            // Identify role and session key
             $role = strtolower($auth['user_role'] ?? '');
             $validRoles = ['faculty', 'student'];
 

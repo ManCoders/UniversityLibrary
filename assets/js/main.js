@@ -639,17 +639,22 @@ $(document).ready(function () {
     const msg = chatInput.val().trim();
     if (!msg) return;
 
-    // User message
-    chatMessages.append(
-      `<div class='text-right'><span class='inline-block bg-indigo-500 text-white p-2 rounded-lg max-w-[80%]'>${msg}</span></div>`
-    );
+    // User message (right-aligned)
+    chatMessages.append(`
+    <div class="text-right">
+      <span class="inline-block bg-indigo-600 text-white p-2 rounded-lg max-w-[80%]">
+        ${msg}
+      </span>
+    </div>
+  `);
     chatInput.val("");
     chatMessages.scrollTop(chatMessages[0].scrollHeight); // Scroll to bottom
 
-    // Assistant response
+    // Assistant reply
     setTimeout(() => {
       let reply =
         "I’ll look that up for you! Please log in for detailed assistance.";
+
       if (msg.toLowerCase().includes("hours")) {
         reply = "The main library is open 8:00 AM – 9:00 PM (Mon–Fri).";
       } else if (msg.toLowerCase().includes("metadata")) {
@@ -657,10 +662,14 @@ $(document).ready(function () {
           "Our Smart Metadata Management automatically tags and organizes research papers for easy citation.";
       }
 
-      chatMessages.append(
-        `<div class='text-left'><span class='inline-block text-white bg-gray-200 dark:bg-gray-700 p-2 rounded-lg max-w-[80%]'>${reply}</span></div>`
-      );
-      chatMessages.scrollTop(chatMessages[0].scrollHeight); // Scroll to bottom
+      chatMessages.append(`
+      <div class="text-left">
+        <span class="inline-block bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-2 rounded-lg max-w-[80%]">
+          ${reply}
+        </span>
+      </div>
+    `);
+      chatMessages.scrollTop(chatMessages[0].scrollHeight);
     }, 700);
   }
 
@@ -693,25 +702,37 @@ $(document).ready(function () {
     if (!query) return;
 
     toggleModal(searchModal, true);
+
+    // 🟣 Searching state
     searchResults.html(
-      `<p class='text-white italic'>Searching for "${query}"...</p>`
+      `<p class='text-gray-700 dark:text-gray-300 italic'>Searching for "${query}"...</p>`
     );
 
     setTimeout(() => {
+      // 🟢 Simulated results
       searchResults.html(`
-                        <div class='p-3 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition'>
-                            <a href='#' class='font-semibold  text-white  hover:underline'>Found: The Future of Digital Libraries</a>
-                            <p class='text-sm text-white'>By J. Doe (2023) - Research Paper</p>
-                        </div>
-                        <div class='p-3 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition'>
-                            <a href='#' class='font-semibold  text-white  hover:underline'>Book: Advanced Library Systems Design</a>
-                            <p class='text-sm text-white'>By M. Reyes (2021) - Available in print</p>
-                        </div>
-                        <div class='p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition'>
-                            <a href='#' class='font-semibold  text-white  hover:underline'>Paper: AI in Metadata Extraction</a>
-                            <p class='text-sm text-white'>University Research Archive - Open Access</p>
-                        </div>
-                    `);
+      <div class='p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition'>
+        <a href='#' class='font-semibold text-indigo-700 dark:text-indigo-400 hover:underline'>
+          Found: The Future of Digital Libraries
+        </a>
+        <p class='text-sm text-gray-700 dark:text-gray-300'>By J. Doe (2023) — Research Paper</p>
+      </div>
+
+      <div class='p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition'>
+        <a href='#' class='font-semibold text-indigo-700 dark:text-indigo-400 hover:underline'>
+          Book: Advanced Library Systems Design
+        </a>
+        <p class='text-sm text-gray-700 dark:text-gray-300'>By M. Reyes (2021) — Available in print</p>
+      </div>
+
+      <div class='p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition'>
+        <a href='#' class='font-semibold text-indigo-700 dark:text-indigo-400 hover:underline'>
+          Paper: AI in Metadata Extraction
+        </a>
+        <p class='text-sm text-gray-700 dark:text-gray-300'>University Research Archive — Open Access</p>
+      </div>
+    `);
+
       searchInput.val("");
     }, 800);
   }
@@ -743,8 +764,6 @@ $(document).ready(function () {
     },
   };
 
- 
-
   // --- Apply theme early (before paint) ---
   $(function () {
     const prefersDark = window.matchMedia(
@@ -760,7 +779,5 @@ $(document).ready(function () {
     } else {
       $("html").removeClass("dark");
     }
-
-
   });
 });

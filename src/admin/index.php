@@ -4,15 +4,13 @@ include '../../header.php';
 $allowed_pages = ['dashboard', 'metadata', 'users', 'reports', 'settings'];
 $page = 'dashboard'; // default page
 
-// ✅ Validate page parameter
 if (isset($_GET['page']) && in_array($_GET['page'], $allowed_pages)) {
   $page = $_GET['page'];
 }
-
 if (!isset($_SESSION['admin'])) {
-  header('Location: ../../index.php');
   exit();
 }
+
 ?>
 
 
