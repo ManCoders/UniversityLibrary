@@ -27,7 +27,7 @@ class Action
     }
 
 
-    function logout()
+    /* function logout()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -53,7 +53,45 @@ class Action
             'status' => 1,
             'redirect_url' => './index.php'
         ]);
+    } */
+
+    function logout()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // ✅ Capture user role before destroying the session
+        $role = isset($_SESSION['user_role']) ? strtolower($_SESSION['user_role']) : 'student';
+
+        // ✅ Clear all session data
+        $_SESSION = [];
+        session_unset();
+        session_destroy();
+
+        // ✅ Remove session cookie safely
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params["path"],
+                $params["domain"],
+                $params["secure"],
+                $params["httponly"]
+            );
+        }
+
+        // ✅ Return structured JSON for frontend handling
+        return json_encode([
+            'status' => 1,
+            'user_role' => $role,
+            'message' => 'Logged out successfully.',
+            'redirect_url' => '../'
+        ]);
     }
+
 
 
 
@@ -106,100 +144,61 @@ class Action
                 return json_encode(['status' => 2, 'message' => 'Incorrect password.']);
             }
 
-            // Faculty login
             $stmt = $this->db->prepare("
-                SELECT * FROM user 
-                WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) = ? 
-                OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ? 
-                LIMIT 1
-            ");
+            SELECT * FROM user 
+            WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) = ? 
+            OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ? 
+            LIMIT 1
+        ");
             $stmt->execute([$username, $username]);
-            $citizen = $stmt->fetch(PDO::FETCH_ASSOC);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($citizen) {
-                $auth = json_decode($citizen['authentication_data'], true);
-                $person = json_decode($citizen['personal_details'], true);
-
-                if (password_verify($password, $auth['password'] ?? '')) {
-
-                    // Check if user role is faculty
-                    if (($auth['user_role'] ?? '') !== 'faculty') {
-                        return json_encode(['status' => 4, 'message' => 'User role not permitted.']);
-                    }
-
-                    // Set session for faculty
-                    $_SESSION['faculty'] = [
-                        'firstname' => $person['firstname'] ?? '',
-                        'middlename' => $person['middlename'] ?? '',
-                        'lastname' => $person['lastname'] ?? '',
-                        'email' => $auth['email'] ?? '',
-                        'username' => $auth['username'] ?? '',
-                        'user_role' => $auth['user_role'] ?? '',
-                        'civil_id' => $citizen['civil_id'] ?? null,
-                        'created_date' => $citizen['created_date'] ?? '',
-                        'profile_pic' => $person['profile_pic'] ?? null // <-- correctly use personal_details
-                    ];
-
-                    return json_encode([
-                        'status' => 1,
-                        'redirect_url' => 'src/faculty/',
-                        'user_name' => trim(($person['firstname'] ?? '') . ' ' . ($person['lastname'] ?? '')),
-                        'user_data' => $_SESSION['faculty'] // <-- fixed: was previously $_SESSION['citizen']
-                    ]);
-                }
-
-                // Incorrect password
+            if (!$user) {
                 return json_encode(['status' => 2, 'message' => 'Incorrect username or password.']);
             }
 
-            // Student login
-            $stmt = $this->db->prepare("
-                SELECT * FROM user 
-                WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) = ? 
-                OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ? 
-                LIMIT 1
-            ");
-            $stmt->execute([$username, $username]);
-            $citizen = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Decode stored JSON fields
+            $auth = json_decode($user['authentication_data'], true);
+            $person = json_decode($user['personal_details'], true);
 
-            if ($citizen) {
-                $auth = json_decode($citizen['authentication_data'], true);
-                $person = json_decode($citizen['personal_details'], true);
-
-                if (password_verify($password, $auth['password'] ?? '')) {
-
-                    // Check if user role is faculty
-                    if (($auth['user_role'] ?? '') !== 'student') {
-                        return json_encode(['status' => 4, 'message' => 'User role not permitted.']);
-                    }
-
-                    // Set session for faculty
-                    $_SESSION['student'] = [
-                        'firstname' => $person['firstname'] ?? '',
-                        'middlename' => $person['middlename'] ?? '',
-                        'lastname' => $person['lastname'] ?? '',
-                        'email' => $auth['email'] ?? '',
-                        'username' => $auth['username'] ?? '',
-                        'user_role' => $auth['user_role'] ?? '',
-                        'civil_id' => $citizen['civil_id'] ?? null,
-                        'created_date' => $citizen['created_date'] ?? '',
-                        'profile_pic' => $person['profile_pic'] ?? null // <-- correctly use personal_details
-                    ];
-
-                    return json_encode([
-                        'status' => 1,
-                        'redirect_url' => 'src/student/',
-                        'user_name' => trim(($person['firstname'] ?? '') . ' ' . ($person['lastname'] ?? '')),
-                        'user_data' => $_SESSION['faculty'] // <-- fixed: was previously $_SESSION['citizen']
-                    ]);
-                }
-
-                // Incorrect password
+            // Verify password
+            if (!password_verify($password, $auth['password'] ?? '')) {
                 return json_encode(['status' => 2, 'message' => 'Incorrect username or password.']);
             }
 
-            // User not found
-            return json_encode(['status' => 3, 'message' => 'User not found.']);
+            // Identify role and session key
+            $role = strtolower($auth['user_role'] ?? '');
+            $validRoles = ['faculty', 'student'];
+
+            if (!in_array($role, $validRoles)) {
+                return json_encode(['status' => 4, 'message' => 'User role not permitted.']);
+            }
+
+            // ✅ Common session data
+            $sessionData = [
+                'firstname' => $person['firstname'] ?? '',
+                'middlename' => $person['middlename'] ?? '',
+                'lastname' => $person['lastname'] ?? '',
+                'email' => $auth['email'] ?? '',
+                'username' => $auth['username'] ?? '',
+                'user_role' => $role,
+                'civil_id' => $user['civil_id'] ?? null,
+                'created_date' => $user['created_date'] ?? '',
+                'profile_pic' => $person['profile_pic'] ?? null
+            ];
+
+            // 🧠 Store session dynamically by role
+            $_SESSION[$role] = $sessionData;
+
+            // Determine redirect path
+            $redirect = ($role === 'faculty') ? 'src/faculty/' : './';
+
+            return json_encode([
+                'status' => 1,
+                'redirect_url' => $redirect,
+                'user_name' => trim(($person['firstname'] ?? '') . ' ' . ($person['lastname'] ?? '')),
+                'user_data' => $_SESSION[$role]
+            ]);
 
 
         } catch (Exception $e) {
@@ -463,8 +462,8 @@ class Action
                 'firstname' => $firstname,
                 'lastname' => $lastname,
                 'course' => $course,
-                'department' =>$department,
-                'profile_pic' => $profile_pic_path 
+                'department' => $department,
+                'profile_pic' => $profile_pic_path
             ]);
 
             $authentication_data = json_encode([
