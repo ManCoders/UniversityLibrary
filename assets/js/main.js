@@ -617,7 +617,7 @@ $(document).ready(function () {
       complete: function () {
         $this.text("Loging out...");
         setTimeout(() => {
-          window.location.href = base_url + "./index.php";
+          window.location.href = base_url +"./index.php";
         }, 400);
       },
     });
