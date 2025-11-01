@@ -69,12 +69,10 @@
                     <span class="text-lg sm:text-2xl font-extrabold">
                         <?php echo htmlspecialchars(get_option('system_title')); ?>
                     </span>
-                    <span
-                        class="text-sm sm:text-base font-medium text-gray-600 dark:text-gray-400 truncate max-w-[200px] sm:max-w-[300px]">
+                    <span class="text-sm sm:text-base text-truncate font-medium text-gray-600 dark:text-gray-400">
                         <?php echo htmlspecialchars(get_option('system_description')); ?>
                     </span>
                 </div>
-
             </h1>
 
 

@@ -1,10 +1,6 @@
 <?php
 include '../../header.php';
 
-session_start();
-$username = "John Paul";
-$picture = "https://placehold.co/40x40/6366f1/ffffff?text=JD";
-
 $allowed_pages = ['dashboard', 'metadata', 'users', 'reports', 'settings'];
 $page = 'dashboard'; // default page
 
@@ -27,26 +23,7 @@ if (!isset($_SESSION['admin'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Modular Admin Dashboard</title>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
-          colors: {
-            'indigo-700': '#4338ca',
-            'indigo-600': '#4f46e5',
-            'indigo-50': '#eef2ff',
-          }
-        }
-      }
 
-
-    }
-
-  </script>
   <style>
     .main-content-wrapper {
       transition: margin-left 0.3s ease-in-out;
@@ -60,93 +37,46 @@ if (!isset($_SESSION['admin'])) {
 </head>
 
 <body class="min-h-screen bg-gray-100 font-sans">
+
   <script>
-    const THEME_KEY = 'theme';
+    $(document).ready(function () {
+      const initializeSidebarToggle = () => {
+        const sidebar = document.getElementById('sidebar');
+        const openBtn = document.getElementById('open-sidebar-btn');
+        const closeBtn = document.getElementById('close-sidebar-btn');
+        const overlay = document.getElementById('sidebar-overlay');
 
-    // --- Apply theme early (before paint)
-    (function () {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const storedTheme = localStorage.getItem(THEME_KEY);
-      const isDark =
-        storedTheme === 'dark' || (storedTheme === null && prefersDark);
+        if (!sidebar || !openBtn || !closeBtn || !overlay) return;
 
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+        const toggleSidebar = (isOpen) => {
+          sidebar.classList.toggle('-translate-x-full', !isOpen);
+          overlay.classList.toggle('opacity-0', !isOpen);
+          overlay.classList.toggle('pointer-events-none', !isOpen);
+          overlay.classList.toggle('opacity-100', isOpen);
+        };
 
-      // Prevent white flash
-      document.documentElement.style.visibility = 'hidden';
-      window.addEventListener('DOMContentLoaded', () => {
-        document.documentElement.style.visibility = 'visible';
-      });
-    })();
+        openBtn.addEventListener('click', () => toggleSidebar(true));
+        closeBtn.addEventListener('click', () => toggleSidebar(false));
+        overlay.addEventListener('click', () => toggleSidebar(false));
 
-    // --- Sidebar Toggle ---
-    const initializeSidebarToggle = () => {
-      const sidebar = document.getElementById('sidebar');
-      const openBtn = document.getElementById('open-sidebar-btn');
-      const closeBtn = document.getElementById('close-sidebar-btn');
-      const overlay = document.getElementById('sidebar-overlay');
+        document.querySelectorAll('.nav-link').forEach(link => {
+          link.addEventListener('click', () => {
+            if (window.innerWidth < 1024)
+              setTimeout(() => toggleSidebar(false), 100);
+          });
+        });
 
-      if (!sidebar || !openBtn || !closeBtn || !overlay) return;
-
-      const toggleSidebar = (isOpen) => {
-        sidebar.classList.toggle('-translate-x-full', !isOpen);
-        overlay.classList.toggle('opacity-0', !isOpen);
-        overlay.classList.toggle('pointer-events-none', !isOpen);
-        overlay.classList.toggle('opacity-100', isOpen);
+        const observer = new MutationObserver(() => {
+          if (window.innerWidth < 1024)
+            document.body.style.overflow =
+              sidebar.classList.contains('-translate-x-full') ? '' : 'hidden';
+        });
+        observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
       };
 
-      openBtn.addEventListener('click', () => toggleSidebar(true));
-      closeBtn.addEventListener('click', () => toggleSidebar(false));
-      overlay.addEventListener('click', () => toggleSidebar(false));
 
-      document.querySelectorAll('.nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-          if (window.innerWidth < 1024)
-            setTimeout(() => toggleSidebar(false), 100);
-        });
-      });
-
-      const observer = new MutationObserver(() => {
-        if (window.innerWidth < 1024)
-          document.body.style.overflow =
-            sidebar.classList.contains('-translate-x-full') ? '' : 'hidden';
-      });
-      observer.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
-    };
-
-    // --- Dark Mode Toggle ---
-    const applyTheme = (isDark) => {
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    };
-
-    const initializeDarkModeToggle = () => {
-      const toggleButton = document.getElementById('dark-mode-toggle');
-      if (!toggleButton) return;
-
-      toggleButton.addEventListener('click', () => {
-        const isCurrentlyDark = document.documentElement.classList.contains('dark');
-        const newIsDark = !isCurrentlyDark;
-        applyTheme(newIsDark);
-        localStorage.setItem(THEME_KEY, newIsDark ? 'dark' : 'light');
-      });
-    };
-
-    // --- Initialize everything ---
-    const renderApp = () => {
-      if (window.lucide) lucide.createIcons();
       initializeSidebarToggle();
-      initializeDarkModeToggle();
-    };
-
-    document.addEventListener('DOMContentLoaded', renderApp);
+    });
   </script>
 
 

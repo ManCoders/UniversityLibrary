@@ -726,4 +726,41 @@ $(document).ready(function () {
       toggleModal(searchModal, false);
     }
   });
+
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ["Inter", "sans-serif"],
+        },
+        colors: {
+          "indigo-700": "#4338ca",
+          "indigo-600": "#4f46e5",
+          "indigo-50": "#eef2ff",
+        },
+      },
+    },
+  };
+
+ 
+
+  // --- Apply theme early (before paint) ---
+  $(function () {
+    const prefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
+    const storedTheme = localStorage.getItem(THEME_KEY);
+    const isDark =
+      storedTheme === "dark" || (storedTheme === null && prefersDark);
+
+    // Apply dark or light mode
+    if (isDark) {
+      $("html").addClass("dark");
+    } else {
+      $("html").removeClass("dark");
+    }
+
+
+  });
 });
