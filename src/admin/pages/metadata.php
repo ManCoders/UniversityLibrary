@@ -93,10 +93,10 @@
         </div>
     </div>
     <!-- METADATA TABLE -->
-    <div id="metadata-table-content" class="tab-panel hidden w-full">
-        <div class="overflow-x-auto max-h-96 w-full">
-            <table class="w-full table-fixed border-collapse bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
-                <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
+    <div id="metadata-table-content" class="tab-panel hidden ">
+        <div class="overflow-x-auto max-h-96 ">
+            <table class="w-full border-collapse bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
+                <thead class=" bg-gray-50 dark:bg-gray-700 top-0 z-10">
                     <tr>
                         <th
                             class="w-[5%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -119,7 +119,7 @@
                     </tr>
                 </thead>
                 <tbody id="metadatafile" class="divide-y divide-gray-200 dark:divide-gray-700">
-                    <!-- JS populates rows here -->
+
                 </tbody>
             </table>
         </div>
@@ -197,7 +197,7 @@
                     <p><span class="font-semibold">ISBN:</span> <span id="viewMetaISBN">—</span></p>
                     <p><span class="font-semibold">Folder:</span> <span id="viewMetaFolder">—</span></p>
                     <p><span class="font-semibold">Filename:</span> <span id="viewMetaFilename">—</span></p>
-                    <p><span class="font-semibold">Other Metadata:</span></p>
+                    <p><span class="font-semibold">Metadata:</span></p>
                     <pre id="viewMetaOther"
                         class="bg-gray-100 dark:bg-gray-700 p-2 rounded max-h-48 overflow-auto whitespace-pre-wrap break-words text-sm"></pre>
                 </div>
@@ -234,13 +234,7 @@
                             alert(res.message || "Failed to load metadata");
                             return;
                         }
-
                         const $tbody = $("#metadatafile").empty();
-
-                        // Wrap tbody in a scrollable container if not already
-                        const $scrollWrapper = $("#metadatafile").parent();
-                        $scrollWrapper.css({ overflowX: 'auto', display: 'block' });
-
                         res.data.forEach((item, index) => {
                             const bookId = item.book_id && item.book_id.trim() !== '' ? item.book_id : '—';
                             const folder = item.foldername && item.foldername.trim() !== '' ? item.foldername : '—';
@@ -290,41 +284,62 @@
                                 const data = res.data;
                                 const meta = data.metadata || {};
 
-                                // Build Other Metadata table
-                                let otherRows = '';
-                                for (let key in meta) {
-                                    if (!['Title', 'Author', 'prism:isbn', 'pdfx:isbn'].includes(key)) {
-                                        let value = meta[key];
-                                        if (typeof value === 'object') value = JSON.stringify(value);
-                                        otherRows += `
-                                <tr>
-                                    <td class="px-2 py-1 font-semibold">${key}</td>
-                                    <td class="px-2 py-1 break-words">${value}</td>
-                                </tr>`;
-                                    }
+                                // === Book cover ===
+                                const coverPath = data.cover_path
+                                    ? base_url + 'auth/' + data.cover_path + data.cover
+                                    : "https://via.placeholder.com/150x200?text=No+Cover"; // fallback
+
+                                $("#viewMetaCover")
+                                    .attr("src", coverPath)
+                                    .on("error", function () {
+                                        $(this).attr("src", "https://via.placeholder.com/150x200?text=No+Cover");
+                                    });
+
+                                // === Basic metadata ===
+                                let rawTitle =
+                                    meta.Title ||
+                                    meta.title ||
+                                    (data.filename ? data.filename.replace(/\.[^/.]+$/, "") : "") ||
+                                    meta["dc:title"] ||
+                                    "—";
+
+                                // Extract author inside parentheses from title (e.g. "(Sam Grubb)")
+                                let extractedAuthor = "—";
+                                const authorMatch = rawTitle.match(/\(([^)]+)\)/);
+                                if (authorMatch) {
+                                    extractedAuthor = authorMatch[1].trim(); // get what's inside ()
+                                    rawTitle = rawTitle.replace(/\s*\([^)]+\)\s*$/, "").trim(); // remove it from title
                                 }
 
-                                let content = `
-                        <p><strong>Folder:</strong> ${data.foldername || '—'}</p>
-                        <p><strong>Filename:</strong> ${data.filename || '—'}</p>
-                        <p><strong>Title:</strong> ${meta.Title || '—'}</p>
-                        <p><strong>Author:</strong> ${meta.Author || '—'}</p>
-                        <p><strong>ISBN:</strong> ${meta['prism:isbn']?.ISBN || meta['pdfx:isbn'] || '—'}</p>
-                        ${otherRows ? `
-                            <p><strong>Other Metadata:</strong></p>
-                            <table class="w-full border border-gray-200 dark:border-gray-700 text-sm">
-                                <thead>
-                                    <tr class="bg-gray-100 dark:bg-gray-700">
-                                        <th class="px-2 py-1 text-left">Key</th>
-                                        <th class="px-2 py-1 text-left">Value</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${otherRows}</tbody>
-                            </table>` : ''}
-                    `;
+                                // === Set Title & Author ===
+                                $("#viewMetaTitle").text(rawTitle);
+                                $("#viewMetaAuthor").text(
+                                    meta.Author ||
+                                    meta.author ||
+                                    extractedAuthor ||
+                                    "—"
+                                );
 
-                                $("#viewMetaModal .modal-body").html(content);
-                                $("#viewMetaModal").show();
+
+                                $("#viewMetaISBN").text(
+                                    meta["prism:isbn"]?.ISBN || meta["pdfx:isbn"] || "—"
+                                );
+                                $("#viewMetaFolder").text(data.foldername || "—");
+                                $("#viewMetaFilename").text(data.filename || "—");
+
+                                // === Other metadata ===
+                                let otherMeta = "";
+                                for (let key in meta) {
+                                    if (!["Title", "Author", "prism:isbn", "pdfx:isbn"].includes(key)) {
+                                        let value = meta[key];
+                                        if (typeof value === "object") value = JSON.stringify(value, null, 2);
+                                        otherMeta += `${key}: ${value}\n`;
+                                    }
+                                }
+                                $("#viewMetaOther").text(otherMeta || "No other metadata available.");
+
+                                // === Show modal ===
+                                $("#viewMetaModal").fadeIn(200);
                             } else {
                                 alert(res.message || "Failed to load metadata");
                             }
@@ -333,6 +348,8 @@
                             alert("Server error while fetching metadata");
                         }
                     });
+
+
 
                 } else if ($(this).hasClass("edit-btn")) {
                     // --- Edit Metadata ---
@@ -385,9 +402,10 @@
                         // Populate Other Metadata table
                         const $tbody = $("#otherMetaTable tbody").empty();
                         for (let key in meta) {
-                            if (!['Title', 'Author', 'prism:isbn', 'pdfx:isbn'].includes(key)) {
-                                addMetaRow(key, meta[key]);
-                            }
+                            addMetaRow(key, meta[key]);
+                            /* if (!['Title', 'Author', 'prism:isbn', 'pdfx:isbn'].includes(key)) {
+                                
+                            } */
                         }
 
                         $("#editMetaModal").show();
@@ -402,18 +420,18 @@
             function addMetaRow(key = '', value = '') {
                 if (typeof value === 'object') value = JSON.stringify(value);
                 $("#otherMetaTable tbody").append(`
-        <tr>
-            <td class="border px-2 py-1">
-                <input type="text" class="w-full border px-1 py-1 rounded" name="other_key[]" value="${key}">
-            </td>
-            <td class="border px-2 py-1">
-                <input type="text" class="w-full border px-1 py-1 rounded" name="other_value[]" value="${value}">
-            </td>
-            <td class="border px-2 py-1 text-center">
-                <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded remove-row">X</button>
-            </td>
-        </tr>
-    `);
+                    <tr>
+                        <td class="border px-2 py-1">
+                            <input type="text" class="w-full border px-1 py-1 rounded" name="other_key[]" value="${key}">
+                        </td>
+                        <td class="border px-2 py-1">
+                            <input type="text" class="w-full border px-1 py-1 rounded" name="other_value[]" value="${value}">
+                        </td>
+                        <td class="border px-2 py-1 text-center">
+                            <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded remove-row">X</button>
+                        </td>
+                    </tr>
+                `);
             }
 
             // Remove row
@@ -589,13 +607,99 @@
                             $li.find('.folder-folder-input').click();
                         });
                         // File input change
-
                         $li.find('.folder-file-input').on('change', async function () {
                             const files = this.files;
                             if (!files.length) return;
 
                             const metadataList = [];
-                            const folderName = $li.find('.mainFolder').text(); // Get selected folder name
+                            const folderName = $li.find('.mainFolder').text();
+
+                            const formData = new FormData();
+                            formData.append('folder', folderName);
+
+                            for (let file of files) {
+                                if (file.type !== 'application/pdf') continue; // skip non-PDFs
+
+                                // Add file to FormData
+                                formData.append('files[]', file);
+
+                                // Read file as ArrayBuffer
+                                const arrayBuffer = await file.arrayBuffer();
+                                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+                                // ---------- 1️⃣ Extract Metadata ----------
+                                const meta = await pdf.getMetadata().catch(() => ({}));
+                                const info = meta?.info || {};
+                                const xmp = meta?.metadata ? meta.metadata.getAll() : {};
+                                const combinedMetadata = { ...info, ...xmp };
+                                const filteredMetadata = Object.fromEntries(
+                                    Object.entries(combinedMetadata).filter(
+                                        ([key, value]) => key && value && String(value).trim() !== ''
+                                    )
+                                );
+
+                                // ---------- 2️⃣ Extract Cover Image (first page render) ----------
+                                const page = await pdf.getPage(1);
+                                const scale = 1.5;
+                                const viewport = page.getViewport({ scale });
+
+                                // create off-screen canvas
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+                                canvas.width = viewport.width;
+                                canvas.height = viewport.height;
+
+                                const renderContext = { canvasContext: ctx, viewport };
+                                await page.render(renderContext).promise;
+
+                                // convert canvas to base64 image (PNG)
+                                const coverImageData = canvas.toDataURL('image/png');
+
+                                // Optional: Convert Base64 to Blob if you want to upload it separately
+                                const coverBlob = await (await fetch(coverImageData)).blob();
+                                const coverFileName = file.name.replace(/\.pdf$/i, '_cover.png');
+                                formData.append('covers[]', coverBlob, coverFileName);
+
+                                // ---------- 3️⃣ Add all metadata ----------
+                                metadataList.push({
+                                    foldername: folderName,
+                                    filename: file.name,
+                                    metadata: filteredMetadata,
+                                    cover: coverFileName // link between PDF and cover
+                                });
+                            }
+                            formData.append('metadata', JSON.stringify(metadataList));
+
+                            console.log('metadata', JSON.stringify(metadataList))
+                            // ---------- 4️⃣ Send FormData to backend ----------
+                            $.ajax({
+                                url: base_url + "auth/action.php?action=uploadFile",
+                                method: "POST",
+                                data: formData,
+                                contentType: false,
+                                processData: false,
+                                dataType: 'json',
+                                success: res => {
+                                    if (res.status === 1) {
+                                        alert(res.message || 'File upload Success');
+                                        console.log('Upload success:', res.files);
+                                        loadFolders();
+                                    } else {
+                                        alert(res.message || 'File upload failed');
+                                    }
+                                },
+                                error: () => alert('Server error during file upload')
+                            });
+
+                            $(this).val(''); // reset input
+                        });
+
+                        /* $li.find('.folder-file-input').on('change', async function () {
+                            const files = this.files;
+                            if (!files.length) return;
+
+                            const metadataList = [];
+                            const folderName = $li.find('.mainFolder').text(); 
 
                             const formData = new FormData();
                             formData.append('folder', folderName);
@@ -651,7 +755,7 @@
                             });
 
                             $(this).val(''); // reset input
-                        });
+                        }); */
                         // Folder input change
                         // $li.find('.folder-folder-input').on('change', async function () {
                         //     const files = this.files;
@@ -759,9 +863,10 @@
                                 return;
                             }
 
-                            const metadataList = [];
                             const formData = new FormData();
                             formData.append('folder', folderName);
+
+                            const metadataList = [];
 
                             for (let file of files) {
                                 if (file.type !== 'application/pdf') continue;
@@ -769,9 +874,14 @@
                                 formData.append('files[]', file, file.name);
                                 formData.append('filePaths[]', file.name);
 
-                                const fileMetadata = { foldername: folderName, filename: file.name, metadata: {} };
+                                const fileMetadata = {
+                                    foldername: folderName,
+                                    filename: file.name,
+                                    metadata: {}
+                                };
 
                                 try {
+                                    // --- Read PDF and extract metadata
                                     const arrayBuffer = await file.arrayBuffer();
                                     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                                     const meta = await pdf.getMetadata().catch(() => ({}));
@@ -781,10 +891,31 @@
                                     const combinedMetadata = { ...info, ...xmp };
 
                                     fileMetadata.metadata = Object.fromEntries(
-                                        Object.entries(combinedMetadata).filter(([k, v]) => k && v && String(v).trim() !== '')
+                                        Object.entries(combinedMetadata).filter(([key, value]) =>
+                                            key && value && String(value).trim() !== ''
+                                        )
                                     );
+
+                                    // --- Generate cover (client-side preview optional)
+                                    const page = await pdf.getPage(1);
+                                    const scale = 1.5;
+                                    const viewport = page.getViewport({ scale });
+
+                                    const canvas = document.createElement('canvas');
+                                    const ctx = canvas.getContext('2d');
+                                    canvas.width = viewport.width;
+                                    canvas.height = viewport.height;
+
+                                    await page.render({ canvasContext: ctx, viewport }).promise;
+
+                                    const coverBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                                    const coverBlob = await (await fetch(coverBase64)).blob();
+                                    const coverFileName = file.name.replace(/\.pdf$/i, '_cover.png');
+
+                                    formData.append('covers[]', coverBlob, coverFileName);
+                                    fileMetadata.cover = coverFileName;
                                 } catch (e) {
-                                    console.error('Error processing PDF metadata for:', file.name, e);
+                                    console.warn('⚠️ Error reading PDF metadata or cover:', file.name, e);
                                 }
 
                                 metadataList.push(fileMetadata);
@@ -803,30 +934,33 @@
                                 processData: false,
                                 dataType: 'json',
                                 success: res => {
-                                    $('#upload-spinner').addClass('hidden'); // hide spinner
+                                    $('#upload-spinner').addClass('hidden');
 
                                     if (res.status === 1) {
-                                        console.log('Files uploaded successfully:', res.files);
+                                        console.log('✅ Folder upload success:', res);
 
                                         const $fileList = $li.find('ul').empty();
-                                        if (res.files.length) {
+                                        if (res.files?.length) {
                                             res.files.forEach(f => {
                                                 const $fileItem = $(`
-                            <li class="file bg-white dark:bg-gray-800 px-3 py-1 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
-                                ${f}
-                            </li>
-                        `);
+                                                <li class="file bg-white dark:bg-gray-800 px-3 py-1 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer flex justify-between items-center">
+                                                    <span>${f}</span>
+                                                    <span class="text-xs text-gray-400">${res.folder_name}</span>
+                                                </li>
+                                            `);
                                                 $fileList.append($fileItem);
                                             });
                                         } else {
                                             $fileList.append('<li class="text-gray-400 text-xs italic">No files uploaded</li>');
                                         }
+
+                                        loadFolders(); // optional refresh after upload
                                     } else {
-                                        alert(res.message || 'Folder upload failed');
+                                        alert(res.message || 'Folder upload failed.');
                                     }
                                 },
                                 error: (jqXHR, textStatus, errorThrown) => {
-                                    $('#upload-spinner').addClass('hidden'); // hide spinner
+                                    $('#upload-spinner').addClass('hidden');
                                     console.error("AJAX Error:", textStatus, errorThrown, jqXHR.responseText);
                                     alert('Server error during folder upload. Check console for details.');
                                 }
@@ -834,6 +968,7 @@
 
                             $(this).val(''); // reset input
                         });
+
 
 
 
