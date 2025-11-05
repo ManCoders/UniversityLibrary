@@ -102,7 +102,9 @@ function render_scripts()
         base_url() . 'assets/js/tailwind.js',
         base_url() . 'assets/js/tailwindcss.js',
         base_url() . 'assets/js/landingpage.js',
-        base_url() . 'assets/js/lucide.js'
+        base_url() . 'assets/js/lucide.js'/* ,
+        base_url() . 'assets/js/build/pdf.mjs',
+        base_url() . 'assets/js/build/pdf.worker.mjs' */
     ];
 
     foreach ($scripts as $script) {

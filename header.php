@@ -15,8 +15,9 @@ if (session_status() === PHP_SESSION_NONE) {
     <title><?php echo get_option('system_title') ?></title>
     <?php render_styles(); ?>
     <?php render_scripts(); ?>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script>
+
         var base_url = '<?php echo base_url() ?>';
         const THEME_KEY = "theme";
 
@@ -91,3 +92,15 @@ if (session_status() === PHP_SESSION_NONE) {
 </head>
 
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <div id="upload-spinner" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center hidden z-50">
+        <div class="loader border-4 border-t-4 border-blue-500 rounded-full w-12 h-12 animate-spin"></div>
+    </div>
+
+    <style>
+        .loader {
+            border-top-color: #3498db;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            border-left-color: transparent;
+        }
+    </style>

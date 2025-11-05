@@ -4,10 +4,10 @@
 <!-- Tabs for Adding Accounts / Dashboard -->
 <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
     <nav class="-mb-px flex space-x-4" aria-label="Tabs">
-        <button id="tab-dashboard"
+        <!-- <button id="tab-dashboard"
             class="tab-button border-indigo-500 text-indigo-600 dark:text-indigo-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
             User Dashboard
-        </button>
+        </button> -->
         <button id="tab-faculty"
             class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
             Add New Faculty
@@ -30,8 +30,7 @@
 <!-- Tab Contents -->
 <div id="tab-content">
     <!-- Dashboard -->
-    <div id="dashboard-content" class="tab-panel">
-        <!-- Stats Cards -->
+    <!-- <div id="dashboard-content" class="tab-panel">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-indigo-500">
                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</p>
@@ -55,7 +54,6 @@
             </div>
         </div>
 
-        <!-- Recent User Activity -->
         <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mt-8">
             <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Recent User Activity</h2>
             <div class="space-y-3">
@@ -74,7 +72,6 @@
             </div>
         </div>
 
-        <!-- Extended User Management Section -->
         <div class="mt-12 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
             <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">Extended User Management Tools</p>
             <p class="mt-4 text-gray-500 dark:text-gray-400">
@@ -85,7 +82,7 @@
                 Placeholder for User Charts/Tables
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- Faculty Form -->
     <div id="faculty-content" class="tab-panel hidden">
@@ -320,9 +317,9 @@
         }
 
         // Initial tab
-        activateTab('#tab-dashboard', '#dashboard-content');
+        activateTab('#tab-faculty', '#faculty-content');
 
-        $('#tab-dashboard').click(function () { activateTab('#tab-dashboard', '#dashboard-content'); });
+        // $('#tab-dashboard').click(function () { activateTab('#tab-dashboard', '#dashboard-content'); });
         $('#tab-faculty').click(function () { activateTab('#tab-faculty', '#faculty-content'); });
         $('#tab-student').click(function () { activateTab('#tab-student', '#student-content'); });
         $('#tab-student-table').click(function () { activateTab('#tab-student-table', '#student-table-content'); });
@@ -604,7 +601,6 @@
 
             console.log("Student payload (Base64 image included):", student_details);
         });
-
         /* END STUDENT */
 
     });

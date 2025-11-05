@@ -234,24 +234,53 @@
             <h2 class="text-4xl font-bold mb-6 text-indigo-600 dark:text-indigo-400">My Profile</h2>
 
             <div
-                class="border-2 border-indigo-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg space-y-4">
-                <p class="text-lg font-medium text-gray-800 dark:text-gray-200">
-                    Welcome back,
-                    <span id="profile-view-username" class="text-indigo-600 dark:text-indigo-400">Guest</span>!
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
-                    <p><strong>Status:</strong> <span id="profile-role">N/A</span></p>
-                    <p><strong>Department:</strong> Computer Science</p>
-                    <p><strong>Library ID:</strong> <span id="profile-view-id">N/A</span></p>
-                    <p><strong>Email:</strong> user@university.edu</p>
+                class="border-2 border-indigo-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg space-y-6 max-w-3xl mx-auto">
+
+                <!-- Profile Header -->
+                <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+                    <!-- Profile Picture -->
+                    <div class="relative">
+                        <img id="profile-picture"
+                            src="https://ui-avatars.com/api/?name=Guest&background=4F46E5&color=fff&size=128"
+                            alt="Profile Picture"
+                            class="w-32 h-32 rounded-full border-4 border-indigo-500 shadow-md object-cover">
+                        <button
+                            class="absolute bottom-1 right-1 bg-indigo-600 text-white p-2 rounded-full text-xs hover:bg-indigo-700 transition"
+                            title="Change Photo">
+                            <i data-lucide="camera" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+
+                    <!-- Welcome Text -->
+                    <div class="flex-1 text-center sm:text-left">
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                            Welcome back,
+                            <span id="profile-view-username" class="text-indigo-600 dark:text-indigo-400">Guest</span>!
+                        </p>
+                        <p class="text-gray-500 dark:text-gray-400">Glad to see you again.</p>
+                    </div>
+                </div>
+
+                <!-- Profile Info Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
+                    <p><strong>Status:</strong> <span id="profile-status">N/A</span></p>
+                    <p><strong>Department:</strong><span id="profile-department">N/A</span></p>
+                    <p><strong>Library ID:</strong> <span id="profile-library_id">N/A</span></p>
+                    <p><strong>Email:</strong> <span id="profile-email">N/A</span></p>
                     <p><strong>Checkouts:</strong> 5 / 10 limit</p>
                     <p><strong>Fines:</strong> $0.00</p>
                 </div>
-                <button
-                    class="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-full hover:bg-indigo-700 transition font-medium">
-                    Edit Profile
-                </button>
+
+                <!-- Edit Button -->
+                <div class="flex justify-center sm:justify-end">
+                    <button
+                        class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition font-medium flex items-center gap-2">
+                        <i data-lucide="edit-3" class="w-5 h-5"></i>
+                        Edit Profile
+                    </button>
+                </div>
             </div>
+
 
             <div
                 class="mt-8 p-6 border-2 border-indigo-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
@@ -421,9 +450,9 @@
             </h3>
             <form id="login" class="space-y-4">
                 <input type="text" id="username-input" name="username" placeholder="University ID or Email" required
-                    class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg p-3 dark:bg-gray-700 focus:ring-indigo-500 focus:border-indigo-500 transition text-gray-900 dark:text-gray-100">
+                    class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg p-3 dark:bg-gray-700 focus:ring-indigo-500 focus:border-indigo-500 transition-opacity text-gray-900 dark:text-gray-100">
                 <input type="password" name="password" id="password-input" placeholder="Password" required
-                    class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg p-3 dark:bg-gray-700 focus:ring-indigo-500 focus:border-indigo-500 transition text-gray-900 dark:text-gray-100">
+                    class="w-full border-2 border-gray-300 dark:border-gray-600 rounded-lg p-3 dark:bg-gray-700 focus:ring-indigo-500 focus:border-indigo-500 transition-opacity text-gray-900 dark:text-gray-100">
                 <p id="login-message" class="text-sm text-center text-red-500 hidden"></p>
                 <button type="submit"
                     class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg hover:bg-indigo-700 transition transform hover:scale-[1.01]">Sign

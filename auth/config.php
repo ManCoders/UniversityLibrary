@@ -44,7 +44,13 @@ function db_connect()
                 id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 system_details JSON,
                 created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            )"
+            )",
+            "CREATE TABLE IF NOT EXISTS folder_structure (
+                folder_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                folder_name VARCHAR(50) NOT NULL,
+                folder_data JSON
+            )
+            "
         ];
 
         foreach ($tableQueries as $sql) {

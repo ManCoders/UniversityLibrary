@@ -88,7 +88,7 @@ class Action
             'status' => 1,
             'user_role' => $role,
             'message' => 'Logged out successfully.',
-            'redirect_url' => '../'
+            'redirect_url' => '../../'
         ]);
     }
 
@@ -176,6 +176,7 @@ class Action
                 'firstname' => $person['firstname'] ?? '',
                 'middlename' => $person['middlename'] ?? '',
                 'lastname' => $person['lastname'] ?? '',
+                'department' => $person['department'] ?? '',
                 'email' => $auth['email'] ?? '',
                 'username' => $auth['username'] ?? '',
                 'user_role' => $role,
@@ -513,5 +514,645 @@ class Action
         }
     }
 
+    function createFolder()
+    {
+        // Validate input
+        $folderName = isset($_REQUEST['folder_name']) ? trim($_REQUEST['folder_name']) : null;
+        if (!$folderName) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Folder name is required'
+            ]);
+        }
 
+        // Sanitize folder name (allow letters, numbers, space, dash, underscore)
+        $folderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $folderName);
+        if (!$folderName) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Folder name contains invalid characters'
+            ]);
+        }
+
+        // Define base path
+        $baseDir = __DIR__ . '/files/';
+        if (!is_dir($baseDir)) {
+            mkdir($baseDir, 0777, true);
+        }
+
+        $folderPath = $baseDir . $folderName;
+
+        // Check if folder already exists
+        if (file_exists($folderPath)) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Folder already exists'
+            ]);
+        }
+
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM folder_structure WHERE folder_name = ?");
+        $stmt->execute([$folderName]);
+        if ($stmt->fetchColumn() > 0) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Folder already exists in database'
+            ]);
+        }
+
+        // Create folder
+        if (!mkdir($folderPath, 0777, true)) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Failed to create folder'
+            ]);
+        }
+
+        try {
+            $sql = "INSERT INTO folder_structure (folder_name) VALUES (?)";
+            $stmt = $this->db->prepare($sql);
+            if ($stmt->execute([$folderName])) {
+                return json_encode([
+                    'status' => 1,
+                    'folder' => $folderName,
+                    'message' => 'Folder created successfully'
+                ]);
+            }
+
+
+        } catch (PDOException $e) {
+            if (file_exists($folderPath)) {
+                rmdir($folderPath);
+            }
+            return json_encode([
+                'status' => 0,
+                'message' => 'Database error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+
+
+    function getFolders()
+    {
+
+        $baseDir = __DIR__ . '/files/';
+
+        // Make sure directory exists
+        if (!is_dir($baseDir))
+            mkdir($baseDir, 0777, true);
+
+        $folders = [];
+
+        foreach (scandir($baseDir) as $f) {
+            if ($f === '.' || $f === '..')
+                continue;
+
+            $folderPath = $baseDir . $f;
+            if (is_dir($folderPath)) {
+                $files = [];
+                foreach (scandir($folderPath) as $file) {
+                    if ($file === '.' || $file === '..')
+                        continue;
+                    $files[] = $file;
+                }
+                $folders[] = ['name' => $f, 'files' => $files];
+            }
+        }
+
+        return json_encode(['status' => 1, 'folders' => $folders]);
+    }
+
+    function deleteFolder()
+    {
+        // Get folder name from request
+        $folderName = isset($_POST['folder_name']) ? trim($_POST['folder_name']) : null;
+
+        if (!$folderName) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Folder name is required'
+            ]);
+        }
+
+        // Sanitize folder name
+        $folderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $folderName);
+
+        $baseDir = __DIR__ . '/files/';
+        $folderPath = $baseDir . $folderName;
+
+        if (!is_dir($folderPath)) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Folder does not exist'
+            ]);
+        }
+
+        // Recursive delete function
+        function rrmdir($dir)
+        {
+            if (!is_dir($dir))
+                return;
+            $objects = scandir($dir);
+            foreach ($objects as $object) {
+                if ($object != "." && $object != "..") {
+                    $path = $dir . DIRECTORY_SEPARATOR . $object;
+                    if (is_dir($path))
+                        rrmdir($path);
+                    else
+                        unlink($path);
+                }
+            }
+            rmdir($dir);
+        }
+
+        rrmdir($folderPath);
+
+        // Optional: log deletion in database with current timestamp
+        try {
+            $sql = "DELETE FROM folder_structure WHERE folder_name = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$folderName]);
+            return json_encode([
+                'status' => 1,
+                'message' => "Folder '$folderName' deleted successfully"
+            ]);
+        } catch (PDOException $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Database error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    function uploadFile()
+    {
+        $uploadedFiles = [];
+
+        // Base directory
+        $baseDir = __DIR__ . '/files/';
+
+        // Check if files exist in $_FILES
+        if (empty($_FILES['files'])) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'No files uploaded'
+            ]);
+        }
+
+        // Expect folder name for all files from POST
+        $folderName = isset($_POST['folder']) ? trim($_POST['folder']) : null;
+        if (!$folderName) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Folder name is required'
+            ]);
+        }
+
+        // Sanitize folder name
+        $folderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $folderName);
+
+        // Create folder if it doesn't exist
+        $targetDir = $baseDir . $folderName . '/';
+        if (!is_dir($targetDir))
+            mkdir($targetDir, 0777, true);
+
+        // Move uploaded files
+        foreach ($_FILES['files']['name'] as $key => $filename) {
+            $tmpName = $_FILES['files']['tmp_name'][$key];
+            $safeName = preg_replace('/[^a-zA-Z0-9_\-\.]/', '_', $filename);
+            $destination = $targetDir . $safeName;
+
+            if (move_uploaded_file($tmpName, $destination)) {
+                $uploadedFiles[] = $safeName;
+            }
+        }
+
+        // Handle optional metadata JSON
+        $metadataJson = isset($_POST['metadata']) ? $_POST['metadata'] : null;
+        if ($metadataJson) {
+            $metadataList = json_decode($metadataJson, true);
+
+            $sql = "UPDATE folder_structure SET folder_data = ? WHERE folder_name = ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([json_encode($metadataList, JSON_UNESCAPED_UNICODE), $folderName]);
+        }
+
+        return json_encode([
+            'status' => 1,
+            'message' => 'Files uploaded successfully',
+            'files' => $uploadedFiles
+        ]);
+    }
+
+    /* function uploadFolder()
+    {
+        // 1. Basic Setup and Security Checks
+        $baseDir = __DIR__ . '/files/';
+
+        // Get and Sanitize Root Folder Name
+        $rootFolderName = $_POST['folder'] ?? null;
+        if (!$rootFolderName) {
+            return json_encode(['status' => 0, 'message' => 'Target folder name not provided.']);
+        }
+
+        // Sanitize folder name: Keep letters, numbers, hyphens, underscores, and spaces
+        $safeRootFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $rootFolderName);
+        if (empty($safeRootFolderName)) {
+            return json_encode(['status' => 0, 'message' => 'Invalid folder name after sanitization.']);
+        }
+
+        // 2. Create Target Root Directory
+        $targetDir = $baseDir . $safeRootFolderName . '/';
+        if (!is_dir($targetDir) && !mkdir($targetDir, 0777, true)) {
+            return json_encode(['status' => 0, 'message' => 'Failed to create target folder.']);
+        }
+
+        // 3. Retrieve File Paths for Nested Folders
+        $filePaths = $_POST['filePaths'] ?? [];
+        $uploadedFiles = [];
+
+        // Check if files were uploaded and if the file count matches the paths count
+        $fileCount = count($_FILES['files']['name'] ?? []);
+        if ($fileCount > 0 && $fileCount === count($filePaths)) {
+
+            for ($index = 0; $index < $fileCount; $index++) {
+
+                if ($_FILES['files']['error'][$index] !== UPLOAD_ERR_OK) {
+                    continue; // Skip file with upload error
+                }
+
+                $tmpName = $_FILES['files']['tmp_name'][$index];
+                $relativePath = $filePaths[$index]; // The full path (e.g., 'subfolder/document.pdf')
+
+                // Security: Strip '..' to prevent directory traversal outside the $targetDir
+                $relativePath = str_replace(['../', '..\\'], '', $relativePath);
+
+                // Full destination path including potential subfolders
+                $destination = $targetDir . $relativePath;
+
+                // 4. Create subfolders if needed
+                $folderPath = dirname($destination);
+
+                if (!is_dir($folderPath) && !mkdir($folderPath, 0777, true)) {
+                    error_log("Failed to create subfolder: " . $folderPath);
+                    continue; // Skip file if subfolder creation fails
+                }
+
+                // 5. Move the uploaded file
+                if (move_uploaded_file($tmpName, $destination)) {
+                    $uploadedFiles[] = $relativePath;
+                } else {
+                    error_log("Failed to move uploaded file to: " . $destination);
+                }
+            }
+        }
+
+        // 6. Handle and Save Metadata to JSON File 
+        // This is the logic you wanted to confirm is present and working.
+        $metadataList = [];
+
+        if (!empty($_POST['metadata'])) {
+            $metadataJson = $_POST['metadata'];
+            $metadataList = json_decode($metadataJson, true);
+
+            if ($metadataList !== null && is_array($metadataList)) {
+
+                // Use sanitized folder name
+                $folderName = $rootFolderName ?? 'NewFolder';
+
+                // Save metadata in database
+                $sql = "UPDATE folder_structure SET folder_data = ? WHERE folder_name = ?";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([json_encode($metadataList, JSON_UNESCAPED_UNICODE), $folderName]);
+
+                // Save metadata.json in the folder
+                $metadataFilePath = $targetDir . 'metadata.json';
+                if (!is_dir($targetDir))
+                    mkdir($targetDir, 0777, true);
+                file_put_contents($metadataFilePath, json_encode($metadataList, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+            }
+        }
+
+
+        // 7. Final Response
+        return json_encode([
+            'status' => 1,
+            'message' => 'Folder and files uploaded successfully (' . count($uploadedFiles) . ' files saved). Metadata saved to metadata.json.',
+            'folder_name' => $safeRootFolderName,
+            'files' => $uploadedFiles,
+            'metadata_count' => count($metadataList)
+        ]);
+
+
+    } */
+
+    function uploadFolder(){
+        $baseDir = __DIR__ . '/files/';
+        $rootFolderName = $_POST['folder'] ?? null;
+
+        if (!$rootFolderName) {
+            return json_encode(['status' => 0, 'message' => 'Target folder name not provided.']);
+        }
+
+        $safeRootFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $rootFolderName);
+        if (empty($safeRootFolderName)) {
+            return json_encode(['status' => 0, 'message' => 'Invalid folder name after sanitization.']);
+        }
+
+        $targetDir = $baseDir . $safeRootFolderName . '/';
+        if (!is_dir($targetDir) && !mkdir($targetDir, 0777, true)) {
+            return json_encode(['status' => 0, 'message' => 'Failed to create target folder.']);
+        }
+
+        $uploadedFiles = [];
+        $filePaths = $_POST['filePaths'] ?? [];
+
+        // 1. Get folder ID from DB
+        $sqlFolder = "SELECT folder_id, folder_data FROM folder_structure WHERE folder_name = ?";
+        $stmtFolder = $this->db->prepare($sqlFolder);
+        $stmtFolder->execute([$safeRootFolderName]);
+        $folderData = $stmtFolder->fetch(PDO::FETCH_ASSOC);
+        $folderId = $folderData['folder_id'] ?? null;
+        $existingMetadata = $folderData ? json_decode($folderData['folder_data'], true) : [];
+
+        if (!is_array($existingMetadata))
+            $existingMetadata = [];
+
+        // 2. Process uploaded files
+        if (!empty($_FILES['files']['name'])) {
+            foreach ($_FILES['files']['name'] as $index => $name) {
+                $relativePath = $filePaths[$index] ?? $name;
+                if (strpos($relativePath, '/') !== false)
+                    continue; // skip subfolders
+
+                $tmpName = $_FILES['files']['tmp_name'][$index];
+                if ($_FILES['files']['error'][$index] !== UPLOAD_ERR_OK)
+                    continue;
+
+                $destination = $targetDir . basename($relativePath);
+                if (move_uploaded_file($tmpName, $destination)) {
+                    $uploadedFiles[] = basename($relativePath);
+                }
+            }
+        }
+        function generateBookId($length = 6)
+        {
+            $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            $randomStr = '';
+            for ($i = 0; $i < $length; $i++) {
+                $randomStr .= $characters[rand(0, strlen($characters) - 1)];
+            }
+            return $randomStr;
+        }
+        // 3. Merge metadata
+        $newMetadata = [];
+        if (!empty($_POST['metadata'])) {
+            $metadataJson = $_POST['metadata'];
+            $newMetadata = json_decode($metadataJson, true);
+            if (!is_array($newMetadata))
+                $newMetadata = [];
+
+            // Add book_id and folder_id to each file
+            foreach ($newMetadata as &$meta) {
+                $meta['id'] = generateBookId();
+                $meta['folder_id'] = $folderId;
+            }
+            unset($meta);
+        }
+
+        // 4. Merge with existing metadata (avoid duplicates)
+        $allMetadata = [];
+        foreach ($existingMetadata as $m) {
+            if (!in_array($m['filename'], array_column($newMetadata, 'filename'))) {
+                $allMetadata[] = $m;
+            }
+        }
+        $allMetadata = array_merge($allMetadata, $newMetadata);
+
+        // 5. Save back to DB and JSON file
+        $sqlUpdate = "UPDATE folder_structure SET folder_data = ? WHERE folder_name = ?";
+        $stmtUpdate = $this->db->prepare($sqlUpdate);
+        $stmtUpdate->execute([json_encode($allMetadata, JSON_UNESCAPED_UNICODE), $safeRootFolderName]);
+
+        file_put_contents($targetDir . 'metadata.json', json_encode($allMetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+        return json_encode([
+            'status' => 1,
+            'message' => 'Files uploaded and metadata updated successfully.',
+            'folder_name' => $safeRootFolderName,
+            'folder_id' => $folderId,
+            'files' => $uploadedFiles,
+            'metadata_count' => count($allMetadata)
+        ]);
+    }
+
+    function getMetadata()
+    {
+        $sql = "SELECT folder_name, folder_data FROM folder_structure";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $metadataArray = [];
+
+        // Recursive function to traverse nested folder_data
+        $traverseFiles = function ($files, $folderName) use (&$metadataArray, &$traverseFiles) {
+            foreach ($files as $file) {
+                if (isset($file['filename'])) {
+                    $meta = $file['metadata'] ?? [];
+
+                    // Book ID
+                    $bookId = $file['id'] ?? 'NA';
+
+                    // Title
+                    $title = $meta['Title']
+                        ?? ($meta['dc:title'] ?? null)
+                        ?? ($meta['pdf:title'] ?? null)
+                        ?? ($meta['title'] ?? null)
+                        ?? pathinfo($file['filename'], PATHINFO_FILENAME);
+
+                    // Author
+                    $author = $meta['Author']
+                        ?? ($meta['dc:creator'][0] ?? null)
+                        ?? ($meta['pdf:author'] ?? null)
+                        ?? ($meta['author'] ?? null)
+                        ?? 'Unknown';
+
+                    // ISBN
+                    $isbn = '';
+                    if (!empty($meta['prism:isbn'])) {
+                        if (is_array($meta['prism:isbn'])) {
+                            $isbn = $meta['prism:isbn']['ISBN'] ?? '';
+                            $isbn = $meta['isbn'] ?? '';
+                        } else {
+                            $isbn = $meta['prism:isbn'];
+                            $isbn = $meta['isbn']?? '';
+                        }
+                    }
+
+                    $metadataArray[] = [
+                        'book_id' => $bookId,
+                        'foldername' => $folderName,
+                        'filename' => $file['filename'], // actual file name
+                        'title' => $title,
+                        'author' => $author,
+                        'isbn' => $isbn
+                    ];
+                }
+
+                // Recurse for nested subfolders
+                if (!empty($file['children']) && is_array($file['children'])) {
+                    $traverseFiles($file['children'], $folderName);
+                }
+            }
+        };
+
+        foreach ($rows as $row) {
+            $data = json_decode($row['folder_data'], true);
+            if (!empty($data) && is_array($data)) {
+                $traverseFiles($data, $row['folder_name']);
+            }
+        }
+
+        return json_encode([
+            'status' => 1,
+            'data' => $metadataArray
+        ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    }
+
+    // View metadata
+    function viewmeta()
+    {
+        $bookId = $_POST['book_id'] ?? '';
+        if (!$bookId) {
+            return json_encode(['status' => 0, 'message' => 'Book ID not provided']);
+        }
+
+        $sql = "SELECT folder_id, folder_name, folder_data FROM folder_structure";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($rows as $row) {
+            $folderId = $row['folder_id'];
+            $folderName = $row['folder_name'];
+            $data = json_decode($row['folder_data'], true) ?? [];
+
+            foreach ($data as $file) {
+                if (!empty($file['id']) && $file['id'] === $bookId) {
+                    $file['foldername'] = $folderName;
+                    $file['folder_id'] = $folderId;
+                    return json_encode([
+                        'status' => 1,
+                        'data' => $file
+                    ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+                }
+            }
+        }
+
+        return json_encode(['status' => 0, 'message' => 'Book not found']);
+    }
+
+
+    function editmeta()
+    {
+        $bookId = $_POST['book_id'] ?? '';
+        $metadataJson = $_POST['metadata'] ?? '';
+
+        if (!$bookId || empty($metadataJson)) {
+            return json_encode(['status' => 0, 'message' => 'Invalid input']);
+        }
+
+        $newMetadata = json_decode($metadataJson, true);
+        if (!is_array($newMetadata)) {
+            return json_encode(['status' => 0, 'message' => 'Invalid metadata format']);
+        }
+
+        // Get all folders
+        $sql = "SELECT folder_name, folder_data FROM folder_structure";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($rows as $row) {
+            $folderName = $row['folder_name'];
+            $data = json_decode($row['folder_data'], true) ?? [];
+            $updated = false;
+
+            foreach ($data as &$file) {
+                if (!empty($file['id']) && $file['id'] === $bookId) {
+                    // Update metadata
+                    $file['metadata'] = array_merge($file['metadata'] ?? [], $newMetadata);
+                    $updated = true;
+                    break;
+                }
+            }
+
+            if ($updated) {
+                // Save to database
+                $updateSql = "UPDATE folder_structure SET folder_data = ? WHERE folder_name = ?";
+                $stmtUpdate = $this->db->prepare($updateSql);
+                $stmtUpdate->execute([json_encode($data, JSON_UNESCAPED_UNICODE), $folderName]);
+
+                // Save to metadata.json
+                $folderPath = __DIR__ . '/files/' . $folderName . '/metadata.json';
+                file_put_contents($folderPath, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+                return json_encode(['status' => 1, 'message' => 'Metadata updated successfully']);
+            }
+        }
+
+        return json_encode(['status' => 0, 'message' => 'Book not found']);
+    }
+
+    function deletemeta()
+    {
+        $bookId = $_POST['book_id'] ?? '';
+        if (!$bookId) {
+            return json_encode(['status' => 0, 'message' => 'Book ID not provided']);
+        }
+
+        $sql = "SELECT folder_id, folder_name, folder_data FROM folder_structure";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($rows as $row) {
+            $folderId = $row['folder_id'];
+            $folderName = $row['folder_name'];
+            $data = json_decode($row['folder_data'], true) ?? [];
+            $newData = [];
+            $deleted = false;
+
+            foreach ($data as $file) {
+                if (!empty($file['id']) && $file['id'] === $bookId) {
+                    // Delete the file from folder if it exists
+                    $filePath = __DIR__ . '/files/' . $folderName . '/' . ($file['filename'] ?? '');
+                    if (file_exists($filePath))
+                        unlink($filePath);
+                    $deleted = true;
+                    continue; // skip adding this file to newData
+                }
+                $newData[] = $file;
+            }
+
+            if ($deleted) {
+                // Update DB
+                $updateSql = "UPDATE folder_structure SET folder_data = ? WHERE folder_id = ?";
+                $stmtUpdate = $this->db->prepare($updateSql);
+                $stmtUpdate->execute([json_encode($newData, JSON_UNESCAPED_UNICODE), $folderId]);
+
+                // Update metadata.json
+                $folderPath = __DIR__ . '/files/' . $folderName . '/metadata.json';
+                file_put_contents($folderPath, json_encode($newData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+
+                return json_encode(['status' => 1, 'message' => 'Book deleted successfully']);
+            }
+        }
+
+        return json_encode(['status' => 0, 'message' => 'Book not found']);
+    }
+
+
+    
 }

@@ -60,6 +60,78 @@ if($action === 'GetFaculty'){
 	}
 }
 
+if($action === 'createFolder'){
+	$logout = $crud->createFolder();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+if($action === 'getFolders'){
+	$logout = $crud->getFolders();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+if($action === 'deleteFolder'){
+	$logout = $crud->deleteFolder();
+	if ($logout) {
+		echo $logout;
+	}
+}
+if($action === 'uploadFile'){
+	$logout = $crud->uploadFile();
+	if ($logout) {
+		echo $logout;
+	}
+}
+if($action === 'uploadFolder'){
+	$logout = $crud->uploadFolder();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+if($action === 'getMetadata'){
+	$logout = $crud->getMetadata();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+
+
+
+if($action === 'viewmeta'){
+	$logout = $crud->viewmeta();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+
+if($action === 'editmeta'){
+	$logout = $crud->editmeta();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+
+if($action === 'deletemeta'){
+	$logout = $crud->deletemeta();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+
+
+
+
+
+
 
 
 

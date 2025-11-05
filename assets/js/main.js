@@ -228,6 +228,7 @@ $(document).ready(function () {
   let userState = {
     isLoggedIn: false,
     username: "guest",
+    user_id: "N/A",
     role: "N/A",
     profilePic: null,
   };
@@ -343,8 +344,18 @@ $(document).ready(function () {
       // Use the 'username' from state, which is set from 'user_name' or 'user_data.username' on login
       const usernameText = `User: ${userState.username}`;
       $("#profile-username").text(usernameText);
-      $("#profile-view-username").text(userState.username); // Update profile view name
+      $("#profile-picture")
+        .attr("src", `${base_url}auth/${userState.profilePic}`)
+        .on("error", function () {
+          $(this).attr(
+            "src",
+            "https://ui-avatars.com/api/?name=Guest&background=4F46E5&color=fff"
+          );
+        });
 
+      $("#profile-view-username").text(userState.username); // Update profile view name
+      $("#profile-department").text(userState.department);
+      $("#profile-email").text(userState.email);
       // Use a mock ID or a real one if the backend provided it
       $("#profile-view-id").text(
         userState.civil_id ||
@@ -491,6 +502,8 @@ $(document).ready(function () {
             const userData = res.user_data || {};
             userState.isLoggedIn = true;
             userState.username = res.user_name || userData.username || username;
+            userState.email = userData.email || "student";
+            userState.department = userData.department || "N/AS";
             userState.role = userData.user_role || "student";
             userState.profilePic = userData.profile_pic || null;
             userState.civil_id = userData.civil_id || null;
@@ -500,7 +513,7 @@ $(document).ready(function () {
               .addClass("text-green-500")
               .text(res.message || "Login successful!")
               .show();
-
+            console.log(userState);
             // ✅ Save user data locally
             localStorage.setItem("userState", JSON.stringify(userState));
 
@@ -617,7 +630,7 @@ $(document).ready(function () {
       complete: function () {
         $this.text("Loging out...");
         setTimeout(() => {
-          window.location.href = base_url +"./index.php";
+          window.location.href = base_url + "./index.php";
         }, 400);
       },
     });

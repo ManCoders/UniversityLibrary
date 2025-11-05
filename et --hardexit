@@ -1,0 +1,50 @@
+[33m14f501d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mroot[m[33m, [m[1;31morigin/root[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{0}: reset: moving to 14f501df0f064b3a0a7675b2991d8d323df122cb
+[33ma43c32b[m HEAD@{1}: reset: moving to a43c32b5c5aad0c455e4c0b0cd267e359065e808
+[33m86a115b[m HEAD@{2}: revert: Reapply "123"
+[33ma43c32b[m HEAD@{3}: revert: Revert "123"
+[33m14f501d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mroot[m[33m, [m[1;31morigin/root[m[33m, [m[1;31morigin/HEAD[m[33m)[m HEAD@{4}: commit: 123
+[33m236908e[m HEAD@{5}: reset: moving to 236908e754a30c11d8628223a4623cc243f9daef
+[33m717a7f3[m HEAD@{6}: reset: moving to 717a7f3ba46a100a89b399b022b05fef5d58c603
+[33mf7e5536[m HEAD@{7}: rebase (finish): returning to refs/heads/root
+[33mf7e5536[m HEAD@{8}: rebase (squash): Revert "12"
+[33m14eb6ea[m HEAD@{9}: rebase (pick): 12
+[33m717a7f3[m HEAD@{10}: rebase (pick): 123
+[33m236908e[m HEAD@{11}: rebase (start): checkout c7eae63e8aaaa6ab90bc9b1a2bb05f8c499fdd54^
+[33m3e75369[m HEAD@{12}: reset: moving to HEAD
+[33m3e75369[m HEAD@{13}: commit: Revert "12"
+[33mcb8b377[m HEAD@{14}: reset: moving to cb8b377d0e6c2fd8d4beebe6a99760fbb9313f8a
+[33m78a889d[m HEAD@{15}: revert: Revert "12"
+[33mcb8b377[m HEAD@{16}: commit: 123
+[33mc7eae63[m HEAD@{17}: reset: moving to c7eae63e8aaaa6ab90bc9b1a2bb05f8c499fdd54
+[33m97eae6c[m HEAD@{18}: checkout: moving from c7eae63e8aaaa6ab90bc9b1a2bb05f8c499fdd54 to root
+[33mc7eae63[m HEAD@{19}: checkout: moving from root to c7eae63e8aaaa6ab90bc9b1a2bb05f8c499fdd54
+[33m97eae6c[m HEAD@{20}: checkout: moving from 30e696448744947dbea7d7247a1a86d3942633b1 to root
+[33m30e6964[m HEAD@{21}: checkout: moving from root to 30e696448744947dbea7d7247a1a86d3942633b1
+[33m97eae6c[m HEAD@{22}: commit: 13
+[33mc7eae63[m HEAD@{23}: rebase (finish): returning to refs/heads/root
+[33mc7eae63[m HEAD@{24}: rebase (squash): 12
+[33mf9b9716[m HEAD@{25}: rebase (start): checkout f9b97169785674f46c345d8dcaaa4d29bab7389f^
+[33mc932896[m HEAD@{26}: reset: moving to HEAD
+[33mc932896[m HEAD@{27}: reset: moving to c93289675b7d7d87e671af604390e82b665c9a2d
+[33m3b6901e[m HEAD@{28}: reset: moving to 3b6901e6cadfa53a534571314ef794b8349ce59d
+[33m94090ec[m HEAD@{29}: commit: 123
+[33m3b6901e[m HEAD@{30}: commit: 13
+[33mc932896[m HEAD@{31}: commit: 12
+[33mf9b9716[m HEAD@{32}: commit: metadata fixed
+[33m236908e[m HEAD@{33}: commit: 123
+[33m30e6964[m HEAD@{34}: commit: final
+[33m3a12d75[m HEAD@{35}: commit: darkmode
+[33mb732699[m HEAD@{36}: commit: 3123
+[33me5c9b23[m HEAD@{37}: commit: qweqweqw
+[33m628a8ac[m HEAD@{38}: commit: ARTDRYFA
+[33mef50e7e[m HEAD@{39}: commit: 12312
+[33me15ddc8[m HEAD@{40}: commit: 123
+[33mcefc338[m HEAD@{41}: commit: 123
+[33m8880f12[m HEAD@{42}: commit: asdasd
+[33m9c02209[m HEAD@{43}: commit: asdas
+[33m9c43a3b[m HEAD@{44}: commit: 123
+[33m24425ff[m HEAD@{45}: commit: test
+[33mea98bef[m HEAD@{46}: commit: test
+[33m1cefaa2[m HEAD@{47}: commit: 12312312312
+[33m689279f[m HEAD@{48}: commit: asda
+[33m20af43d[m HEAD@{49}: clone: from https://github.com/ManCoders/UniversityLibrary.git
