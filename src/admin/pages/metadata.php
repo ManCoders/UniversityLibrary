@@ -93,44 +93,39 @@
         </div>
     </div>
     <!-- METADATA TABLE -->
-    <div id="metadata-table-content" class="tab-panel hidden">
-        <div class="overflow-x-auto">
-            <table
-                class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
+    <div id="metadata-table-content" class="tab-panel hidden w-full">
+        <div class="overflow-x-auto max-h-96 w-full">
+            <table class="w-full table-fixed border-collapse bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
                 <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
                     <tr>
                         <th
-                            class="px-1 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            class="w-[5%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             #</th>
                         <th
-                            class="px-2 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Book ID</th>
-
+                            class="w-[15%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Book&nbsp;ID</th>
                         <th
-                            class="px-5 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            class="w-[25%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Title</th>
                         <th
-                            class="px-5 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            class="w-[20%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Author</th>
                         <th
-                            class="px-3 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            class="w-[15%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             ISBN</th>
                         <th
-                            class="px-3 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            class="w-[20%] px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Actions</th>
                     </tr>
                 </thead>
+                <tbody id="metadatafile" class="divide-y divide-gray-200 dark:divide-gray-700">
+                    <!-- JS populates rows here -->
+                </tbody>
             </table>
-            <div class="overflow-y-auto max-h-75">
-                <table
-                    class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 text-xs">
-                    <tbody id="metadatafile">
-                        <!-- JS populates rows here -->
-                    </tbody>
-                </table>
-            </div>
         </div>
     </div>
+
+
 
     <!-- Edit Metadata Modal -->
     <div id="editMetaModal"
@@ -254,19 +249,20 @@
                             const isbn = item.isbn && item.isbn.trim() !== '' ? item.isbn : '—';
 
                             const row = `
-                                <tr>
-                                    <td class="px-3 py-2">${index + 1}</td>
-                                    <td class="px-4 py-2 truncate max-w-xs" title="${bookId}">${bookId}</td>
-                                    <td class="px-7 py-2 truncate max-w-xs" title="${title}">${title}</td>
-                                    <td class="px-6 py-2 truncate max-w-xs" title="${author}">${author}</td>
-                                    <td class="px-5 py-2 truncate max-w-xs" title="${isbn}">${isbn}</td>
-                                    <td class="px-3 py-2 text-center truncate max-w-xs space-x-1">
-                                        <button class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs view-btn" data-id="${bookId}">View</button>
-                                        <button class="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs edit-btn" data-id="${bookId}">Edit</button>
-                                        <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs delete-btn" data-id="${bookId}">Delete</button>
-                                    </td>
-                                </tr>
-                            `;
+                                        <tr>
+                                            <td class="px-4 py-2 text-center">${index + 1}</td>
+                                            <td class="px-4 py-2 truncate max-w-xs" title="${bookId}">${bookId}</td>
+                                            <td class="px-4 py-2 truncate max-w-xs" title="${title}">${title}</td>
+                                            <td class="px-4 py-2 truncate max-w-xs" title="${author}">${author}</td>
+                                            <td class="px-4 py-2 truncate max-w-xs" title="${isbn}">${isbn}</td>
+                                            <td class="px-4 py-2 text-center space-x-1">
+                                                <button class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs view-btn" data-id="${bookId}">View</button>
+                                                <button class="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs edit-btn" data-id="${bookId}">Edit</button>
+                                                <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs delete-btn" data-id="${bookId}">Delete</button>
+                                            </td>
+                                        </tr>
+                                        `;
+
                             $tbody.append(row);
                         });
                     },

@@ -1,151 +1,90 @@
 [
     {
-        "foldername": "test",
-        "filename": "Clean Architectures in Python A practical approach to better software design, 2nd Edition (2023 Update) (Leonardo Giordani).pdf",
-        "metadata": {
-            "PDFFormatVersion": "1.5",
-            "Creator": "LaTeX with hyperref package",
-            "Title": "Clean Architectures in Python",
-            "Author": "Leonardo Giordani",
-            "Producer": "XeTeX 0.99998",
-            "CreationDate": "D:20230509162939-00'00'"
-        },
-        "id": "8TUDP1",
-        "folder_id": "33"
-    },
-    {
-        "foldername": "test",
-        "filename": "Facilitating Software Architecture Empowering Teams to Make Architectural Decisions (Andrew Harmel-Law) 2024.pdf",
+        "foldername": "TEST",
+        "filename": "Linux Cookbook Essential Skills for Linux Users and System  Network Administrators (Carla Schroder).pdf",
         "metadata": {
             "PDFFormatVersion": "1.6",
             "Language": "EN",
-            "Author": "Andrew Harmel-Law;",
-            "CreationDate": "D:20241108183446Z",
+            "IsLinearized": "true",
+            "Author": "Carla Schroder",
+            "CreationDate": "D:20210812164954Z",
             "Creator": "AH CSS Formatter V6.2 MR4 for Linux64 : 6.2.6.18551 (2014\/09\/24 15:00JST)",
-            "ModDate": "D:20241108135243-05'00'",
-            "Producer": "Antenna House PDF Output Library 6.2.609 (Linux64)",
-            "Title": "Facilitating Software Architecture",
-            "Trapped": "{",
             "Custom": "{",
-            "xmp:createdate": "2024-11-08T18:34:46Z",
+            "ModDate": "D:20210825123000+03'00'",
+            "Producer": "Antenna House PDF Output Library 6.2.609 (Linux64)",
+            "Title": "Linux Cookbook",
+            "Trapped": "{",
+            "xmp:createdate": "2021-08-12T16:49:54Z",
             "xmp:creatortool": "AH CSS Formatter V6.2 MR4 for Linux64 : 6.2.6.18551 (2014\/09\/24 15:00JST)",
-            "xmp:modifydate": "2024-11-08T13:52:43-05:00",
-            "xmp:metadatadate": "2024-11-08T13:52:43-05:00",
+            "xmp:modifydate": "2021-08-25T12:30+03:00",
+            "xmp:metadatadate": "2021-08-25T12:30+03:00",
             "pdf:producer": "Antenna House PDF Output Library 6.2.609 (Linux64)",
             "pdf:trapped": "False",
             "dc:format": "application\/pdf",
-            "dc:title": "Facilitating Software Architecture",
+            "dc:title": "Linux Cookbook",
             "dc:creator": "[",
-            "xmpmm:documentid": "uuid:5c01098c-b69a-7841-b9be-ebb0de333376",
-            "xmpmm:instanceid": "uuid:b174b040-3f80-8646-8367-a7fb3dd1bb7e",
+            "xmpmm:documentid": "uuid:48d8eead-5e75-3f47-a787-14fdadc46f8f",
+            "xmpmm:instanceid": "uuid:1b752dda-eb45-4d01-b6ff-3188bd1c2f87",
             "prism:isbn": []
         },
-        "id": "ROPEMI",
-        "folder_id": "33"
+        "id": "ABQVGX",
+        "folder_id": "36"
     },
     {
-        "foldername": "test",
-        "filename": "Fundamentals of Software Architecture An Engineering Approach (Mark Richards, Neal Ford).pdf",
+        "foldername": "TEST",
+        "filename": "Mastering Linux System Administration (Christine Bresnahan, Richard Blum).pdf",
         "metadata": {
             "PDFFormatVersion": "1.6",
-            "Language": "\n’",
-            "IsLinearized": true,
-            "Author": "Mark Richards and Neal Ford",
-            "CreationDate": "D:20210205190958Z",
-            "Creator": "AH CSS Formatter V6.2 MR4 for Linux64 : 6.2.6.18551 (2014\/09\/24 15:00JST)",
+            "Author": "Bresnahan, Christine; Blum, Richard; ",
+            "CreationDate": "D:20210625011413+05'30'",
+            "ModDate": "D:20210629212233+05'30'",
+            "Producer": "iTextSharpŽ 5.5.5 ©2000-2014 iText Group NV (AGPL-version); modified using iTextSharp™ 5.5.5 ©2000-2014 iText Group NV (AGPL-version)",
+            "Title": "Mastering Linux System Administration",
             "Custom": {
-                "EBX_PUBLISHER": "O'Reilly Media, Incorporated"
+                "EBX_PUBLISHER": "John Wiley & Sons, Incorporated"
             },
-            "ModDate": "D:20210914110451+03'00'",
-            "Producer": "Antenna House PDF Output Library 6.2.609 (Linux64)",
-            "Title": "Fundamentals of Software Architecture",
-            "Trapped": {
-                "name": "False"
-            },
-            "xmp:createdate": "2021-02-05T19:09:58Z",
-            "xmp:creatortool": "AH CSS Formatter V6.2 MR4 for Linux64 : 6.2.6.18551 (2014\/09\/24 15:00JST)",
-            "xmp:modifydate": "2021-09-14T11:04:51+03:00",
-            "xmp:metadatadate": "2021-09-14T11:04:51+03:00",
-            "pdf:producer": "Antenna House PDF Output Library 6.2.609 (Linux64)",
-            "pdf:trapped": "False",
             "dc:format": "application\/pdf",
-            "dc:title": "Fundamentals of Software Architecture",
             "dc:creator": [
-                "Mark Richards and Neal Ford"
+                "Christine Bresnahan"
             ],
-            "xmpmm:documentid": "uuid:bf5f42b0-5aae-a94f-893a-15da507198b7",
-            "xmpmm:instanceid": "uuid:6cb581c9-9fdb-4a96-98e8-53b62fdd3eb5"
+            "dc:title": "MasteringLinux® System Administration",
+            "xmp:createdate": "2021-06-25T01:14:13+05:30",
+            "xmp:modifydate": "2021-06-29T21:22:33+05:30",
+            "xmp:metadatadate": "2021-06-29T21:22:33+05:30",
+            "pdf:producer": "iTextSharpŽ 5.5.5 ©2000-2014 iText Group NV (AGPL-version); modified using iTextSharp™ 5.5.5 ©2000-2014 iText Group NV (AGPL-version)",
+            "xmpmm:documentid": "uuid:b19c84d5-ed8d-494c-bfb0-31eca1cd9589",
+            "xmpmm:instanceid": "uuid:e7ff082a-eb3d-4484-9362-6311569619c8"
         },
-        "id": "JIZPRP",
-        "folder_id": "33"
+        "id": "RV5A2A",
+        "folder_id": "36"
     },
     {
-        "foldername": "test",
-        "filename": "Software Architecture and Decision-Making (Srinath Perera) 2024.pdf",
+        "foldername": "TEST",
+        "filename": "Modern System Administration Building and Maintaining Reliable Systems (Ninth Early Release) (Jennifer Davis Tabitha Sable, Chris Devers).pdf",
         "metadata": {
             "PDFFormatVersion": "1.4",
-            "Author": "Srinath Perera;",
-            "CreationDate": "D:20240301214256+00'00'",
-            "ModDate": "D:20240301214256+00'00'",
-            "Title": "Software Architecture and Decision-Making",
-            "calibre:timestamp": "2024-03-01T22:42:53.316093+01:00",
-            "dc:date": "2024-03-15T01:00:00+01:00",
+            "Author": "Jennifer Davis",
+            "CreationDate": "D:20211006054902+00'00'",
+            "Creator": "calibre (5.26.0) [http:\/\/calibre-ebook.com]",
+            "ModDate": "D:20211005224903-08'00'",
+            "Producer": "calibre (5.26.0) [http:\/\/calibre-ebook.com]",
+            "Title": "Modern System Administration",
+            "dc:title": "Modern System Administration",
+            "dc:description": "<span><div><p>Early system administration required in-depth knowledge of a variety of services on individual systems. Now, the job is increasingly complex and different from one company to the next with an ever-growing list of technologies and third-party services to integrate. How does any one individual stay relevant in systems and services? This practical guide helps anyone in operations—sysadmins, automation engineers, IT professionals, and site reliability engineers—understand the essential concepts of the role today.<\/p><p>Collaboration, automation, and the evolution of systems change the fundamentals of operations work. No matter where you are in your journey, this book provides you the information to craft your path to advancing essential system administration skills. Author Jennifer Davis provides examples of modern practices and tools with recommended materials to advance your skills.<\/p><p>Topics include:<\/p><ul>Development and testing: Version control, fundamentals of virtualization and containers, testing, and architecture reviewDeploying and configuring services: Infrastructure management, networks, security, storage, serverless, and release managementScaling administration: Monitoring and observability, capacity planning, log management and analysis, and security and compliance<\/ul><\/div><\/span>",
+            "dc:creator": [
+                "Jennifer Davis"
+            ],
+            "dc:publisher": "O'Reilly Media, Inc.",
+            "dc:date": "2022-05-25T00:00:00-07:00",
             "dc:language": "en",
-            "dc:publisher": "Pearson Education (US)",
-            "dc:title": "Software Architecture and Decision-Making",
-            "xmp:metadatadate": "2024-03-01T22:42:58.886032+01:00"
+            "xmp:identifier": "isbn9781492055211",
+            "xmp:metadatadate": "2021-10-05T22:49:04.206269-07:00",
+            "prism:isbn": "9781492055211",
+            "pdfx:isbn": "9781492055211",
+            "calibre:timestamp": "2021-10-05T22:46:19.871791-07:00",
+            "calibre:author_sort": "Jennifer Davis"
         },
-        "id": "5O4EKI",
-        "folder_id": "33"
-    },
-    {
-        "foldername": "test",
-        "filename": "Software Architecture in Practice, 4th Edition (Rough Cut) (Len Bass Paul Clements Rick Kazman).pdf",
-        "metadata": {
-            "PDFFormatVersion": "1.4",
-            "Author": "Len Bass & Paul Clements & Rick Kazman",
-            "CreationDate": "D:20210619033938Z",
-            "Creator": "calibre (5.21.0) [https:\/\/calibre-ebook.com]",
-            "ModDate": "D:20210619054700+02'00'",
-            "Producer": "calibre (5.21.0) [https:\/\/calibre-ebook.com]",
-            "Subject": "The Definitive, Practical, Proven Guide to Architecting Modern Software--Now Fully Updated<\/strong><\/p><p>Now with nine new chapters, <em><strong>Software Architecture in Practice, Fourth Edition,<\/strong><\/em> thoroughly explains what software architecture is, why it’s important, and how to design, instantiate, analyze, evolve, and manage it in disciplined and effective ways.<\/p><p>Three renowned software architects cover the entire lifecycle, presenting practical guidance, expert methods, and tested models for use in any project, no matter how complex. You'll learn how to use architecture to address accelerating growth in requirements, system size, and abstraction, and to manage emergent quality attributes as systems are dynamically combined in new ways.<\/p><p>With insights for utilizing architecture to optimize key quality attributes--including performance, modifiability, security, availability, interoperability, testability, usability, deployability, and more--this guide explains how to manage and refine existing architectures, transform them to solve new problems, and build reusable architectures that become strategic business assets.<\/p><ul><li><p>Discover how architecture influences (and is influenced by) technical environments, project lifecycles, business profiles, and your own practices<\/p><\/li><li><p>Leverage proven patterns, interfaces, and practices for optimizing quality through architecture<\/p><\/li><li><p>Architect for mobility, the cloud, machine learning, and quantum computing<\/p><\/li><li><p>Design for increasingly crucial attributes such as energy efficiency and safety<\/p><\/li><li><p>Scale systems by discovering architecturally significant influences, using DevOps and deployment pipelines, and managing architecture debt<\/p><\/li><li><p>Understand architecture's role in the organization, so you can deliver more value",
-            "Title": "Software Architecture in Practice, 4th Edition",
-            "Custom": "{",
-            "dc:format": "application\/pdf",
-            "dc:title": "Software Architecture in Practice, 4th Edition",
-            "dc:description": "The Definitive, Practical, Proven Guide to Architecting Modern Software--Now Fully Updated<\/strong><\/p><p>Now with nine new chapters, <em><strong>Software Architecture in Practice, Fourth Edition,<\/strong><\/em> thoroughly explains what software architecture is, why it’s important, and how to design, instantiate, analyze, evolve, and manage it in disciplined and effective ways.<\/p><p>Three renowned software architects cover the entire lifecycle, presenting practical guidance, expert methods, and tested models for use in any project, no matter how complex. You'll learn how to use architecture to address accelerating growth in requirements, system size, and abstraction, and to manage emergent quality attributes as systems are dynamically combined in new ways.<\/p><p>With insights for utilizing architecture to optimize key quality attributes--including performance, modifiability, security, availability, interoperability, testability, usability, deployability, and more--this guide explains how to manage and refine existing architectures, transform them to solve new problems, and build reusable architectures that become strategic business assets.<\/p><ul><li><p>Discover how architecture influences (and is influenced by) technical environments, project lifecycles, business profiles, and your own practices<\/p><\/li><li><p>Leverage proven patterns, interfaces, and practices for optimizing quality through architecture<\/p><\/li><li><p>Architect for mobility, the cloud, machine learning, and quantum computing<\/p><\/li><li><p>Design for increasingly crucial attributes such as energy efficiency and safety<\/p><\/li><li><p>Scale systems by discovering architecturally significant influences, using DevOps and deployment pipelines, and managing architecture debt<\/p><\/li><li><p>Understand architecture's role in the organization, so you can deliver more value",
-            "dc:creator": "[",
-            "dc:publisher": "Addison-Wesley Professional",
-            "dc:date": "2021-06-19T00:00:00+02:00",
-            "dc:language": "en",
-            "xmp:metadatadate": "2021-06-19T05:47+02:00",
-            "xmp:createdate": "2021-06-19T03:39:38Z",
-            "xmp:creatortool": "calibre (5.21.0) [https:\/\/calibre-ebook.com]",
-            "xmp:modifydate": "2021-06-19T05:47+02:00",
-            "xmp:identifier": "9780136885979isbn",
-            "prism:isbn": [],
-            "pdfx:isbn": "9780136885979",
-            "calibre:timestamp": "2021-06-19T05:35:25.383875+02:00",
-            "calibre:title_sort": "Software Architecture in Practice, 4th Edition",
-            "calibre:author_sort": "Len Bass",
-            "pdf:producer": "calibre (5.21.0) [https:\/\/calibre-ebook.com]",
-            "xmpmm:documentid": "uuid:29c99581-bc57-4022-b9a7-f1acb7cb33dd",
-            "xmpmm:instanceid": "uuid:4fc59990-2688-47f7-a6b8-44587ab72bb9"
-        },
-        "id": "KMGZC0",
-        "folder_id": "33"
-    },
-    {
-        "foldername": "test",
-        "filename": "Software Architecture visual lecture notes (Cesare Pautasso)2023.pdf",
-        "metadata": {
-            "PDFFormatVersion": "1.5",
-            "Creator": "LaTeX with hyperref",
-            "Title": "Software Architecture: visual lecture notes",
-            "Producer": "xdvipdfmx (20211117)",
-            "CreationDate": "D:20230220171633+01'00'"
-        },
-        "id": "STE7YW",
-        "folder_id": "33"
+        "id": "RKCRY9",
+        "folder_id": "36"
     }
 ]
