@@ -124,105 +124,6 @@ $(document).ready(function () {
     }
   });
 
-  /* $("#login").on("submit", function (e) {
-    e.preventDefault();
-
-    const username = $("#university-id").val().trim();
-    const password = $("#password").val().trim();
-
-    if (!username || !password) {
-      $("#login-message")
-        .removeClass("hidden text-green-500")
-        .addClass("text-red-500")
-        .text("Please enter both username and password.");
-      return;
-    }
-
-    $.ajax({
-      url: `${base_url}auth/action.php?action=login`,
-      type: "POST",
-      data: { username: username, password: password },
-      dataType: "json",
-
-      beforeSend: function () {
-        $("#login button[type=submit]")
-          .prop("disabled", true)
-          .text("Logging in...");
-        $("#login-message")
-          .removeClass("hidden text-red-500 text-green-500")
-          .addClass("text-gray-500")
-          .text("Authenticating...");
-      },
-
-      success: function (res) {
-        try {
-          // Handle plain-text JSON responses safely
-          if (typeof res === "string") res = JSON.parse(res);
-
-          if (res.status === 1) {
-            $("#login-message")
-              .removeClass("text-gray-500 text-red-500 hidden")
-              .addClass("text-green-500")
-              .text(res.message || "Login successful! Redirecting...");
-
-            setTimeout(() => {
-              window.location.href = res.redirect_url || "./dashboard.php";
-            }, 800);
-          } else {
-            $("#login-message")
-              .removeClass("text-gray-500 text-green-500 hidden")
-              .addClass("text-red-500")
-              .text(res.message || "Invalid username or password.");
-          }
-        } catch (err) {
-          console.error("JSON parse error:", err);
-          $("#login-message")
-            .removeClass("text-gray-500 text-green-500 hidden")
-            .addClass("text-red-500")
-            .text("Unexpected server response. Please try again.");
-        }
-      },
-
-      error: function (xhr, status, error) {
-        console.error("Login AJAX error:", error);
-        $("#login-message")
-          .removeClass("text-gray-500 text-green-500 hidden")
-          .addClass("text-red-500")
-          .text("Network error. Please try again later.");
-      },
-
-      complete: function () {
-        $("#login button[type=submit]").prop("disabled", false).text("Sign In");
-      },
-    });
-  }); */
-
-  /* $("body").on("click", "#logout", function (e) {
-    e.preventDefault();
-    const $this = $(this);
-    $.ajax({
-      url: base_url + "auth/action.php?action=logout",
-      method: "POST",
-      dataType: "json",
-      beforeSend: function () {
-        $this.text("Logging out.");
-      },
-      success: function (response) {
-        if (response.status == 1) {
-          window.location.href =
-            base_url + (response.redirect_url || "index.php");
-        } else {
-          console.log(response.message);
-        }
-      },
-      error: function () {
-        console.error("AJAX error");
-      },
-    });
-  }); */
-  /* END LIBRARIAN SETTING PROFILE */
-
-  /* INDEX FUNCTION */
 
   // --- GLOBAL STATE ---
   let userState = {
@@ -232,9 +133,6 @@ $(document).ready(function () {
     role: "N/A",
     profilePic: null,
   };
-
-  // --- SESSION PERSISTENCE ---
-  // Check localStorage for a saved user session
   const savedState = localStorage.getItem("userState");
   if (savedState) {
     try {
@@ -248,14 +146,11 @@ $(document).ready(function () {
     }
   }
 
-  // 1. Initial Icon Rendering & Footer Year
   if (typeof lucide !== "undefined" && lucide.createIcons) {
-    // Renders all Lucide icons initially
     lucide.createIcons();
   }
   $("#current-year").text(new Date().getFullYear());
 
-  // 2. Dark Mode Logic (Synchronization and Listener)
   const THEME_KEY = "theme";
   const htmlElement = $("html");
   const darkModeIcon = $("#dark-mode-icon");
@@ -265,32 +160,24 @@ $(document).ready(function () {
    * @param {boolean} isDark - True to set dark mode, false for light.
    */
   function applyTheme(isDark) {
-    // Toggle classes based on new state
     htmlElement.toggleClass("dark", isDark).toggleClass("light", !isDark);
 
-    // Update the icon attribute (sun for dark mode, moon for light mode)
     darkModeIcon.attr("data-lucide", isDark ? "sun" : "moon");
 
-    // Re-render the specific icon element
     if (typeof lucide !== "undefined" && lucide.createIcons) {
       lucide.createIcons();
     }
   }
 
-  // SYNCHRONIZE INITIAL ICON STATE: Check the theme set by the FOUC script and set the correct icon
   const isDarkInitial = htmlElement.hasClass("dark");
   applyTheme(isDarkInitial);
 
   // Dark Mode Toggle Click Handler
   $("#dark-mode-toggle").on("click", function () {
-    // Determine the new state (toggle the current state)
     const isDark = !htmlElement.hasClass("dark");
     applyTheme(isDark);
-    // Persist the preference
     localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
   });
-
-  // Theme selectors in Settings
   $(".theme-select").on("click", function () {
     const theme = $(this).data("theme");
     let isDark;
@@ -403,7 +290,6 @@ $(document).ready(function () {
     toggleProfileDropdown(false);
   }
 
-  // Hide/Show Profile Dropdown
   function toggleProfileDropdown(show) {
     const isVisible = profileDropdown.hasClass("hidden");
     show = show === undefined ? isVisible : show; // Toggle if no argument provided
@@ -417,9 +303,7 @@ $(document).ready(function () {
     }
   }
 
-  // Listeners for Profile/Dropdown
   profileBtn.on("click", () => toggleProfileDropdown());
-  // Close dropdown if user clicks anywhere outside of the button or dropdown
   $(document).on("click", function (e) {
     if (
       userState.isLoggedIn &&
@@ -456,7 +340,6 @@ $(document).ready(function () {
     }
   });
 
-  // ✅ Handle Login Form Submission (REAL BACKEND)
   $("#login").on("submit", function (e) {
     e.preventDefault();
     const $form = $(this);
@@ -580,8 +463,6 @@ $(document).ready(function () {
     });
   });
 
-  // Handle Logout
-  // ✅ Handle Logout (Full Reset for Admin/Faculty)
   $("body").on("click", "#logout", function (e) {
     e.preventDefault();
 
@@ -636,9 +517,8 @@ $(document).ready(function () {
     });
   });
 
-  // Initialize UI state (checks localStorage)
   updateHeaderUI();
-  showView("home"); // Ensure we start on the home tab
+  showView("home"); 
 
   // 5. Chatbot Logic
   const chatbox = $("#chatbox");
