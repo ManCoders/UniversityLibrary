@@ -606,7 +606,8 @@
                             e.stopPropagation();
                             $li.find('.folder-folder-input').click();
                         });
-                        // File input change
+
+
                         $li.find('.folder-file-input').on('change', async function () {
                             const files = this.files;
                             if (!files.length) return;
@@ -679,178 +680,42 @@
                                 contentType: false,
                                 processData: false,
                                 dataType: 'json',
+
+                                // 🔹 Show spinner before upload starts
+                                beforeSend: function () {
+                                    $('#upload-spinner').removeClass('hidden').show();
+                                    console.log("📤 File upload started...");
+                                },
+
                                 success: res => {
+                                    console.log("✅ Upload response:", res);
+
                                     if (res.status === 1) {
-                                        alert(res.message || 'File upload Success');
-                                        console.log('Upload success:', res.files);
+                                        alert(res.message || '✅ File upload success');
+                                        console.log('Uploaded files:', res.files);
                                         loadFolders();
                                     } else {
-                                        alert(res.message || 'File upload failed');
+                                        alert(res.message || '❌ File upload failed');
                                     }
                                 },
-                                error: () => alert('Server error during file upload')
+
+                                // 🔹 Handle any server error
+                                error: (jqXHR, textStatus, errorThrown) => {
+                                    console.error("🚨 AJAX Error:", textStatus, errorThrown, jqXHR.responseText);
+                                    alert('Server error during file upload. Check console for details.');
+                                },
+
+                                // 🔹 Always hide spinner after completion
+                                complete: function () {
+                                    $('#upload-spinner').fadeOut(200).addClass('hidden');
+                                    console.log("✅ File upload complete");
+                                }
                             });
+
 
                             $(this).val(''); // reset input
                         });
 
-                        /* $li.find('.folder-file-input').on('change', async function () {
-                            const files = this.files;
-                            if (!files.length) return;
-
-                            const metadataList = [];
-                            const folderName = $li.find('.mainFolder').text(); 
-
-                            const formData = new FormData();
-                            formData.append('folder', folderName);
-
-                            for (let file of files) {
-                                if (file.type !== 'application/pdf') continue; // skip non-PDFs
-
-                                // Add file to FormData
-                                formData.append('files[]', file);
-
-                                // Extract metadata
-                                const arrayBuffer = await file.arrayBuffer();
-                                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                                const meta = await pdf.getMetadata().catch(() => ({}));
-                                const info = meta?.info || {};
-                                const xmp = meta?.metadata ? meta.metadata.getAll() : {};
-                                const combinedMetadata = { ...info, ...xmp };
-                                const filteredMetadata = Object.fromEntries(
-                                    Object.entries(combinedMetadata).filter(
-                                        ([key, value]) => key && value && String(value).trim() !== ''
-                                    )
-                                );
-
-                                metadataList.push({
-                                    foldername: folderName,
-                                    filename: file.name,
-                                    metadata: filteredMetadata
-                                });
-
-                            }
-
-                            // Add metadata JSON to FormData
-                            formData.append('metadata', JSON.stringify(metadataList));
-
-                            // Send FormData to backend
-                            $.ajax({
-                                url: base_url + "auth/action.php?action=uploadFile",
-                                method: "POST",
-                                data: formData,
-                                contentType: false,
-                                processData: false,
-                                dataType: 'json',
-                                success: res => {
-                                    if (res.status === 1) {
-                                        alert(res.message || 'File upload Success');
-                                        console.log('Upload success:', res.files);
-                                        loadFolders();
-                                    } else {
-                                        alert(res.message || 'File upload failed');
-                                    }
-                                },
-                                error: () => alert('Server error during file upload')
-                            });
-
-                            $(this).val(''); // reset input
-                        }); */
-                        // Folder input change
-                        // $li.find('.folder-folder-input').on('change', async function () {
-                        //     const files = this.files;
-                        //     if (!files.length) return;
-
-                        //     const folderName = $li.find('.mainFolder').text().trim(); // Target root folder name
-
-                        //     if (!folderName) {
-                        //         alert('Could not determine the target folder name.');
-                        //         $(this).val('');
-                        //         return;
-                        //     }
-
-                        //     const metadataList = [];
-                        //     const formData = new FormData();
-                        //     // 1. Send the root folder name separately
-                        //     formData.append('folder', folderName);
-
-                        //     const processingPromises = [];
-
-                        //     for (let i = 0; i < files.length; i++) {
-                        //         const file = files[i];
-                        //         const filePath = file.webkitRelativePath || file.name;
-
-                        //         formData.append('files[]', file);
-                        //         formData.append('filePaths[]', filePath);
-
-                        //         const processFile = async () => {
-                        //             const fileMetadata = {
-                        //                 foldername: folderName,
-                        //                 filename: filePath, 
-                        //                 metadata: {}
-                        //             };
-
-                        //             if (file.type === 'application/pdf') {
-                        //                 try {
-                        //                     const arrayBuffer = await file.arrayBuffer();
-                        //                     const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                        //                     const meta = await pdf.getMetadata().catch(() => ({}));
-
-                        //                     const info = meta?.info || {};
-                        //                     const xmp = meta?.metadata ? meta.metadata.getAll() : {};
-                        //                     const combinedMetadata = { ...info, ...xmp };
-
-                        //                     const filteredMetadata = Object.fromEntries(
-                        //                         Object.entries(combinedMetadata).filter(
-                        //                             ([key, value]) => key && value && String(value).trim() !== ''
-                        //                         )
-                        //                     );
-
-                        //                     fileMetadata.metadata = filteredMetadata;
-
-                        //                 } catch (e) {
-                        //                     console.error('Error processing PDF metadata for:', file.name, e);
-                        //                     // On error, metadata remains empty ({})
-                        //                 }
-                        //             }
-                        //             metadataList.push(fileMetadata);
-                        //         };
-                        //         processingPromises.push(processFile());
-                        //     }
-
-                        //     // Wait for all metadata extraction promises to resolve
-                        //     await Promise.all(processingPromises);
-
-
-                        //     // 3. Add metadata JSON to FormData
-                        //     formData.append('metadata', JSON.stringify(metadataList));
-
-                        //     console.log('datasender :::' + JSON.stringify(metadataList));
-
-                        //     // 4. Send to backend
-                        //     $.ajax({
-                        //         url: base_url + "auth/action.php?action=uploadFolder",
-                        //         method: "POST",
-                        //         data: formData,
-                        //         contentType: false,
-                        //         processData: false,
-                        //         dataType: 'json',
-                        //         success: res => {
-                        //             if (res.status === 1) {
-                        //                 console.log('Folder upload success:', res.files);
-                        //                 loadFolders(); // reload folder list
-                        //             } else {
-                        //                 alert(res.message || 'Folder upload failed');
-                        //             }
-                        //         },
-                        //         error: (jqXHR, textStatus, errorThrown) => {
-                        //             console.error("AJAX Error:", textStatus, errorThrown, jqXHR.responseText);
-                        //             alert('Server error during folder upload. Check console for details.');
-                        //         }
-                        //     });
-
-                        //     $(this).val(''); // reset input
-                        // });
 
                         $li.find('.folder-folder-input').on('change', async function () {
                             const files = this.files;
@@ -933,15 +798,21 @@
                                 contentType: false,
                                 processData: false,
                                 dataType: 'json',
+
+                                // 🔹 Show spinner before upload starts
+                                beforeSend: function () {
+                                    $('#upload-spinner').removeClass('hidden').show();
+                                    console.log("📤 Upload started...");
+                                },
+
                                 success: res => {
-                                    $('#upload-spinner').addClass('hidden');
+                                    console.log('✅ Upload response:', res);
 
                                     if (res.status === 1) {
-                                        console.log('✅ Folder upload success:', res);
-
                                         const $fileList = $li.find('ul').empty();
-                                        if (res.files?.length) {
-                                            res.files.forEach(f => {
+
+                                        if (res.files_uploaded?.length) {
+                                            res.files_uploaded.forEach(f => {
                                                 const $fileItem = $(`
                                                 <li class="file bg-white dark:bg-gray-800 px-3 py-1 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer flex justify-between items-center">
                                                     <span>${f}</span>
@@ -956,21 +827,26 @@
 
                                         loadFolders(); // optional refresh after upload
                                     } else {
-                                        alert(res.message || 'Folder upload failed.');
+                                        alert(res.message || '❌ Folder upload failed.');
                                     }
                                 },
+
+                                // 🔹 Handle server or connection errors
                                 error: (jqXHR, textStatus, errorThrown) => {
-                                    $('#upload-spinner').addClass('hidden');
-                                    console.error("AJAX Error:", textStatus, errorThrown, jqXHR.responseText);
+                                    console.error("🚨 AJAX Error:", textStatus, errorThrown, jqXHR.responseText);
                                     alert('Server error during folder upload. Check console for details.');
+                                },
+
+                                // 🔹 Always hide spinner at the end
+                                complete: function () {
+                                    $('#upload-spinner').fadeOut(200).addClass('hidden');
+                                    console.log("✅ Upload complete");
                                 }
                             });
 
+
                             $(this).val(''); // reset input
                         });
-
-
-
 
 
                         $('#folder-list').on('click', '.file', function () {
