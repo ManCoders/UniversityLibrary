@@ -124,7 +124,6 @@ $(document).ready(function () {
     }
   });
 
-
   // --- GLOBAL STATE ---
   let userState = {
     isLoggedIn: false,
@@ -166,7 +165,9 @@ $(document).ready(function () {
 
     if (typeof lucide !== "undefined" && lucide.createIcons) {
       lucide.createIcons();
+      
     }
+    
   }
 
   const isDarkInitial = htmlElement.hasClass("dark");
@@ -228,7 +229,6 @@ $(document).ready(function () {
     if (userState.isLoggedIn) {
       signInBtn.addClass("hidden");
       profileBtn.removeClass("hidden");
-      // Use the 'username' from state, which is set from 'user_name' or 'user_data.username' on login
       const usernameText = `User: ${userState.username}`;
       $("#profile-username").text(usernameText);
       $("#profile-picture")
@@ -264,14 +264,10 @@ $(document).ready(function () {
     }
   }
 
-  // Simple View Manager (for main tabs)
   function showView(viewId) {
-    // Hide all view sections
     allViewSections.addClass("hidden");
-    // Show the requested section
     $(`#${viewId}-section`).removeClass("hidden");
 
-    // Update navigation active state
     allNavLinks.each(function () {
       const $link = $(this);
       const isActive = $link.data("view") === viewId;
@@ -313,24 +309,19 @@ $(document).ready(function () {
     }
   });
 
-  // Click listener for main navigation buttons
   allNavLinks.on("click", function () {
     const viewId = $(this).data("view");
     showView(viewId);
   });
 
-  // Update profile dropdown links to use showView
   $("[data-view-target]").on("click", (e) => {
     e.preventDefault();
     showView($(e.currentTarget).data("view-target"));
   });
 
-  // Link Sign In button to open the Login Modal
   signInBtn.on("click", () => toggleModal(loginModal, true));
 
-  // Close Login Modal
   $("#close-login, #login-modal").on("click", function (e) {
-    // Only close if clicked on the X button or the backdrop
     if (
       e.target === this ||
       e.target.id === "close-login" ||
@@ -518,7 +509,7 @@ $(document).ready(function () {
   });
 
   updateHeaderUI();
-  showView("home"); 
+  showView("home");
 
   // 5. Chatbot Logic
   const chatbox = $("#chatbox");
@@ -532,10 +523,10 @@ $(document).ready(function () {
     const msg = chatInput.val().trim();
     if (!msg) return;
 
-    // User message (right-aligned)
+    // User message (right-aligned, maroon)
     chatMessages.append(`
     <div class="text-right">
-      <span class="inline-block bg-indigo-600 text-white p-2 rounded-lg max-w-[80%]">
+      <span class="inline-block bg-[#b03060] text-white p-2 rounded-lg max-w-[80%]">
         ${msg}
       </span>
     </div>
@@ -557,7 +548,7 @@ $(document).ready(function () {
 
       chatMessages.append(`
       <div class="text-left">
-        <span class="inline-block bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-2 rounded-lg max-w-[80%]">
+        <span class="inline-block bg-[#ffe6e6] dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-2 rounded-lg max-w-[80%]">
           ${reply}
         </span>
       </div>

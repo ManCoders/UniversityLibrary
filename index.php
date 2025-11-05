@@ -30,13 +30,13 @@
         }
 
         #chat-messages::-webkit-scrollbar-thumb {
-            background-color: #a78bfa;
+            background-color: #fa8b8bff;
             /* Indigo 400 */
             border-radius: 3px;
         }
 
         .dark #chat-messages::-webkit-scrollbar-thumb {
-            background-color: #4338ca;
+            background-color: #b62e2eff;
             /* Indigo 700 */
         }
     </style>
@@ -67,14 +67,14 @@
             <div class="flex items-center gap-3 relative">
                 <!-- Dark Mode Toggle -->
                 <button id="dark-mode-toggle"
-                    class="p-2 rounded-full text-white hover:bg-white/20 dark:text-gray-300 dark:hover:bg-gray-700 transition">
+                    class="p-2 rounded-full text-white hover:bg-white/20  dark:hover:bg-gray-700 transition">
                     <i id="dark-mode-icon" data-lucide="moon" class="w-5 h-5"></i>
                 </button>
 
                 <!-- Home Button -->
                 <button data-view="home"
                     class="nav-link text-white border-b-2 border-white font-semibold px-3 py-2 text-sm transition-colors duration-200 focus:outline-none">
-                    <i data-lucide="home" class="inline-block w-4 h-4 mr-1"></i> Home
+                    <i data-lucide="home" class="inline-block w-4 h-4 mr-1 text-white"></i>
                 </button>
 
                 <!-- User Authentication Container -->
@@ -216,26 +216,23 @@
 
         </section>
 
-
-        <!-- MY PROFILE SECTION -->
-
         <!-- PROFILE SECTION -->
         <section id="profile-section" class="view-section hidden pt-8 pb-20 max-w-4xl mx-auto px-6">
-            <h2 class="text-4xl font-bold mb-6 text-indigo-600 dark:text-indigo-400">My Profile</h2>
+            <h2 class="text-4xl font-bold mb-6 text-[#b03060] dark:text-[#ff4d6d]">My Profile</h2>
 
             <div
-                class="border-2 border-indigo-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg space-y-6 max-w-3xl mx-auto">
+                class="border-2 border-[#b03060] dark:border-[#800000] bg-[#fff0f0] dark:bg-[#330000] p-8 rounded-2xl shadow-lg space-y-6 max-w-3xl mx-auto">
 
                 <!-- Profile Header -->
                 <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
                     <!-- Profile Picture -->
                     <div class="relative">
                         <img id="profile-picture"
-                            src="https://ui-avatars.com/api/?name=Guest&background=4F46E5&color=fff&size=128"
+                            src="https://ui-avatars.com/api/?name=Guest&background=b03060&color=fff&size=128"
                             alt="Profile Picture"
-                            class="w-32 h-32 rounded-full border-4 border-indigo-500 shadow-md object-cover">
+                            class="w-32 h-32 rounded-full border-4 border-[#b03060] shadow-md object-cover">
                         <button
-                            class="absolute bottom-1 right-1 bg-indigo-600 text-white p-2 rounded-full text-xs hover:bg-indigo-700 transition"
+                            class="absolute bottom-1 right-1 bg-[#b03060] text-white p-2 rounded-full text-xs hover:bg-[#800000] transition"
                             title="Change Photo">
                             <i data-lucide="camera" class="w-4 h-4"></i>
                         </button>
@@ -243,16 +240,16 @@
 
                     <!-- Welcome Text -->
                     <div class="flex-1 text-center sm:text-left">
-                        <p class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                        <p class="text-2xl font-semibold text-[#660000] dark:text-[#ffd1d1]">
                             Welcome back,
-                            <span id="profile-view-username" class="text-indigo-600 dark:text-indigo-400">Guest</span>!
+                            <span id="profile-view-username" class="text-[#b03060] dark:text-[#ff4d6d]">Guest</span>!
                         </p>
-                        <p class="text-gray-500 dark:text-gray-400">Glad to see you again.</p>
+                        <p class="text-[#800000] dark:text-[#ffcccc]">Glad to see you again.</p>
                     </div>
                 </div>
 
                 <!-- Profile Info Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-700 dark:text-gray-300">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[#660000] dark:text-[#ffd1d1]">
                     <p><strong>Status:</strong> <span id="profile-status">N/A</span></p>
                     <p><strong>Department:</strong><span id="profile-department">N/A</span></p>
                     <p><strong>Library ID:</strong> <span id="profile-library_id">N/A</span></p>
@@ -264,75 +261,73 @@
                 <!-- Edit Button -->
                 <div class="flex justify-center sm:justify-end">
                     <button
-                        class="mt-4 bg-indigo-600 text-white px-6 py-2 rounded-full hover:bg-indigo-700 transition font-medium flex items-center gap-2">
+                        class="mt-4 bg-[#b03060] text-white px-6 py-2 rounded-full hover:bg-[#800000] transition font-medium flex items-center gap-2">
                         <i data-lucide="edit-3" class="w-5 h-5"></i>
                         Edit Profile
                     </button>
                 </div>
             </div>
 
-
             <div
-                class="mt-8 p-6 border-2 border-indigo-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-                <h3 class="text-xl font-semibold mb-3 text-gray-800 dark:text-gray-100">Activity Log</h3>
-                <ul class="text-sm space-y-1 text-gray-700 dark:text-gray-300">
-                    <li><span class="font-mono text-gray-500 mr-2">2024-10-28:</span> Renewed "Data Structures"</li>
-                    <li><span class="font-mono text-gray-500 mr-2">2024-10-25:</span> Checked out "Literary Theory"</li>
-                    <li><span class="font-mono text-gray-500 mr-2">2024-10-25:</span> Account logged in from campus IP
-                    </li>
+                class="mt-8 p-6 border-2 border-[#b03060] dark:border-[#800000] bg-[#fff0f0] dark:bg-[#330000] rounded-xl shadow-lg">
+                <h3 class="text-xl font-semibold mb-3 text-[#660000] dark:text-[#ffd1d1]">Activity Log</h3>
+                <ul class="text-sm space-y-1 text-[#660000] dark:text-[#ffd1d1]">
+                    <li><span class="font-mono text-[#800000] dark:text-[#ffcccc] mr-2">2024-10-28:</span> Renewed "Data
+                        Structures"</li>
+                    <li><span class="font-mono text-[#800000] dark:text-[#ffcccc] mr-2">2024-10-25:</span> Checked out
+                        "Literary Theory"</li>
+                    <li><span class="font-mono text-[#800000] dark:text-[#ffcccc] mr-2">2024-10-25:</span> Account
+                        logged in from campus IP</li>
                 </ul>
             </div>
         </section>
 
         <!-- MY BOOKS SECTION -->
         <section id="books-section" class="view-section hidden pt-8 pb-20 max-w-6xl mx-auto px-6">
-            <h2 class="text-4xl font-bold mb-6 text-indigo-600 dark:text-indigo-400">My Books & Resources</h2>
+            <h2 class="text-4xl font-bold mb-6 text-[#b03060] dark:text-[#ff4d6d]">My Books & Resources</h2>
 
             <div
-                class="border-2 border-indigo-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                class="border-2 border-[#b03060] dark:border-[#800000] bg-[#fff0f0] dark:bg-[#330000] p-6 rounded-xl shadow-lg">
                 <h3
-                    class="text-xl font-semibold mb-4 border-b border-gray-200 dark:border-gray-700 text-gray-800 dark:text-gray-100">
-                    Currently Checked Out (3)
-                </h3>
+                    class="text-xl font-semibold mb-4 border-b border-[#b03060] dark:border-[#800000] text-[#660000] dark:text-[#ffd1d1]">
+                    Currently Checked Out (3)</h3>
 
-                <ul class="space-y-3 divide-y divide-gray-200 dark:divide-gray-700">
+                <ul class="space-y-3 divide-y divide-[#b03060]/30 dark:divide-[#800000]/40">
                     <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3">
                         <div class="flex-1">
-                            <span class="font-medium text-gray-900 dark:text-gray-100">The Structure of Scientific
+                            <span class="font-medium text-[#660000] dark:text-[#ffd1d1]">The Structure of Scientific
                                 Revolutions</span>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Thomas S. Kuhn</p>
+                            <p class="text-xs text-[#800000] dark:text-[#ffcccc]">Thomas S. Kuhn</p>
                         </div>
                         <span class="text-sm text-red-600 dark:text-red-400 font-medium mt-1 sm:mt-0 sm:mr-4">Due: Nov
                             15, 2024</span>
                         <button
-                            class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm border border-indigo-200 dark:border-indigo-600 rounded-full px-3 py-1 transition mt-2 sm:mt-0">
+                            class="text-[#b03060] hover:text-[#800000] dark:text-[#ff4d6d] dark:hover:text-[#ff9999] text-sm border border-[#b03060] dark:border-[#800000] rounded-full px-3 py-1 transition mt-2 sm:mt-0">
                             Renew
                         </button>
                     </li>
-
                     <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3">
                         <div class="flex-1">
-                            <span class="font-medium text-gray-900 dark:text-gray-100">Designing Data-Intensive
+                            <span class="font-medium text-[#660000] dark:text-[#ffd1d1]">Designing Data-Intensive
                                 Applications</span>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">Martin Kleppmann</p>
+                            <p class="text-xs text-[#800000] dark:text-[#ffcccc]">Martin Kleppmann</p>
                         </div>
-                        <span class="text-sm text-gray-600 dark:text-gray-400 font-medium mt-1 sm:mt-0 sm:mr-4">Due: Dec
-                            5, 2024</span>
+                        <span class="text-sm text-[#660000] dark:text-[#ffd1d1] font-medium mt-1 sm:mt-0 sm:mr-4">Due:
+                            Dec 5, 2024</span>
                         <button
-                            class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm border border-indigo-200 dark:border-indigo-600 rounded-full px-3 py-1 transition mt-2 sm:mt-0">
+                            class="text-[#b03060] hover:text-[#800000] dark:text-[#ff4d6d] dark:hover:text-[#ff9999] text-sm border border-[#b03060] dark:border-[#800000] rounded-full px-3 py-1 transition mt-2 sm:mt-0">
                             Renew
                         </button>
                     </li>
-
                     <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3">
                         <div class="flex-1">
-                            <span class="font-medium text-gray-900 dark:text-gray-100">Modern Literary Theory</span>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">M.H. Abrams</p>
+                            <span class="font-medium text-[#660000] dark:text-[#ffd1d1]">Modern Literary Theory</span>
+                            <p class="text-xs text-[#800000] dark:text-[#ffcccc]">M.H. Abrams</p>
                         </div>
-                        <span class="text-sm text-gray-600 dark:text-gray-400 font-medium mt-1 sm:mt-0 sm:mr-4">Due: Dec
-                            10, 2024</span>
+                        <span class="text-sm text-[#660000] dark:text-[#ffd1d1] font-medium mt-1 sm:mt-0 sm:mr-4">Due:
+                            Dec 10, 2024</span>
                         <button
-                            class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm border border-indigo-200 dark:border-indigo-600 rounded-full px-3 py-1 transition mt-2 sm:mt-0">
+                            class="text-[#b03060] hover:text-[#800000] dark:text-[#ff4d6d] dark:hover:text-[#ff9999] text-sm border border-[#b03060] dark:border-[#800000] rounded-full px-3 py-1 transition mt-2 sm:mt-0">
                             Renew
                         </button>
                     </li>
@@ -342,52 +337,53 @@
 
         <!-- SETTINGS SECTION -->
         <section id="settings-section" class="view-section hidden pt-8 pb-20 max-w-4xl mx-auto px-6">
-            <h2 class="text-4xl font-bold mb-6 text-indigo-600 dark:text-indigo-400">Account Settings</h2>
+            <h2 class="text-4xl font-bold mb-6 text-[#b03060] dark:text-[#ff4d6d]">Account Settings</h2>
 
             <div
-                class="border-2 border-indigo-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg space-y-6">
+                class="border-2 border-[#b03060] dark:border-[#800000] bg-[#fff0f0] dark:bg-[#330000] p-8 rounded-xl shadow-lg space-y-6">
                 <!-- Theme Preferences -->
                 <div>
-                    <h3 class="text-xl font-semibold mb-2 flex items-center text-gray-800 dark:text-gray-100">
-                        <i data-lucide="palette" class="w-5 h-5 mr-2 text-indigo-500"></i> Theme Preferences
+                    <h3 class="text-xl font-semibold mb-2 flex items-center text-[#660000] dark:text-[#ffd1d1]">
+                        <i data-lucide="palette" class="w-5 h-5 mr-2 text-[#b03060]"></i> Theme Preferences
                     </h3>
-                    <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">
+                    <p class="text-[#800000] dark:text-[#ffcccc] text-sm mb-3">
                         Change the visual appearance of the portal.
                     </p>
                     <div class="flex flex-wrap gap-3">
                         <button data-theme="light"
-                            class="theme-select px-4 py-2 border rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm text-gray-800 dark:text-gray-200">
+                            class="theme-select px-4 py-2 border rounded-full hover:bg-[#ffd1d1] dark:hover:bg-[#660000] transition text-sm text-[#660000] dark:text-[#ffd1d1]">
                             Light Mode
                         </button>
                         <button data-theme="dark"
-                            class="theme-select px-4 py-2 border rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition text-sm text-gray-800 dark:text-gray-200">
+                            class="theme-select px-4 py-2 border rounded-full hover:bg-[#ffd1d1] dark:hover:bg-[#660000] transition text-sm text-[#660000] dark:text-[#ffd1d1]">
                             Dark Mode
                         </button>
                         <button data-theme="system"
-                            class="theme-select px-4 py-2 border rounded-full transition text-sm font-medium border-indigo-500 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">
+                            class="theme-select px-4 py-2 border rounded-full transition text-sm font-medium border-[#b03060] bg-[#fff0f0] dark:bg-[#330000] text-[#b03060] dark:text-[#ff4d6d]">
                             System Default
                         </button>
                     </div>
                 </div>
 
                 <!-- Notification Settings -->
-                <div class="border-t pt-4 border-gray-200 dark:border-gray-700">
-                    <h3 class="text-xl font-semibold mb-3 flex items-center text-gray-800 dark:text-gray-100">
-                        <i data-lucide="bell" class="w-5 h-5 mr-2 text-indigo-500"></i> Notification Settings
+                <div class="border-t pt-4 border-[#b03060] dark:border-[#800000]">
+                    <h3 class="text-xl font-semibold mb-3 flex items-center text-[#660000] dark:text-[#ffd1d1]">
+                        <i data-lucide="bell" class="w-5 h-5 mr-2 text-[#b03060]"></i> Notification Settings
                     </h3>
                     <label class="flex items-center space-x-3 cursor-pointer mt-2">
                         <input type="checkbox" checked
-                            class="form-checkbox text-indigo-600 rounded-sm w-5 h-5 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600">
-                        <span class="text-gray-700 dark:text-gray-300">Email notifications for due dates</span>
+                            class="form-checkbox text-[#b03060] rounded-sm w-5 h-5 focus:ring-[#b03060] dark:bg-[#440000] dark:border-[#800000]">
+                        <span class="text-[#660000] dark:text-[#ffd1d1]">Email notifications for due dates</span>
                     </label>
                     <label class="flex items-center space-x-3 cursor-pointer mt-2">
                         <input type="checkbox"
-                            class="form-checkbox text-indigo-600 rounded-sm w-5 h-5 focus:ring-indigo-500 dark:bg-gray-700 dark:border-gray-600">
-                        <span class="text-gray-700 dark:text-gray-300">Portal alerts for new features</span>
+                            class="form-checkbox text-[#b03060] rounded-sm w-5 h-5 focus:ring-[#b03060] dark:bg-[#440000] dark:border-[#800000]">
+                        <span class="text-[#660000] dark:text-[#ffd1d1]">Portal alerts for new features</span>
                     </label>
                 </div>
             </div>
         </section>
+
 
     </main>
 
