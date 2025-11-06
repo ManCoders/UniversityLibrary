@@ -126,6 +126,21 @@ if($action === 'deletemeta'){
 	}
 }
 
+if($action === 'searching'){
+	$logout = $crud->searching();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+if($action === 'check_login'){
+	$logout = $crud->check_login();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+
 
 
 

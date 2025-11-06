@@ -1,6 +1,6 @@
 <?php include "./header.php"; ?>
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth dark:bg-gray-800 ">
+<html lang="en" class="scroll-smooth dark:bg-white-800 ">
 
 <head>
     <meta charset="UTF-8" />
@@ -128,7 +128,6 @@
 
     </header>
 
-    <!-- Main Content Wrapper to handle the padding for the fixed header (Approx. 110-118px height) -->
     <main class="pt-[110px] sm:pt-[118px] ">
 
         <!-- HOME SECTION -->
@@ -140,12 +139,12 @@
 
                 <h2 class="text-4xl sm:text-6xl font-extrabold mb-4 leading-tight">
                     <span class="text-[#800000] dark:text-[#ff4d6d]">Discover</span>
-                    <span class="text-[#660000] dark:text-[#ffe5e5]">Your Academic World</span>
+                    <span class="text-[#660000] dark:text-[#ffe5e5]">Your Favorite Books</span>
                 </h2>
 
                 <p class="text-lg text-[#660000] dark:text-[#ffd1d1] mb-8 max-w-3xl mx-auto">
                     The central hub for research, publications, and
-                    <strong>24/7 access</strong> to campus-wide academic resources.
+                    <strong>Digital library</strong> to campus-wide academic resources.
                 </p>
 
                 <!-- Search Bar -->
@@ -161,7 +160,7 @@
                 </div>
 
                 <p class="text-sm text-[#800000] dark:text-[#ffd1d1] italic">
-                    Over 1.2 million digital assets available.
+                    Our digital library assets available.
                 </p>
             </section>
 
@@ -467,30 +466,34 @@
         class="hidden fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100] transition-opacity duration-300">
 
         <div
-            class="bg-[#fff0f0] dark:bg-[#330000] rounded-xl shadow-2xl w-full max-w-lg mx-4 p-6 relative max-h-[80vh] overflow-y-auto border border-[#b03060] dark:border-[#800000] transition-all duration-300">
+            class="bg-[#fff0f0] dark:bg-[#330000] rounded-xl shadow-2xl w-full max-w-lg mx-4 p-0 relative max-h-[80vh] border border-[#b03060] dark:border-[#800000] transition-all duration-300 flex flex-col">
 
-            <button id="close-search"
-                class="absolute top-3 right-3 text-[#800000] dark:text-[#ffcccc] hover:text-red-500 transition p-1">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
+            <!-- Header: sticky -->
+            <div
+                class="p-6 border-b border-[#b03060] dark:border-[#800000] sticky top-0 bg-[#fff0f0] dark:bg-[#330000] z-10 flex items-center justify-between">
+                <h3 class="text-xl font-bold text-[#b03060] dark:text-[#ff4d6d]">
+                    Search Results
+                </h3>
+                <button id="close-search" class="text-[#800000] dark:text-[#ffcccc] hover:text-red-500 transition p-1">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
 
-            <h3
-                class="text-xl font-bold mb-4 text-[#b03060] dark:text-[#ff4d6d] border-b border-[#b03060] dark:border-[#800000] pb-2">
-                Search Results
-            </h3>
-
-            <div id="search-results" class="space-y-4 text-base text-[#660000] dark:text-[#ffd1d1]">
+            <!-- Scrollable Content -->
+            <div id="search-results"
+                class="p-6 overflow-y-auto flex-1 space-y-4 text-base text-[#660000] dark:text-[#ffd1d1]">
                 <p class="italic text-[#800000] dark:text-[#ffcccc]">No results yet...</p>
             </div>
         </div>
     </div>
+
 
     <!-- Footer -->
     <footer
         class="bg-[#fff0f0] dark:bg-[#330000] border-t border-[#b03060] dark:border-[#800000] text-center py-6 text-sm text-[#660000] dark:text-[#ffd1d1]">
 
         <div class="max-w-7xl mx-auto px-4">
-            <p>&copy; <span id="current-year">2024</span> University Campus Library — All Rights Reserved</p>
+            <p>&copy; <span id="current-year">2024</span> Zamboanga Peninsula Polytechnic State University Campus Library — All Rights Reserved</p>
             <p class="mt-1 text-xs">Developed for Academic Use |
                 <a href="#" class="text-[#b03060] dark:text-[#ff4d6d] hover:underline">Privacy Policy</a>
             </p>

@@ -165,9 +165,7 @@ $(document).ready(function () {
 
     if (typeof lucide !== "undefined" && lucide.createIcons) {
       lucide.createIcons();
-      
     }
-    
   }
 
   const isDarkInitial = htmlElement.hasClass("dark");
@@ -201,7 +199,6 @@ $(document).ready(function () {
       .removeClass("border-gray-300 dark:border-gray-600");
   });
 
-  // 3. Modal helper (Used for Login and Search)
   function toggleModal(modal, show) {
     if (show) {
       modal.removeClass("hidden").addClass("flex");
@@ -564,65 +561,138 @@ $(document).ready(function () {
       sendMessage();
     }
   });
-
-  // 6. Search Logic
+  // --- Elements ---
   const searchModal = $("#search-modal");
   const searchInput = $("#search-input");
   const searchResults = $("#search-results");
 
-  $("#search-btn").on("click", function (e) {
-    e.preventDefault();
-    performSearch();
-  });
-  searchInput.on("keypress", function (e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      performSearch();
-    }
-  });
-
+  // --- Login check ---
+  // --- Perform search (no login required) ---
   function performSearch() {
     const query = searchInput.val().trim();
     if (!query) return;
 
     toggleModal(searchModal, true);
-
-    // 🟣 Searching state
     searchResults.html(
       `<p class='text-gray-700 dark:text-gray-300 italic'>Searching for "${query}"...</p>`
     );
 
-    setTimeout(() => {
-      // 🟢 Simulated results
-      searchResults.html(`
-      <div class='p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition'>
-        <a href='#' class='font-semibold text-indigo-700 dark:text-indigo-400 hover:underline'>
-          Found: The Future of Digital Libraries
-        </a>
-        <p class='text-sm text-gray-700 dark:text-gray-300'>By J. Doe (2023) — Research Paper</p>
-      </div>
+    $.ajax({
+      url: `${base_url}auth/action.php?action=searching`,
+      type: "POST",
+      data: { q: query },
+      dataType: "json",
+      success: function (res) {
+        let html = "";
+        if (
+          res.status === 1 &&
+          Array.isArray(res.data) &&
+          res.data.length > 0
+        ) {
+          res.data.forEach((book) => {
+            const title =
+              book.metadata["dc:title"] || book.metadata.Title || book.filename;
+            const author = book.metadata["dc:creator"]
+              ? Array.isArray(book.metadata["dc:creator"])
+                ? book.metadata["dc:creator"].join(", ")
+                : book.metadata["dc:creator"]
+              : book.metadata.Author || "Unknown Author";
 
-      <div class='p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition'>
-        <a href='#' class='font-semibold text-indigo-700 dark:text-indigo-400 hover:underline'>
-          Book: Advanced Library Systems Design
-        </a>
-        <p class='text-sm text-gray-700 dark:text-gray-300'>By M. Reyes (2021) — Available in print</p>
-      </div>
+            const coverPath = book.cover_path || "";
+            const coverFile = book.cover || "default-cover.png";
+            const cover =
+              base_url +
+              "auth/" +
+              (coverPath + coverFile)
+                .split("/")
+                .map(encodeURIComponent)
+                .join("/");
 
-      <div class='p-3 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition'>
-        <a href='#' class='font-semibold text-indigo-700 dark:text-indigo-400 hover:underline'>
-          Paper: AI in Metadata Extraction
-        </a>
-        <p class='text-sm text-gray-700 dark:text-gray-300'>University Research Archive — Open Access</p>
-      </div>
-    `);
+            const filePath =
+              base_url +
+              "auth/" +
+              (book.file_path || "#")
+                .split("/")
+                .map(encodeURIComponent)
+                .join("/");
 
-      searchInput.val("");
-    }, 800);
+            html += `
+          <div class='p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition flex items-center space-x-3'>
+            <img src='${cover}' alt='Cover' class='w-12 h-16 object-cover rounded-md'/>
+            <div class='flex-1'>
+              <button type="button" class='font-semibold text-indigo-700 dark:text-indigo-400 hover:underline text-left w-full file-link' data-file='${filePath}'>
+                ${title}
+              </button>
+              <p class='text-sm text-gray-700 dark:text-gray-300'>${author}</p>
+            </div>
+          </div>
+        `;
+          });
+        } else {
+          html = `<p class='text-gray-700 dark:text-gray-300 italic'>No results found for "${query}".</p>`;
+        }
+
+        searchResults.html(html);
+        searchInput.val("");
+
+        // --- File link click handler (login required) ---
+        $(".file-link")
+          .off("click")
+          .on("click", function () {
+            const fileUrl = $(this).data("file");
+            checkLogin(() => window.open(fileUrl, "_blank"));
+          });
+      },
+      error: function (xhr, status, err) {
+        console.error("Search AJAX error:", err, xhr.responseText);
+        searchResults.html(
+          `<p class='text-red-500 italic'>Error fetching results. Please try again.</p>`
+        );
+      },
+    });
   }
 
+  function checkLogin(callback) {
+    if (searchModal.is(":visible")) {
+      searchModal.addClass("opacity-0 transition-opacity duration-300"); // start fade-out
+      setTimeout(() => {
+        toggleModal(searchModal, false); 
+        searchModal.removeClass("opacity-0 transition-opacity duration-300");
+      }, 300); 
+    }
+
+    $.ajax({
+      url: `${base_url}auth/action.php?action=check_login`,
+      type: "GET",
+      dataType: "json",
+      success: function (res) {
+        if (res.status === 1) {
+          callback(); // user logged in
+        } else {
+          toggleModal(loginModal, true); // show login modal
+          window.pendingAction = callback;
+        }
+      },
+      error: function () {
+        alert("Error checking login status. Please refresh the page.");
+      },
+    });
+  }
+
+  // --- Bind search triggers (no login needed to search) ---
+  $("#search-btn").on("click", (e) => {
+    e.preventDefault();
+    performSearch(); // anyone can search
+  });
+
+  searchInput.on("keypress", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      performSearch(); // anyone can search
+    }
+  });
+
   $("#close-search, #search-modal").on("click", function (e) {
-    // Only close if clicked on the X button or the backdrop (e.target is the modal itself)
     if (
       e.target === this ||
       e.target.id === "close-search" ||
@@ -631,7 +701,6 @@ $(document).ready(function () {
       toggleModal(searchModal, false);
     }
   });
-
   tailwind.config = {
     darkMode: "class",
     theme: {
