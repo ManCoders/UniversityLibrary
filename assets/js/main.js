@@ -635,13 +635,19 @@ $(document).ready(function () {
         searchResults.html(html);
         searchInput.val("");
 
-        // --- File link click handler (login required) ---
+
+
+        /* READ ONLY LINK THIS TO OTHER FUNCTION */
+        /* START HERE */
+
         $(".file-link")
           .off("click")
           .on("click", function () {
             const fileUrl = $(this).data("file");
             checkLogin(() => window.open(fileUrl, "_blank"));
           });
+
+          /* END HERE */
       },
       error: function (xhr, status, err) {
         console.error("Search AJAX error:", err, xhr.responseText);
