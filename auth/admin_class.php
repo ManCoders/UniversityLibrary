@@ -98,13 +98,13 @@ class Action
             session_start();
 
         if (!empty($_SESSION['admin'])) {
-            echo json_encode(['status' => 1, 'role' => 'admin', 'user_data' => $_SESSION['admin']]);
+            return json_encode(['status' => 1, 'role' => 'admin', 'user_data' => $_SESSION['admin']]);
         } elseif (!empty($_SESSION['faculty'])) {
-            echo json_encode(['status' => 1, 'role' => 'faculty', 'user_data' => $_SESSION['faculty']]);
+            return json_encode(['status' => 1, 'role' => 'faculty', 'user_data' => $_SESSION['faculty']]);
         } elseif (!empty($_SESSION['student'])) {
-            echo json_encode(['status' => 1, 'role' => 'student', 'user_data' => $_SESSION['student']]);
+            return json_encode(['status' => 1, 'role' => 'student', 'user_data' => $_SESSION['student']]);
         } else {
-            echo json_encode(['status' => 0]);
+            return json_encode(['status' => 0]);
         }
     }
 
@@ -1265,6 +1265,131 @@ class Action
             ], JSON_UNESCAPED_UNICODE);
         }
     }
+
+    function readingbooks()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $user_id = $_SESSION['student']['civil_id'] ?? null;
+        $file = $_POST['file'] ?? null;
+
+        if (!$user_id || !$file) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Missing user or file data.'
+            ]);
+        }
+
+        $timestamp = date('Y-m-d H:i:s');
+
+        try {
+            // Prevent multiple active sessions for same user & file
+            $check = $this->db->prepare("
+            SELECT id FROM reading_logs
+            WHERE user_id = ? AND file_path = ? AND end_time IS NULL
+            LIMIT 1
+        ");
+            $check->bind_param("is", $user_id, $file);
+            $check->execute();
+            $result = $check->get_result();
+
+            if ($result && $result->num_rows > 0) {
+                return json_encode([
+                    'status' => 1,
+                    'message' => 'Reading session already active.',
+                    'data' => $file
+                ]);
+            }
+
+            // Start new reading log
+            $stmt = $this->db->prepare("
+            INSERT INTO reading_logs (user_id, file_path, start_time)
+            VALUES (?, ?, ?)
+        ");
+            $stmt->bind_param("iss", $user_id, $file, $timestamp);
+            $stmt->execute();
+
+            return json_encode([
+                'status' => 1,
+                'data' => $file,
+                'message' => 'Reading session started.'
+            ]);
+
+        } catch (Exception $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Database error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+
+    function closereading()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $user_id = $_SESSION['student']['civil_id'] ?? null;
+        $file = $_POST['file'] ?? null;
+
+        if (!$user_id || !$file) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Missing user or file data.'
+            ]);
+        }
+
+        try {
+            // Find the most recent open reading session
+            $stmt = $this->db->prepare("
+            SELECT id, start_time
+            FROM reading_logs
+            WHERE user_id = ? AND file_path = ? AND end_time IS NULL
+            ORDER BY id DESC
+            LIMIT 1
+        ");
+            $stmt->bind_param("is", $user_id, $file);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($row = $result->fetch_assoc()) {
+                $end_time = date('Y-m-d H:i:s');
+                $start_time = strtotime($row['start_time']);
+                $total_seconds = max(0, strtotime($end_time) - $start_time); // prevent negative
+
+                $update = $this->db->prepare("
+                UPDATE reading_logs
+                SET end_time = ?, total_read_time = ?
+                WHERE id = ?
+            ");
+                $update->bind_param("sii", $end_time, $total_seconds, $row['id']);
+                $update->execute();
+
+                return json_encode([
+                    'status' => 1,
+                    'message' => 'Reading session ended.',
+                    'total_read_time' => $total_seconds
+                ]);
+            }
+
+            return json_encode([
+                'status' => 0,
+                'message' => 'No active session found.'
+            ]);
+
+        } catch (Exception $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Database error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+
+
 
 
 

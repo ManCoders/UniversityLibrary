@@ -50,7 +50,15 @@ function db_connect()
                 folder_name VARCHAR(50) NOT NULL,
                 folder_data JSON
             )
-            "
+            ",
+            "CREATE TABLE IF NOT EXISTS reading_logs (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                file_path VARCHAR(255) NOT NULL,
+                start_time DATETIME NOT NULL,
+                end_time DATETIME DEFAULT NULL,
+                total_read_time INT DEFAULT 0
+            )"
         ];
 
         foreach ($tableQueries as $sql) {

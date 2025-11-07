@@ -620,7 +620,11 @@ $(document).ready(function () {
           <div class='p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition flex items-center space-x-3'>
             <img src='${cover}' alt='Cover' class='w-12 h-16 object-cover rounded-md'/>
             <div class='flex-1'>
-              <button type="button" class='font-semibold text-indigo-700 dark:text-indigo-400 hover:underline text-left w-full file-link' data-file='${filePath}'>
+              <button 
+                type="button" 
+                class="font-semibold text-indigo-700 dark:text-indigo-400 hover:underline text-left w-full file-link"
+                data-file="${book.file_path}"  <!-- this should be the raw relative path, not full base_url -->
+              >
                 ${title}
               </button>
               <p class='text-sm text-gray-700 dark:text-gray-300'>${author}</p>
@@ -635,19 +639,44 @@ $(document).ready(function () {
         searchResults.html(html);
         searchInput.val("");
 
-
-
         /* READ ONLY LINK THIS TO OTHER FUNCTION */
         /* START HERE */
 
         $(".file-link")
           .off("click")
           .on("click", function () {
-            const fileUrl = $(this).data("file");
-            checkLogin(() => window.open(fileUrl, "_blank"));
+            const filePath = $(this).data("file");
+            // alert(filePath)
+            if (!filePath) {
+              alert("File not found.");
+              return;
+            }
+
+            $.ajax({
+              type: "POST",
+              url: `${base_url}auth/action.php?action=openbooks`,
+              data: { file: filePath },
+              dataType: "json",
+              success: function (response) {
+                if (response.status === 1 && response.data) {
+                  console.log(response.data)
+                  checkLogin(() => {
+                    const viewerUrl = `${base_url}auth/viewer.php?file=${encodeURIComponent(
+                      response.data
+                    )}`;
+                    window.open(viewerUrl, "_blank");
+                  });
+                } else {
+                  alert(response.message || "Failed to open the book.");
+                }
+              },
+              error: function () {
+                alert("Server error while opening the book.");
+              },
+            });
           });
 
-          /* END HERE */
+        /* END HERE */
       },
       error: function (xhr, status, err) {
         console.error("Search AJAX error:", err, xhr.responseText);
@@ -662,9 +691,9 @@ $(document).ready(function () {
     if (searchModal.is(":visible")) {
       searchModal.addClass("opacity-0 transition-opacity duration-300"); // start fade-out
       setTimeout(() => {
-        toggleModal(searchModal, false); 
+        toggleModal(searchModal, false);
         searchModal.removeClass("opacity-0 transition-opacity duration-300");
-      }, 300); 
+      }, 300);
     }
 
     $.ajax({
