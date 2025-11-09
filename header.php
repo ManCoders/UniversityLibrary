@@ -19,6 +19,8 @@ if (session_status() === PHP_SESSION_NONE) {
     <script>
 
         var base_url = '<?php echo base_url() ?>';
+        var student_id = "<?php echo isset($_SESSION['student']['email']) ? $_SESSION['student']['civil_id'] : 'Not Found the ID'; ?>";
+
         const THEME_KEY = "theme";
 
         // ✅ Apply theme *before paint* to prevent flashing

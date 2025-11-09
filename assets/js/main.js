@@ -229,7 +229,7 @@ $(document).ready(function () {
       const usernameText = `User: ${userState.username}`;
       $("#profile-username").text(usernameText);
       $("#profile-picture")
-        .attr("src", `${base_url}auth/${userState.profilePic}`)
+        .attr("src", `${base_url}auth/auth/${userState.profilePic}`)
         .on("error", function () {
           $(this).attr(
             "src",
@@ -566,8 +566,6 @@ $(document).ready(function () {
   const searchInput = $("#search-input");
   const searchResults = $("#search-results");
 
-  // --- Login check ---
-  // --- Perform search (no login required) ---
   function performSearch() {
     const query = searchInput.val().trim();
     if (!query) return;
@@ -608,29 +606,21 @@ $(document).ready(function () {
                 .map(encodeURIComponent)
                 .join("/");
 
-            const filePath =
-              base_url +
-              "auth/" +
-              (book.file_path || "#")
-                .split("/")
-                .map(encodeURIComponent)
-                .join("/");
-
             html += `
-          <div class='p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition flex items-center space-x-3'>
-            <img src='${cover}' alt='Cover' class='w-12 h-16 object-cover rounded-md'/>
-            <div class='flex-1'>
-              <button 
-                type="button" 
-                class="font-semibold text-indigo-700 dark:text-indigo-400 hover:underline text-left w-full file-link"
-                data-file="${book.file_path}"  <!-- this should be the raw relative path, not full base_url -->
-              >
-                ${title}
-              </button>
-              <p class='text-sm text-gray-700 dark:text-gray-300'>${author}</p>
+            <div class='p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition flex items-center space-x-3'>
+              <img src='${cover}' alt='Cover' class='w-12 h-16 object-cover rounded-md'/>
+              <div class='flex-1'>
+                <button 
+                  type="button" 
+                  class="font-semibold text-indigo-700 dark:text-indigo-400 hover:underline text-left w-full file-link"
+                  data-file="${book.file_path}"  <!-- relative path only -->
+                >
+                  ${title}
+                </button>
+                <p class='text-sm text-gray-700 dark:text-gray-300'>${author}</p>
+              </div>
             </div>
-          </div>
-        `;
+          `;
           });
         } else {
           html = `<p class='text-gray-700 dark:text-gray-300 italic'>No results found for "${query}".</p>`;
@@ -639,44 +629,73 @@ $(document).ready(function () {
         searchResults.html(html);
         searchInput.val("");
 
-        /* READ ONLY LINK THIS TO OTHER FUNCTION */
-        /* START HERE */
-
+        // ---------- FILE LINK CLICK ----------
         $(".file-link")
           .off("click")
           .on("click", function () {
             const filePath = $(this).data("file");
-            // alert(filePath)
             if (!filePath) {
               alert("File not found.");
               return;
             }
 
-            $.ajax({
-              type: "POST",
-              url: `${base_url}auth/action.php?action=openbooks`,
-              data: { file: filePath },
-              dataType: "json",
-              success: function (response) {
-                if (response.status === 1 && response.data) {
-                  console.log(response.data)
-                  checkLogin(() => {
-                    const viewerUrl = `${base_url}auth/viewer.php?file=${encodeURIComponent(
-                      response.data
-                    )}`;
-                    window.open(viewerUrl, "_blank");
-                  });
-                } else {
-                  alert(response.message || "Failed to open the book.");
-                }
-              },
-              error: function () {
-                alert("Server error while opening the book.");
-              },
+            // Check login before starting reading session
+            checkLogin(() => {
+              startReadingSession(filePath);
             });
           });
 
-        /* END HERE */
+        // ---------- START READING SESSION ----------
+        function startReadingSession(filePath) {
+          console.log("Opening book at:", filePath);
+          $.ajax({
+            type: "POST",
+            url: `${base_url}auth/action.php?action=readingbooks`,
+            data: { file: filePath }, // relative path
+            dataType: "json",
+            success: function (res) {
+              if (res.status === 1 && res.data) {
+                
+                window.open(res.data, "_blank");
+              } else {
+                alert(res.message || "Cannot open book.");
+              }
+            },
+            error: function (_xhr, _status, error) {
+              console.error("AJAX error:", error);
+              alert("Server error while opening the book.");
+            },
+          });
+        }
+
+        // ---------- LOGIN CHECK ----------
+        function checkLogin(callback) {
+          $.ajax({
+            url: `${base_url}auth/action.php?action=check_login`,
+            type: "GET",
+            dataType: "json",
+            success: function (res) {
+              if (res.status === 1) {
+                callback(); 
+              } else {
+                toggleModal(loginModal, true);
+                toggleModal(searchModal, false);
+                window.pendingAction = callback; 
+              }
+            },
+            error: function () {
+              alert("Error checking login status. Please refresh the page.");
+            },
+          });
+        }
+        onLoginSuccess();
+        // ---------- AFTER LOGIN ----------
+        function onLoginSuccess() {
+          if (window.pendingAction) {
+            window.pendingAction();
+            window.pendingAction = null;
+          }
+        }
       },
       error: function (xhr, status, err) {
         console.error("Search AJAX error:", err, xhr.responseText);
@@ -686,34 +705,7 @@ $(document).ready(function () {
       },
     });
   }
-
-  function checkLogin(callback) {
-    if (searchModal.is(":visible")) {
-      searchModal.addClass("opacity-0 transition-opacity duration-300"); // start fade-out
-      setTimeout(() => {
-        toggleModal(searchModal, false);
-        searchModal.removeClass("opacity-0 transition-opacity duration-300");
-      }, 300);
-    }
-
-    $.ajax({
-      url: `${base_url}auth/action.php?action=check_login`,
-      type: "GET",
-      dataType: "json",
-      success: function (res) {
-        if (res.status === 1) {
-          callback(); // user logged in
-        } else {
-          toggleModal(loginModal, true); // show login modal
-          window.pendingAction = callback;
-        }
-      },
-      error: function () {
-        alert("Error checking login status. Please refresh the page.");
-      },
-    });
-  }
-
+  
   // --- Bind search triggers (no login needed to search) ---
   $("#search-btn").on("click", (e) => {
     e.preventDefault();

@@ -140,7 +140,7 @@ if($action === 'check_login'){
 	}
 }
 
-if($action === 'openbooks'){
+if($action === 'readingbooks'){
 	$logout = $crud->readingbooks();
 	if ($logout) {
 		echo $logout;
