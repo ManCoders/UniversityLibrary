@@ -129,6 +129,8 @@ $(document).ready(function () {
     isLoggedIn: false,
     username: "guest",
     user_id: "N/A",
+    email: "N/A",
+    department: "N/A",
     role: "N/A",
     profilePic: null,
   };
@@ -141,7 +143,7 @@ $(document).ready(function () {
       }
     } catch (e) {
       console.error("Failed to parse saved user state:", e);
-      localStorage.removeItem("userState"); // Clear corrupted state
+      localStorage.removeItem("userState");
     }
   }
 
@@ -156,8 +158,9 @@ $(document).ready(function () {
 
   /**
    * Applies the 'dark' class, updates the stored preference, and refreshes the Lucide icon.
-   * @param {boolean} isDark - True to set dark mode, false for light.
+   * @param {boolean} isDark
    */
+
   function applyTheme(isDark) {
     htmlElement.toggleClass("dark", isDark).toggleClass("light", !isDark);
 
@@ -242,7 +245,7 @@ $(document).ready(function () {
       $("#profile-email").text(userState.email);
       // Use a mock ID or a real one if the backend provided it
       $("#profile-view-id").text(
-        userState.civil_id ||
+        userState.user_id ||
           (userState.username === "admin" ? "U142-993-A" : "T200-111-B")
       );
       $("#profile-role").text(userState.role || "Student"); // Update role from state
@@ -371,14 +374,15 @@ $(document).ready(function () {
 
           if (res.status === 1) {
             const userData = res.user_data || {};
+            
             userState.isLoggedIn = true;
             userState.username = res.user_name || userData.username || username;
             userState.email = userData.email || "student";
-            userState.department = userData.department || "N/AS";
+            userState.department = userData.department || "N/A";
             userState.role = userData.user_role || "student";
             userState.profilePic = userData.profile_pic || null;
-            userState.civil_id = userData.civil_id || null;
-
+            userState.user_id = res.user_id || null;
+            console.log("Login successful:", res.user_data.user_id);
             $message
               .removeClass("text-gray-500 text-red-500")
               .addClass("text-green-500")
@@ -414,7 +418,6 @@ $(document).ready(function () {
               $message.hide().text("");
             }, 1500);
           } else {
-            // ❌ Login failed
             userState.isLoggedIn = false;
             $message
               .removeClass("text-gray-500 text-green-500")
@@ -471,7 +474,7 @@ $(document).ready(function () {
           username: null,
           role: null,
           profilePic: null,
-          civil_id: null,
+          user_id: null,
         };
 
         const role = (response.user_role || "").toLowerCase();
@@ -484,7 +487,6 @@ $(document).ready(function () {
               window.location.href = base_url + "index.php";
             }, 400);
           } else {
-            // 👨‍🎓 Student logout just resets the SPA
             updateHeaderUI();
             showView("home");
             setTimeout(() => location.reload(), 500);
@@ -613,7 +615,7 @@ $(document).ready(function () {
                 <button 
                   type="button" 
                   class="font-semibold text-indigo-700 dark:text-indigo-400 hover:underline text-left w-full file-link"
-                  data-file="${book.file_path}"  <!-- relative path only -->
+                  data-file="${book.file_path}"  
                 >
                   ${title}
                 </button>
@@ -647,7 +649,6 @@ $(document).ready(function () {
 
         // ---------- START READING SESSION ----------
         function startReadingSession(filePath) {
-          console.log("Opening book at:", filePath);
           $.ajax({
             type: "POST",
             url: `${base_url}auth/action.php?action=readingbooks`,
@@ -655,7 +656,6 @@ $(document).ready(function () {
             dataType: "json",
             success: function (res) {
               if (res.status === 1 && res.data) {
-                
                 window.open(res.data, "_blank");
               } else {
                 alert(res.message || "Cannot open book.");
@@ -676,11 +676,11 @@ $(document).ready(function () {
             dataType: "json",
             success: function (res) {
               if (res.status === 1) {
-                callback(); 
+                callback();
               } else {
                 toggleModal(loginModal, true);
                 toggleModal(searchModal, false);
-                window.pendingAction = callback; 
+                window.pendingAction = callback;
               }
             },
             error: function () {
@@ -705,7 +705,7 @@ $(document).ready(function () {
       },
     });
   }
-  
+
   // --- Bind search triggers (no login needed to search) ---
   $("#search-btn").on("click", (e) => {
     e.preventDefault();

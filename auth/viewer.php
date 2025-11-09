@@ -26,7 +26,6 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Secure PDF Viewer</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.3.136/pdf.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 
 <body class="bg-gray-900 text-white min-h-screen flex flex-col">
@@ -94,7 +93,7 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
               if (e.ctrlKey && ["s", "p", "u", "c"].includes(e.key.toLowerCase())) e.preventDefault();
             });
             $("body").css("user-select", "none");
-            startTimer();
+
           });
 
           function renderPage(i) {
@@ -114,6 +113,7 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
           $loader.html(`<p class='text-red-500 font-semibold'>⚠️ Failed to load PDF.</p>`);
         });
 
+      startTimer();
       // --- Timer ---
       function startTimer() {
         timerInterval = setInterval(() => {
@@ -141,7 +141,7 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
           dataType: "json",
           success: function (response) {
             if (response.status === 1) {
-              console.log("Favorite updated successfully");
+              alert("Favorite updated successfully");
             }
           },
           error: function (err) {
@@ -155,7 +155,7 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
         clearInterval(timerInterval);
 
         $.ajax({
-          url: "<?php echo base_url(); ?>/auth/action.php?action=end_reading",
+          url: `${base_url}auth/action.php?action=end_reading`,
           type: "POST",
           data: {
             file: "<?php echo $pdfFile; ?>",
@@ -167,11 +167,9 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
               alert(`Reading session ended. You spent ${Math.floor(seconds / 60)}m ${seconds % 60}s.`);
               window.location.href = "<?php echo base_url(); ?>";
             }
-          },
-          error: function (err) {
-            console.error("End reading session failed:", err);
           }
         });
+
       });
 
     });

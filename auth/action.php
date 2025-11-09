@@ -148,6 +148,31 @@ if($action === 'readingbooks'){
 }
 
 
+if($action === 'end_reading'){
+	$logout = $crud->endReading();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+if($action === 'toggle_favorite'){
+	$logout = $crud->toggleFavorite();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+if($action === 'get_favorite_books'){
+	$logout = $crud->get_favorite_books();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+
+
+
+
 
 
 

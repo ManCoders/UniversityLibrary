@@ -54,10 +54,14 @@ function db_connect()
             "CREATE TABLE IF NOT EXISTS reading_logs (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
-                file_path VARCHAR(255) NOT NULL,
+                file VARCHAR(255) NOT NULL,
+                duration INT DEFAULT 0,
+                is_favorite TINYINT(1) DEFAULT 0,
                 start_time DATETIME NOT NULL,
                 end_time DATETIME DEFAULT NULL,
-                total_read_time INT DEFAULT 0
+                total_read_time INT DEFAULT 0,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )"
         ];
 

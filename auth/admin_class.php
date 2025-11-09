@@ -163,7 +163,7 @@ class Action
             WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) = ? 
             OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ? 
             LIMIT 1
-        ");
+                ");
             $stmt->execute([$username, $username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -194,7 +194,7 @@ class Action
                 'email' => $auth['email'] ?? '',
                 'username' => $auth['username'] ?? '',
                 'user_role' => $role,
-                'civil_id' => $user['civil_id'] ?? null,
+                'user_id' => $user['user_id'] ?? null,
                 'created_date' => $user['created_date'] ?? '',
                 'profile_pic' => $person['profile_pic'] ?? null
             ];
@@ -205,11 +205,19 @@ class Action
             // Determine redirect path
             $redirect = ($role === 'faculty') ? 'src/faculty/' : './';
 
+            $_SESSION['user'] = [
+                'role' => $role,
+                'user_id' => $user['user_id'] ?? null
+            ];
+
             return json_encode([
                 'status' => 1,
+                'message' => 'Login successful.',
                 'redirect_url' => $redirect,
+                'user_role' => $role,
+                'user_id' => $user['user_id'] ?? null,
                 'user_name' => trim(($person['firstname'] ?? '') . ' ' . ($person['lastname'] ?? '')),
-                'user_data' => $_SESSION[$role]
+                'user_data' => $sessionData
             ]);
 
 
@@ -662,8 +670,8 @@ class Action
         function rrmdir($dir)
         {
             if (!is_dir($dir))
-                return;
-            $objects = scandir($dir);
+
+                $objects = scandir($dir);
             foreach ($objects as $object) {
                 if ($object != "." && $object != "..") {
                     $path = $dir . DIRECTORY_SEPARATOR . $object;
@@ -1274,14 +1282,21 @@ class Action
 
         header('Content-Type: application/json');
 
-        // Get the file from POST
         $file = $_POST['file'] ?? null;
         if (!$file) {
             return json_encode([
                 'status' => 0,
                 'message' => 'Missing file parameter.'
             ]);
+        }
 
+        $user_id = $_SESSION['student']['user_id'] ?? null;
+        if (!$user_id) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'User not logged in.',
+                'session' => $_SESSION['student'] ?? null
+            ]);
         }
 
         try {
@@ -1296,172 +1311,260 @@ class Action
                 'expires' => time() + 300
             ];
 
+            // ✅ Check if the reading log exists
+            $stmt = $this->db->prepare("SELECT id FROM reading_logs WHERE user_id = ? AND file = ?");
+            $stmt->execute([$user_id, $file]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($row) {
+                // ✅ Update existing reading session
+                $update = $this->db->prepare("
+                UPDATE reading_logs 
+                SET start_time = NOW(), end_time = NULL, total_read_time = 0, updated_at = NOW()
+                WHERE id = ?
+            ");
+                $update->execute([$row['id']]);
+            } else {
+                // ✅ Insert new reading session
+                $insert = $this->db->prepare("
+                INSERT INTO reading_logs (user_id, file, start_time, is_favorite) 
+                VALUES (?, ?, NOW(), 0)
+            ");
+                $insert->execute([$user_id, $file]);
+            }
+
+            // ✅ Build secure viewer URL
             $baseURL = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}/UniversityLibrary/";
             $secure_view_url = $baseURL . "auth/viewer.php?token=" . urlencode($token);
 
             return json_encode([
                 'status' => 1,
+                'user_id' => $user_id,
                 'message' => 'Reading session started.',
                 'data' => $secure_view_url
             ]);
+        } catch (Exception $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+    }
 
+    function endReading()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        header('Content-Type: application/json');
+
+        $file = $_POST['file'] ?? null;
+        $duration = (int) ($_POST['duration'] ?? 0);
+
+        $user_id = $_SESSION['student']['user_id'] ?? null;
+        if (!$user_id) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'User not logged in.'
+            ]);
+        }
+
+        if (!$file) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Missing file parameter.'
+            ]);
+        }
+
+        try {
+            // ✅ Find the active reading session
+            $stmt = $this->db->prepare("SELECT id, total_read_time, start_time FROM reading_logs WHERE user_id = ? AND file = ? ORDER BY id DESC LIMIT 1");
+            $stmt->execute([$user_id, $file]);
+            $log = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$log) {
+                return json_encode([
+                    'status' => 0,
+                    'message' => 'No active reading session found.'
+                ]);
+            }
+
+            // ✅ Calculate total reading time (add to previous total)
+            $new_total = $log['total_read_time'] + $duration;
+
+            // ✅ Update the reading log
+            $update = $this->db->prepare("
+            UPDATE reading_logs 
+            SET end_time = NOW(), duration = ?, total_read_time = ?, updated_at = NOW()
+            WHERE id = ?
+        ");
+            $update->execute([$duration, $new_total, $log['id']]);
+
+            return json_encode([
+                'status' => 1,
+                'message' => 'Reading session ended successfully.',
+                'duration' => $duration,
+                'total_read_time' => $new_total
+            ]);
 
         } catch (Exception $e) {
             return json_encode([
                 'status' => 0,
                 'message' => 'Error: ' . $e->getMessage()
             ]);
-
         }
     }
 
-    
-    function toggle_favorite()
-    {
-
-        $user_id = $_SESSION['student']['civil_id'] ?? null;
-        if (!$user_id) {
-            return json_encode(['status' => 0, 'message' => 'User not logged in']);
-            
-        }
-        $file = $_POST['file'] ?? null;
-        $favorite = isset($_POST['favorite']) ? (int) $_POST['favorite'] : 0;
-
-        if (!$file) {
-            return json_encode(['status' => 0, 'message' => 'Missing file']);
-
-        }
-
-        // Check if entry exists
-        $stmt = $this->db->prepare("SELECT id FROM reading_sessions WHERE user_id=? AND file=?");
-        $stmt->bind_param("is", $user_id, $file);
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows > 0) {
-            // Update existing
-            $stmt2 = $this->db->prepare("UPDATE reading_sessions SET is_favorite=? WHERE user_id=? AND file=?");
-            $stmt2->bind_param("iis", $favorite, $user_id, $file);
-            $stmt2->execute();
-        } else {
-            // Insert new
-            $stmt2 = $this->db->prepare("INSERT INTO reading_sessions (user_id, file, is_favorite) VALUES (?, ?, ?)");
-            $stmt2->bind_param("isi", $user_id, $file, $favorite);
-            $stmt2->execute();
-        }
-
-        return json_encode(['status' => 1, 'message' => 'Favorite updated']);
-
-    }
-
-/* 
-    function end_reading()
-    {
-        $user_id = $_SESSION['student']['civil_id'] ?? null;
-        if (!$user_id) {
-            return json_encode(['status' => 0, 'message' => 'User not logged in']);
-            
-        }
-        $file = $_POST['file'] ?? null;
-        $duration = isset($_POST['duration']) ? (int) $_POST['duration'] : 0;
-
-        if (!$file) {
-            return json_encode(['status' => 0, 'message' => 'Missing file']);
-
-        }
-
-        // Check if entry exists
-        $stmt = $this->db->prepare("SELECT id, duration FROM reading_sessions WHERE user_id=? AND file=?");
-        $stmt->bind_param("is", $user_id, $file);
-        $stmt->execute();
-        $stmt->store_result();
-
-        if ($stmt->num_rows > 0) {
-            $stmt->bind_result($id, $prevDuration);
-            $stmt->fetch();
-            $totalDuration = $prevDuration + $duration;
-            $stmt2 = $this->db->prepare("UPDATE reading_sessions SET duration=?, updated_at=NOW() WHERE id=?");
-            $stmt2->bind_param("ii", $totalDuration, $id);
-            $stmt2->execute();
-        } else {
-            // Insert new session
-            $stmt2 = $this->db->prepare("INSERT INTO reading_sessions (user_id, file, duration) VALUES (?, ?, ?)");
-            $stmt2->bind_param("isi", $user_id, $file, $duration);
-            $stmt2->execute();
-        }
-
-        return json_encode(['status' => 1, 'message' => 'Reading session saved']);
-
-
-    }
- */
 
 
 
-
-
-
-    function closereading()
+    function toggleFavorite()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
-        $user_id = $_SESSION['student']['civil_id'] ?? null;
-        $file = $_POST['file'] ?? null;
+        header('Content-Type: application/json');
 
-        if (!$user_id || !$file) {
+        $file = $_POST['file'] ?? null;
+        $favorite = isset($_POST['favorite']) ? (int) $_POST['favorite'] : 0;
+        $user_id = $_SESSION['student']['user_id'] ?? null;
+
+        if (!$user_id) {
             return json_encode([
                 'status' => 0,
-                'message' => 'Missing user or file data.'
+                'message' => 'User not logged in.'
+            ]);
+        }
+
+        if (!$file) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Missing file parameter.'
             ]);
         }
 
         try {
-            // Find the most recent open reading session
-            $stmt = $this->db->prepare("
-            SELECT id, start_time
-            FROM reading_logs
-            WHERE user_id = ? AND file_path = ? AND end_time IS NULL
-            ORDER BY id DESC
-            LIMIT 1
-        ");
-            $stmt->bind_param("is", $user_id, $file);
-            $stmt->execute();
-            $result = $stmt->get_result();
+            // ✅ Check if entry exists
+            $stmt = $this->db->prepare("SELECT id FROM reading_logs WHERE user_id = ? AND file = ? LIMIT 1");
+            $stmt->execute([$user_id, $file]);
+            $log = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($row = $result->fetch_assoc()) {
-                $end_time = date('Y-m-d H:i:s');
-                $start_time = strtotime($row['start_time']);
-                $total_seconds = max(0, strtotime($end_time) - $start_time); // prevent negative
-
-                $update = $this->db->prepare("
-                UPDATE reading_logs
-                SET end_time = ?, total_read_time = ?
-                WHERE id = ?
-            ");
-                $update->bind_param("sii", $end_time, $total_seconds, $row['id']);
-                $update->execute();
-
-                return json_encode([
-                    'status' => 1,
-                    'message' => 'Reading session ended.',
-                    'total_read_time' => $total_seconds
-                ]);
+            if ($log) {
+                // ✅ Update favorite status
+                $update = $this->db->prepare("UPDATE reading_logs SET is_favorite = ?, updated_at = NOW() WHERE id = ?");
+                $update->execute([$favorite, $log['id']]);
+            } else {
+                // ✅ Create new log entry if not found
+                $insert = $this->db->prepare("INSERT INTO reading_logs (user_id, file, is_favorite, start_time) VALUES (?, ?, ?, NOW())");
+                $insert->execute([$user_id, $file, $favorite]);
             }
 
             return json_encode([
-                'status' => 0,
-                'message' => 'No active session found.'
+                'status' => 1,
+                'message' => $favorite ? 'Added to favorites.' : 'Removed from favorites.'
             ]);
 
         } catch (Exception $e) {
             return json_encode([
                 'status' => 0,
-                'message' => 'Database error: ' . $e->getMessage()
+                'message' => 'Error: ' . $e->getMessage()
             ]);
         }
     }
+
+
+
+    function get_favorite_books()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        header('Content-Type: application/json');
+
+        $user_id = $_SESSION['student']['user_id'] ?? $_SESSION['faculty']['user_id'] ?? null;
+        if (!$user_id) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'User not logged in.'
+            ]);
+        }
+
+        try {
+            $baseURL = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}/UniversityLibrary/";
+
+            // Get favorite books for user
+            $stmt = $this->db->prepare("
+            SELECT rl.file, rl.is_favorite, rl.start_time, rl.updated_at, rl.duration,
+                   fs.folder_name, fs.folder_data
+            FROM reading_logs rl
+            LEFT JOIN folder_structure fs
+                ON rl.file = JSON_UNQUOTE(JSON_EXTRACT(fs.folder_data, '$.filename'))
+                
+            WHERE rl.user_id = ? AND rl.is_favorite = 1
+            ORDER BY rl.updated_at DESC
+        ");
+            $stmt->execute([$user_id]);
+            $favorites = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $result = [];
+
+            foreach ($favorites as $row) {
+                $folderData = json_decode($row['folder_data'], true) ?? [];
+                $metadata = $folderData['metadata'] ?? [];
+
+                $title = $metadata['Title'] ?? $metadata['title'] ?? 'Unknown Title';
+                $author = $metadata['Author'] ?? $metadata['author'] ?? 'Unknown Author';
+                $coverFile = $folderData['cover'] ?? null;
+                $file_path = $folderData['file_path'] ?? $row['file'];
+
+                $cover_url = $coverFile ? $baseURL . "files/" . ($row['folder_name'] ?? '') . "/covers/" . $coverFile : null;
+                $file_url = $file_path ? $baseURL . "auth/" . $file_path : null;
+
+                // ✅ Generate a secure token and store in session
+                if (!isset($_SESSION['pdf_tokens'])) {
+                    $_SESSION['pdf_tokens'] = [];
+                }
+
+
+                $token = bin2hex(random_bytes(16));
+                $_SESSION['pdf_tokens'][$token] = [
+                    'file' => $file_path,
+                    'created' => time(),
+                    'expires' => time() + 300
+                ];
+                $result[] = [
+                    'file' => pathinfo($row['file'], PATHINFO_FILENAME),
+                    'title' => $title,
+                    'author' => $author,
+                    'file_path' => $file_path,
+                    'cover_url' => $cover_url,
+                    'folder_name' => $row['folder_name'] ?? '',
+                    'start_time' => $row['start_time'],
+                    'updated_at' => $row['updated_at'],
+                    'duration' => $row['duration'],
+                    'file_url' => $file_url,
+                    'secure_view_url' => $baseURL . "auth/viewer.php?token=" . urlencode($token)
+                ];
+            }
+
+            return json_encode([
+                'status' => 1,
+                'data' => $result
+            ]);
+
+        } catch (Exception $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+
+
 
 
 

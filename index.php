@@ -291,46 +291,9 @@
                     class="text-xl font-semibold mb-4 border-b border-[#b03060] dark:border-[#800000] text-[#660000] dark:text-[#ffd1d1]">
                     Currently Checked Out (3)</h3>
 
-                <ul class="space-y-3 divide-y divide-[#b03060]/30 dark:divide-[#800000]/40">
-                    <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3">
-                        <div class="flex-1">
-                            <span class="font-medium text-[#660000] dark:text-[#ffd1d1]">The Structure of Scientific
-                                Revolutions</span>
-                            <p class="text-xs text-[#800000] dark:text-[#ffcccc]">Thomas S. Kuhn</p>
-                        </div>
-                        <span class="text-sm text-red-600 dark:text-red-400 font-medium mt-1 sm:mt-0 sm:mr-4">Due: Nov
-                            15, 2024</span>
-                        <button
-                            class="text-[#b03060] hover:text-[#800000] dark:text-[#ff4d6d] dark:hover:text-[#ff9999] text-sm border border-[#b03060] dark:border-[#800000] rounded-full px-3 py-1 transition mt-2 sm:mt-0">
-                            Renew
-                        </button>
-                    </li>
-                    <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3">
-                        <div class="flex-1">
-                            <span class="font-medium text-[#660000] dark:text-[#ffd1d1]">Designing Data-Intensive
-                                Applications</span>
-                            <p class="text-xs text-[#800000] dark:text-[#ffcccc]">Martin Kleppmann</p>
-                        </div>
-                        <span class="text-sm text-[#660000] dark:text-[#ffd1d1] font-medium mt-1 sm:mt-0 sm:mr-4">Due:
-                            Dec 5, 2024</span>
-                        <button
-                            class="text-[#b03060] hover:text-[#800000] dark:text-[#ff4d6d] dark:hover:text-[#ff9999] text-sm border border-[#b03060] dark:border-[#800000] rounded-full px-3 py-1 transition mt-2 sm:mt-0">
-                            Renew
-                        </button>
-                    </li>
-                    <li class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-3">
-                        <div class="flex-1">
-                            <span class="font-medium text-[#660000] dark:text-[#ffd1d1]">Modern Literary Theory</span>
-                            <p class="text-xs text-[#800000] dark:text-[#ffcccc]">M.H. Abrams</p>
-                        </div>
-                        <span class="text-sm text-[#660000] dark:text-[#ffd1d1] font-medium mt-1 sm:mt-0 sm:mr-4">Due:
-                            Dec 10, 2024</span>
-                        <button
-                            class="text-[#b03060] hover:text-[#800000] dark:text-[#ff4d6d] dark:hover:text-[#ff9999] text-sm border border-[#b03060] dark:border-[#800000] rounded-full px-3 py-1 transition mt-2 sm:mt-0">
-                            Renew
-                        </button>
-                    </li>
-                </ul>
+                <div id="favorites-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    <!-- Favorite books will be appended here -->
+                </div>
             </div>
         </section>
 
@@ -382,8 +345,6 @@
                 </div>
             </div>
         </section>
-
-
     </main>
 
 
@@ -493,15 +454,91 @@
         class="bg-[#fff0f0] dark:bg-[#330000] border-t border-[#b03060] dark:border-[#800000] text-center py-6 text-sm text-[#660000] dark:text-[#ffd1d1]">
 
         <div class="max-w-7xl mx-auto px-4">
-            <p>&copy; <span id="current-year">2024</span> Zamboanga Peninsula Polytechnic State University Campus Library — All Rights Reserved</p>
+            <p>&copy; <span id="current-year">2024</span> Zamboanga Peninsula Polytechnic State University Campus
+                Library — All Rights Reserved</p>
             <p class="mt-1 text-xs">Developed for Academic Use |
                 <a href="#" class="text-[#b03060] dark:text-[#ff4d6d] hover:underline">Privacy Policy</a>
             </p>
         </div>
     </footer>
-
-
-
 </body>
 
 </html>
+
+<script>
+    $(document).ready(function () {
+        const $container = $("#favorites-container");
+
+        $.ajax({
+            url: base_url + "auth/action.php?action=get_favorite_books",
+            type: "GET",
+            dataType: "json",
+            success: function (res) {
+                if (res.status === 1 && res.data.length) {
+                    $container.empty();
+
+                    res.data.forEach(book => {
+                        const bookHtml = `
+                        <div class="bg-[#fff0f0] dark:bg-[#330000] p-4 rounded-xl shadow-lg flex flex-col items-center text-center">
+                            <img src="${book.cover_url || base_url + 'assets/image/library.png'}" 
+                                 alt="${book.title} Cover" 
+                                 class="w-25 h-40 object-cover rounded-lg mb-3">
+                            <p class="font-semibold text-[#660000] dark:text-[#ffd1d1] mb-1">${book.title}</p>
+                            <p class="text-sm text-[#800000] dark:text-[#ffcccc] mb-3">${book.author}</p>
+                            <button class="read-btn text-[#b03060] hover:text-[#800000] dark:text-[#ff4d6d] dark:hover:text-[#ff9999] text-sm border border-[#b03060] dark:border-[#800000] rounded-full px-3 py-1 transition"
+                                    data-file="${book.file_path}">
+                                Read
+                            </button>
+                        </div>
+                    `;
+                        $container.append(bookHtml);
+                    });
+
+                    $("#books-section").removeClass("hidden");
+
+                } else {
+                    $container.html(`<p class="text-gray-500 dark:text-gray-400">No favorite books found.</p>`);
+                    $("#books-section").removeClass("hidden");
+                }
+            },
+            error: function (err) {
+                console.error("Failed to fetch favorite books:", err);
+                $container.html(`<p class="text-red-500 dark:text-red-400">Error loading favorites.</p>`);
+                $("#books-section").removeClass("hidden");
+            }
+        });
+
+        $container.on("click", ".read-btn", function () {
+            const filePath = $(this).data("file");
+            if (!filePath) return;
+
+            console.log("Requesting reading session for file:", filePath);
+
+            const $btn = $(this);
+            $btn.prop("disabled", true).text("Opening...");
+
+            $.ajax({
+                url: base_url + "auth/action.php?action=readingbooks",
+                type: "POST",
+                data: { file: filePath }, // encode special chars
+                dataType: "json",
+                success: function (res) {
+                    if (res && res.status === 1 && res.data) {
+                        console.log("Received token:", res.data);
+                        window.open(res.data, "_blank"); 
+                    } else {
+                        alert(res?.message || "Failed to open the book.");
+                    }
+                },
+                error: function (err) {
+                    console.error("Error starting reading session:", err);
+                    alert("Failed to open the book.");
+                },
+                complete: function () {
+                    $btn.prop("disabled", false).text("Read"); // reset button text
+                }
+            });
+        });
+
+    });
+</script>
