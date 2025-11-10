@@ -343,8 +343,53 @@
                         <span class="text-[#660000] dark:text-[#ffd1d1]">Portal alerts for new features</span>
                     </label>
                 </div>
+
+                <!-- Change Password Section -->
+                <div class="border-t pt-4 border-[#b03060] dark:border-[#800000]">
+                    <h3 class="text-xl font-semibold mb-3 flex items-center text-[#660000] dark:text-[#ffd1d1]">
+                        <i data-lucide="key" class="w-5 h-5 mr-2 text-[#b03060]"></i> Change Password
+                    </h3>
+
+                    <form id="change-password-form" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-[#660000] dark:text-[#ffd1d1] mb-1"
+                                for="current-password">
+                                Current Password
+                            </label>
+                            <input type="password" id="current-password" name="current-password"
+                                class="w-full px-4 py-2 border rounded-lg border-[#b03060] dark:border-[#800000] bg-[#fff0f0] dark:bg-[#330000] text-[#660000] dark:text-[#ffd1d1] focus:ring-[#b03060] focus:outline-none"
+                                required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-[#660000] dark:text-[#ffd1d1] mb-1"
+                                for="new-password">
+                                New Password
+                            </label>
+                            <input type="password" id="new-password" name="new-password"
+                                class="w-full px-4 py-2 border rounded-lg border-[#b03060] dark:border-[#800000] bg-[#fff0f0] dark:bg-[#330000] text-[#660000] dark:text-[#ffd1d1] focus:ring-[#b03060] focus:outline-none"
+                                required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-[#660000] dark:text-[#ffd1d1] mb-1"
+                                for="confirm-password">
+                                Confirm New Password
+                            </label>
+                            <input type="password" id="confirm-password" name="confirm-password"
+                                class="w-full px-4 py-2 border rounded-lg border-[#b03060] dark:border-[#800000] bg-[#fff0f0] dark:bg-[#330000] text-[#660000] dark:text-[#ffd1d1] focus:ring-[#b03060] focus:outline-none"
+                                required>
+                        </div>
+
+                        <button type="submit"
+                            class="px-6 py-2 bg-[#b03060] dark:bg-[#800000] text-white rounded-lg hover:bg-[#ff4d6d] dark:hover:bg-[#a00000] transition">
+                            Update Password
+                        </button>
+                    </form>
+                </div>
             </div>
         </section>
+
     </main>
 
 
