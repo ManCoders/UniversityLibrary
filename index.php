@@ -289,7 +289,7 @@
                 class="border-2 border-[#b03060] dark:border-[#800000] bg-[#fff0f0] dark:bg-[#330000] p-6 rounded-xl shadow-lg">
                 <h3
                     class="text-xl font-semibold mb-4 border-b border-[#b03060] dark:border-[#800000] text-[#660000] dark:text-[#ffd1d1]">
-                    Currently Checked Out (3)</h3>
+                    Currently Checked Out</h3>
 
                 <div id="favorites-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                     <!-- Favorite books will be appended here -->
@@ -468,46 +468,48 @@
 <script>
     $(document).ready(function () {
         const $container = $("#favorites-container");
-
-        $.ajax({
-            url: base_url + "auth/action.php?action=get_favorite_books",
-            type: "GET",
-            dataType: "json",
-            success: function (res) {
-                if (res.status === 1 && res.data.length) {
-                    $container.empty();
-
-                    res.data.forEach(book => {
-                        const bookHtml = `
+        fetchbookfavorite();
+        function fetchbookfavorite() {
+            $.ajax({
+                url: base_url + "auth/action.php?action=get_favorite_books",
+                type: "GET",
+                dataType: "json",
+                success: function (res) {
+                    console.log(res); // <-- debug the response
+                    if (res.status === 1 && res.data.length) {
+                        $container.empty();
+                        res.data.forEach(book => {
+                            const bookHtml = `
                         <div class="bg-[#fff0f0] dark:bg-[#330000] p-4 rounded-xl shadow-lg flex flex-col items-center text-center">
                             <img src="${book.cover_url || base_url + 'assets/image/library.png'}" 
-                                 alt="${book.title} Cover" 
-                                 class="w-25 h-40 object-cover rounded-lg mb-3">
+                                alt="${book.title} Cover" 
+                                class="w-25 h-40 object-cover rounded-lg mb-3">
                             <p class="font-semibold text-[#660000] dark:text-[#ffd1d1] mb-1">${book.title}</p>
                             <p class="text-sm text-[#800000] dark:text-[#ffcccc] mb-3">${book.author}</p>
                             <button class="read-btn text-[#b03060] hover:text-[#800000] dark:text-[#ff4d6d] dark:hover:text-[#ff9999] text-sm border border-[#b03060] dark:border-[#800000] rounded-full px-3 py-1 transition"
-                                    data-file="${book.file_path}">
+                                    data-file="${book.file_url}">
                                 Read
                             </button>
                         </div>
-                    `;
-                        $container.append(bookHtml);
-                    });
-
-                    $("#books-section").removeClass("hidden");
-
-                } else {
-                    $container.html(`<p class="text-gray-500 dark:text-gray-400">No favorite books found.</p>`);
-                    $("#books-section").removeClass("hidden");
+                        `;
+                            $container.append(bookHtml);
+                        });
+                        $("#books-section").removeClass("hidden");
+                    } else if (res.status === 0) {
+                        alert("Error: " + res.message);
+                    } else {
+                        $container.html(`<p class="text-gray-500 dark:text-gray-400">No favorite books found.</p>`);
+                        $("#books-section").removeClass("hidden");
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr.responseText); // debug raw response
+                    alert("AJAX Error: " + error);
                 }
-            },
-            error: function (err) {
-                console.error("Failed to fetch favorite books:", err);
-                $container.html(`<p class="text-red-500 dark:text-red-400">Error loading favorites.</p>`);
-                $("#books-section").removeClass("hidden");
-            }
-        });
+            });
 
+
+        }
         $container.on("click", ".read-btn", function () {
             const filePath = $(this).data("file");
             if (!filePath) return;
@@ -525,7 +527,7 @@
                 success: function (res) {
                     if (res && res.status === 1 && res.data) {
                         console.log("Received token:", res.data);
-                        window.open(res.data, "_blank"); 
+                        window.open(res.data, "_blank");
                     } else {
                         alert(res?.message || "Failed to open the book.");
                     }

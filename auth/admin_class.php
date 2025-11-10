@@ -1490,68 +1490,111 @@ class Action
                 'status' => 0,
                 'message' => 'User not logged in.'
             ]);
+
         }
 
         try {
             $baseURL = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}/UniversityLibrary/";
 
-            // Get favorite books for user
+            // Step 1: Get user's favorite reading logs
             $stmt = $this->db->prepare("
-            SELECT rl.file, rl.is_favorite, rl.start_time, rl.updated_at, rl.duration,
-                   fs.folder_name, fs.folder_data
-            FROM reading_logs rl
-            LEFT JOIN folder_structure fs
-                ON rl.file = JSON_UNQUOTE(JSON_EXTRACT(fs.folder_data, '$.filename'))
-                
-            WHERE rl.user_id = ? AND rl.is_favorite = 1
-            ORDER BY rl.updated_at DESC
-        ");
+                SELECT * FROM reading_logs 
+                WHERE user_id = ? AND is_favorite = 1
+                ORDER BY updated_at DESC
+            ");
             $stmt->execute([$user_id]);
-            $favorites = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $readingLogs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if (!$readingLogs) {
+                return json_encode([
+                    'status' => 1,
+                    'message' => 'No favorite books found.',
+                    'data' => []
+                ]);
+            }
 
             $result = [];
 
-            foreach ($favorites as $row) {
-                $folderData = json_decode($row['folder_data'], true) ?? [];
-                $metadata = $folderData['metadata'] ?? [];
+            // Folder lookup
+            $stmtFolder = $this->db->prepare("
+                SELECT *
+                FROM folder_structure
+                WHERE JSON_CONTAINS(folder_data, JSON_OBJECT('filename', ?), '$')
+            ");
+            $folderRow = [];
+            $title = 'Unknown';
+            $author = 'Unknown';
+            $cover_url = null;
+            $folder_name = '';
+            $file_name = '';
+            foreach ($readingLogs as $log) {
+                $log_file_name = pathinfo($log['file'], PATHINFO_BASENAME);
 
-                $title = $metadata['Title'] ?? $metadata['title'] ?? 'Unknown Title';
-                $author = $metadata['Author'] ?? $metadata['author'] ?? 'Unknown Author';
-                $coverFile = $folderData['cover'] ?? null;
-                $file_path = $folderData['file_path'] ?? $row['file'];
+                $stmtFolder->execute([$log_file_name]);
+                $folderRow = $stmtFolder->fetch(PDO::FETCH_ASSOC);
 
-                $cover_url = $coverFile ? $baseURL . "files/" . ($row['folder_name'] ?? '') . "/covers/" . $coverFile : null;
-                $file_url = $file_path ? $baseURL . "auth/" . $file_path : null;
 
-                // ✅ Generate a secure token and store in session
+                if ($folderRow) {
+                    $folderData = json_decode($folderRow['folder_data'], true) ?? [];
+                    foreach ($folderData as $file) {
+                        if (!is_array($folderData)) $folderData = [];
+                        if (($file['filename'] ?? '') === $log_file_name) {
+                            $metadata = $file['metadata'] ?? [];
+
+                            // Title extraction
+                            $title = $metadata['Title']
+                                ?? ($metadata['dc:title'] ?? null)
+                                ?? ($metadata['pdf:title'] ?? null)
+                                ?? ($metadata['title'] ?? null)
+                                ?? $title;
+
+                            // Author extraction
+                            $author = $metadata['Author']
+                                ?? ($metadata['dc:creator'][0] ?? null)
+                                ?? ($metadata['pdf:author'] ?? null)
+                                ?? ($metadata['author'] ?? null)
+                                ?? $author;
+
+                            // Cover URL
+                            if (!empty($file['cover'])) {
+                                $cover_url = $baseURL . "auth/files/" . $folderRow['folder_name'] . "/covers/" . $file['cover'];
+                            }
+
+                            $folder_name = $folderRow['folder_name'];
+                            break;
+                        }
+                    }
+                }
+
+                // Secure token setup (unchanged)
                 if (!isset($_SESSION['pdf_tokens'])) {
                     $_SESSION['pdf_tokens'] = [];
                 }
-
-
                 $token = bin2hex(random_bytes(16));
                 $_SESSION['pdf_tokens'][$token] = [
-                    'file' => $file_path,
+                    'file' => $baseURL . "auth/" . $log['file'],
                     'created' => time(),
                     'expires' => time() + 300
                 ];
+
                 $result[] = [
-                    'file' => pathinfo($row['file'], PATHINFO_FILENAME),
+                    'file' => pathinfo($log['file'], PATHINFO_FILENAME),
                     'title' => $title,
                     'author' => $author,
-                    'file_path' => $file_path,
+                    'file_name' => $file_name,
                     'cover_url' => $cover_url,
-                    'folder_name' => $row['folder_name'] ?? '',
-                    'start_time' => $row['start_time'],
-                    'updated_at' => $row['updated_at'],
-                    'duration' => $row['duration'],
-                    'file_url' => $file_url,
+                    'folder_name' => $folder_name,
+                    'start_time' => $log['start_time'],
+                    'updated_at' => $log['updated_at'],
+                    'duration' => $log['duration'],
+                    'file_url' => $log['file'],
                     'secure_view_url' => $baseURL . "auth/viewer.php?token=" . urlencode($token)
                 ];
             }
 
             return json_encode([
                 'status' => 1,
+                'message' => 'Favorite books retrieved successfully.',
                 'data' => $result
             ]);
 
@@ -1561,7 +1604,13 @@ class Action
                 'message' => 'Error: ' . $e->getMessage()
             ]);
         }
+
     }
+
+
+
+
+
 
 
 
