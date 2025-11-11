@@ -18,7 +18,7 @@ $navLinks = [
     <div class="flex items-center justify-between h-16 border-b border-gray-100 dark:border-gray-700 mb-6 flex-shrink-0">
         <div class="text-xl font-bold text-indigo-700 dark:text-indigo-400 flex items-center">
             <i data-lucide="layout-grid" class="w-6 h-6 mr-2"></i>
-            Admin Panel
+            Faculty Panel
         </div>
         <button id="close-sidebar-btn" class="lg:hidden text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white focus:outline-none">
             <i data-lucide="x" class="w-6 h-6"></i>

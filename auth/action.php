@@ -170,7 +170,26 @@ if($action === 'get_favorite_books'){
 }
 
 
+if($action === 'change_password'){
+	$logout = $crud->change_password();
+	if ($logout) {
+		echo $logout;
+	}
+}
 
+if($action === 'register_user'){
+	$logout = $crud->register_user();
+	if ($logout) {
+		echo $logout;
+	}
+}
+
+if($action === 'settingupdate'){
+	$logout = $crud->setting();
+	if ($logout) {
+		echo $logout;
+	}
+}
 
 
 

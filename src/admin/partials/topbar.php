@@ -26,9 +26,9 @@
                 <!-- User Info -->
                 <div class="ml-4 flex items-center space-x-3">
                     <span
-                        class="text-sm font-medium text-gray-700 dark:text-gray-200 hidden md:block"><?php echo 'admin'; ?></span>
+                        class="text-sm font-medium text-gray-700 dark:text-gray-200 hidden md:block"><?php echo isset($_SESSION['admin']) ? $_SESSION['admin']['firstname'] .' '. $_SESSION['admin']['lastname'] : ''; ?></span>
                     <img class="h-10 w-10 rounded-full object-cover shadow-lg ring-2 ring-indigo-500/50"
-                        src="" alt="User Avatar">
+                        src="../../assets/image/<?php echo isset($_SESSION['admin']) ? $_SESSION['admin']['profile_pic'] : '';?>" alt="User Avatar">
                 </div>
             </div>
         </div>

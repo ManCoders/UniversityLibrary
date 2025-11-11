@@ -227,7 +227,7 @@
                     <!-- Profile Picture -->
                     <div class="relative">
                         <img id="profile-picture"
-                            src="https://ui-avatars.com/api/?name=Guest&background=b03060&color=fff&size=128"
+                            src="<?php echo isset($_SESSION['student']['profile_pic']) ? $_SESSION['student']['profile_pic'] : ''?>"
                             alt="Profile Picture"
                             class="w-32 h-32 rounded-full border-4 border-[#b03060] shadow-md object-cover">
                         <button
@@ -463,9 +463,251 @@
                 <button type="button"
                     class="w-full text-[#b03060] dark:text-[#ff4d6d] text-sm mt-2 hover:underline">Forgot
                     Password?</button>
+                <!-- Inside login form -->
+                <button type="button" class="w-full text-[#b03060] dark:text-[#ff4d6d] text-sm mt-3 ">
+                    Don’t have an account? <span id="open-register" class="font-semibold hover:underline">Register
+                        here</span>
+                </button>
+
             </form>
         </div>
     </div>
+
+
+    <div id="register-modal" aria-expanded="false"
+        class="hidden fixed inset-0 bg-black/60 dark:bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center transition-opacity duration-300">
+
+        <div
+            class="bg-[#fff0f0] dark:bg-[#330000] rounded-xl shadow-2xl w-[95%] sm:w-[800px] p-6 relative animate-fade-in border border-[#b03060] dark:border-[#800000] flex flex-col sm:flex-row gap-6">
+
+            <!-- Close Button -->
+            <button id="close-register"
+                class="absolute top-3 right-3 text-[#800000] dark:text-[#ffcccc] hover:text-red-500 transition p-1">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <!-- LEFT: Profile Upload -->
+            <div
+                class="flex flex-col items-center justify-center w-full sm:w-[35%] border-r border-[#b03060]/40 dark:border-[#800000]/40 pr-4">
+                <div
+                    class="relative w-32 h-32 rounded-full overflow-hidden border-2 border-[#b03060] dark:border-[#800000]">
+                    <img id="profile-preview" src="assets/default-profile.png" alt="Profile Preview"
+                        class="w-full h-full object-cover">
+                </div>
+                <label for="profile"
+                    class="mt-3 cursor-pointer text-sm font-semibold text-[#b03060] dark:text-[#ff4d6d] hover:underline">
+                    Upload Profile
+                </label>
+                <input type="file" name="profile" id="profile" accept="image/*" class="hidden">
+                <p class="mt-2 text-xs text-[#800000] dark:text-[#ffcccc]">JPG, PNG under 2MB</p>
+            </div>
+
+            <!-- RIGHT: Registration Form -->
+            <div class="flex-1">
+                <h3 class="text-2xl font-bold text-center mb-3 text-[#b03060] dark:text-[#ff4d6d]">
+                    <i data-lucide="user-plus" class="inline-block w-4 h-4 mr-1 align-text-bottom"></i> Campus
+                    Registration
+                </h3>
+
+                <form id="register" class="space-y-2" enctype="multipart/form-data">
+
+                    <!-- Role Selector -->
+                    <div class="flex gap-3 justify-center mb-2">
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="role" value="student" class="accent-[#b03060]" checked> Student
+                        </label>
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="role" value="faculty" class="accent-[#b03060]"> Faculty
+                        </label>
+                    </div>
+
+                    <!-- Two-row layout -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" name="firstname" placeholder="First Name" required
+                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                        <input type="text" name="lastname" placeholder="Last Name" required
+                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+
+                        <input type="text" name="middlename" placeholder="Middle Name"
+                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                        <input type="text" name="suffix" placeholder="Suffix (e.g. Jr., III)"
+                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                    </div>
+
+                    <!-- Common fields -->
+                    <input type="text" name="department" placeholder="Department" required
+                        class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+
+                    <!-- Student Section -->
+                    <div id="student-fields" class="space-y-3">
+                        <input type="text" name="student_id" placeholder="Student ID"
+                            class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                        <input type="text" name="section" placeholder="Section"
+                            class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                    </div>
+
+                    <!-- Faculty Section -->
+                    <div id="faculty-fields" class="hidden space-y-3">
+                        <input type="text" name="employee_id" placeholder="Employee ID"
+                            class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="email" name="email" placeholder="Email" required
+                        class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                        <input type="text" name="username" placeholder="Username" required
+                        class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                        
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="password" name="password" placeholder="Password" required
+                            class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                        <input type="password" name="confirm_password" placeholder="Confirm Password" required
+                            class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                    </div>
+
+                    <p id="register-message" class="text-sm text-red-500 hidden"></p>
+
+                    <button type="submit"
+                        class="w-full bg-[#b03060] text-white font-semibold py-3 rounded-lg hover:bg-[#800000] transition transform hover:scale-[1.01]">
+                        Register Account
+                    </button>
+
+                    <button type="button" class="w-full text-[#b03060] dark:text-[#ff4d6d] text-sm mt-2">
+                        Already have an account? <span id="open-login-from-register"
+                            class="font-semibold  hover:underline">Sign In</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        $('#profile').on('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => $('#profile-preview').attr('src', e.target.result);
+            reader.readAsDataURL(file);
+        });
+        $('#role').on('change', function () {
+            const role = $(this).val();
+            if (role === 'student') {
+                $('#student-fields').removeClass('hidden');
+                $('#faculty-fields').addClass('hidden');
+            } else if (role === 'faculty') {
+                $('#faculty-fields').removeClass('hidden');
+                $('#student-fields').addClass('hidden');
+            } else {
+                $('#student-fields, #faculty-fields').addClass('hidden');
+            }
+        });
+        // Open Register Modal from Login
+        $('#open-register').on('click', function () {
+            $('#login-modal').addClass('hidden').attr('aria-expanded', 'false');
+            $('#register-modal').removeClass('hidden').attr('aria-expanded', 'true');
+        });
+
+        // Open Login from Register
+        $('#open-login-from-register').on('click', function () {
+            $('#register-modal').addClass('hidden').attr('aria-expanded', 'false');
+            $('#login-modal').removeClass('hidden').attr('aria-expanded', 'true');
+        });
+
+        // Close Register Modal
+        $('#close-register').on('click', function () {
+            $('#register-modal').addClass('hidden').attr('aria-expanded', 'false');
+        });
+
+        // Role switch logic
+        $('input[name="role"]').on('change', function () {
+            if ($(this).val() === 'student') {
+                $('#student-fields').removeClass('hidden');
+                $('#faculty-fields').addClass('hidden');
+            } else {
+                $('#faculty-fields').removeClass('hidden');
+                $('#student-fields').addClass('hidden');
+            }
+        });
+
+
+        $('#register').on('submit', function (e) {
+            e.preventDefault();
+
+            const form = this;
+            const formData = new FormData(form);
+            const role = $('input[name="role"]:checked').val();
+
+            // Convert profile image to Base64 if selected
+            const fileInput = $('#profile')[0].files[0];
+            if (fileInput) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    formData.set('profile_pic', e.target.result);
+                    sendRegisterRequest(formData, role);
+                };
+                reader.readAsDataURL(fileInput);
+            } else {
+                // No profile selected, send form as is
+                sendRegisterRequest(formData, role);
+            }
+        });
+
+        function sendRegisterRequest(formData, role) {
+            // Convert FormData to JSON
+            const jsonData = {};
+            formData.forEach((value, key) => {
+                jsonData[key] = value;
+            });
+
+            $.ajax({
+                url: `${base_url}auth/action.php?action=register_user`, // adjust this path to your backend
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(jsonData),
+                success: function (res) {
+                    try {
+                        const data = typeof res === 'string' ? JSON.parse(res) : res;
+                        if (data.status === 1) {
+                            $('#register-message')
+                                .removeClass('text-red-500')
+                                .addClass('text-green-500')
+                                .text(data.message)
+                                .removeClass('hidden');
+
+                            // Optionally, clear form
+                            $('#register')[0].reset();
+                            $('#profile-preview').attr('src', 'assets/default-profile.png');
+
+                            setTimeout(() => {
+                                $('#register-modal').addClass('hidden').attr('aria-expanded', 'false');
+                                $('#login-modal').removeClass('hidden').attr('aria-expanded', 'true');
+                            }, 1500);
+                        } else {
+                            $('#register-message')
+                                .removeClass('hidden text-green-500')
+                                .addClass('text-red-500')
+                                .text(data.message);
+                        }
+                    } catch (err) {
+                        $('#register-message')
+                            .removeClass('hidden text-green-500')
+                            .addClass('text-red-500')
+                            .text('Unexpected server response.');
+                    }
+                },
+                error: function () {
+                    $('#register-message')
+                        .removeClass('hidden text-green-500')
+                        .addClass('text-red-500')
+                        .text('Failed to connect to the server.');
+                }
+            });
+        }
+    </script>
+
 
     <!-- Search Modal -->
     <div id="search-modal" aria-expanded="false"
@@ -513,8 +755,8 @@
 <script>
     $(document).ready(function () {
         const $container = $("#favorites-container");
-        fetchbookfavorite();
-        function fetchbookfavorite() {
+
+        $("#dropdown-my-books").on("click", function () {
             $.ajax({
                 url: base_url + "auth/action.php?action=get_favorite_books",
                 type: "GET",
@@ -553,8 +795,7 @@
                 }
             });
 
-
-        }
+        });
         $container.on("click", ".read-btn", function () {
             const filePath = $(this).data("file");
             if (!filePath) return;

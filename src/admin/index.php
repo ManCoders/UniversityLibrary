@@ -8,7 +8,6 @@ if (isset($_GET['page']) && in_array($_GET['page'], $allowed_pages)) {
   $page = $_GET['page'];
 }
 if (!isset($_SESSION['admin'])) {
-  exit();
 }
 
 ?>

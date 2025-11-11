@@ -232,7 +232,7 @@ $(document).ready(function () {
       const usernameText = `User: ${userState.username}`;
       $("#profile-username").text(usernameText);
       $("#profile-picture")
-        .attr("src", `${base_url}auth/auth/${userState.profilePic}`)
+        .attr("src", `${base_url}auth/${userState.profilePic}`)
         .on("error", function () {
           $(this).attr(
             "src",
@@ -374,7 +374,7 @@ $(document).ready(function () {
 
           if (res.status === 1) {
             const userData = res.user_data || {};
-            
+
             userState.isLoggedIn = true;
             userState.username = res.user_name || userData.username || username;
             userState.email = userData.email || "student";
@@ -484,7 +484,7 @@ $(document).ready(function () {
           if (role === "admin" || role === "faculty") {
             console.log(`${role} logged out — returning to index...`);
             setTimeout(() => {
-              window.location.href = base_url + "index.php";
+              window.location.href = base_url + "./index.php";
             }, 400);
           } else {
             updateHeaderUI();
@@ -759,5 +759,36 @@ $(document).ready(function () {
     } else {
       $("html").removeClass("dark");
     }
+  });
+
+  $("#change-password-form").on("submit", function (e) {
+    e.preventDefault();
+
+    const current = $("#current-password").val().trim();
+    const newPass = $("#new-password").val().trim();
+    const confirm = $("#confirm-password").val().trim();
+
+    if (newPass !== confirm) {
+      alert("New passwords do not match!");
+      return;
+    }
+
+    $.ajax({
+      url: `${base_url}auth/action.php?action=change_password`,
+      type: "POST",
+      data: { current, newPass },
+      dataType: "json",
+      success: function (res) {
+        if (res.status === 1) {
+          alert(res.message);
+          $("#change-password-form")[0].reset();
+        } else {
+          alert(res.message);
+        }
+      },
+      error: function () {
+        alert("Server error. Please try again.");
+      },
+    });
   });
 });
