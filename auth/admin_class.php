@@ -503,6 +503,27 @@ class Action
             return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
         }
     }
+    private function saveBase64ImageHelper($base64, $folder, $prefix)
+    {
+        if (!$base64)
+            return null;
+        if (!is_dir($folder))
+            mkdir($folder, 0755, true);
+        if (!preg_match('/^data:image\/(\w+);base64,/', $base64, $type))
+            return null;
+        $data = substr($base64, strpos($base64, ',') + 1);
+        $type = strtolower($type[1]);
+        if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif']))
+            return null;
+        $decoded = base64_decode($data);
+        if ($decoded === false)
+            return null;
+        $filename = uniqid($prefix . '_') . '.' . $type;
+        $path = $folder . $filename;
+        file_put_contents($path, $decoded);
+        return $path;
+    }
+
     function register_user()
     {
         $input = json_decode(file_get_contents('php://input'), true);
@@ -554,31 +575,9 @@ class Action
 
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-        // Helper function to save Base64 image
-        function saveBase64Image($base64, $folder, $prefix)
-        {
-            if (!$base64)
-                return null;
-            if (!is_dir($folder))
-                mkdir($folder, 0755, true);
-            if (!preg_match('/^data:image\/(\w+);base64,/', $base64, $type))
-                return null;
-            $data = substr($base64, strpos($base64, ',') + 1);
-            $type = strtolower($type[1]);
-            if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif']))
-                return null;
-            $decoded = base64_decode($data);
-            if ($decoded === false)
-                return null;
-            $filename = uniqid($prefix . '_') . '.' . $type;
-            $path = $folder . $filename;
-            file_put_contents($path, $decoded);
-            return $path;
-        }
-
         // Process profile picture
         $uploadFolder = 'uploads/' . $role . '_profiles/';
-        $profile_pic_path = saveBase64Image($profilePicBase64, $uploadFolder, $role) ?? 'assets/default-profile.png';
+        $profile_pic_path = $this->saveBase64ImageHelper($profilePicBase64, $uploadFolder, $role) ?? 'assets/default-profile.png';
 
         // Prepare JSON for database
         $personal_details = json_encode([
@@ -776,25 +775,27 @@ class Action
             ]);
         }
 
-        // Recursive delete function
-        function rrmdir($dir)
-        {
-            if (!is_dir($dir))
-
-                $objects = scandir($dir);
-            foreach ($objects as $object) {
-                if ($object != "." && $object != "..") {
-                    $path = $dir . DIRECTORY_SEPARATOR . $object;
-                    if (is_dir($path))
-                        rrmdir($path);
-                    else
-                        unlink($path);
+        // Recursive delete function - safely remove directory and its contents
+        $removeDir = function ($dir) use (&$removeDir) {
+            if (!is_dir($dir)) {
+                return;
+            }
+            $items = scandir($dir);
+            foreach ($items as $item) {
+                if ($item === '.' || $item === '..') {
+                    continue;
+                }
+                $path = $dir . DIRECTORY_SEPARATOR . $item;
+                if (is_dir($path)) {
+                    $removeDir($path);
+                } else {
+                    @unlink($path);
                 }
             }
-            rmdir($dir);
-        }
+            @rmdir($dir);
+        };
 
-        rrmdir($folderPath);
+        $removeDir($folderPath);
 
         // Optional: log deletion in database with current timestamp
         try {
@@ -814,38 +815,51 @@ class Action
     }
     function uploadFile()
     {
+        // Suppress notices/warnings for clean JSON output
+        error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+        ob_start(); // start output buffering
+
         $baseDir = __DIR__ . '/files/';
         $folderName = $_POST['folder'] ?? null;
 
         if (!$folderName) {
+            ob_clean();
             return json_encode(['status' => 0, 'message' => 'Folder name is required.']);
+            
         }
 
         $safeFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $folderName);
         if (empty($safeFolderName)) {
+            ob_clean();
             return json_encode(['status' => 0, 'message' => 'Invalid folder name.']);
+            
         }
 
         $targetDir = $baseDir . $safeFolderName . '/';
         $coverDir = $targetDir . 'covers/';
+
         if (!is_dir($targetDir))
             mkdir($targetDir, 0777, true);
         if (!is_dir($coverDir))
             mkdir($coverDir, 0777, true);
 
-        $sqlFolder = "SELECT folder_id, folder_data FROM folder_structure WHERE folder_name = ?";
-        $stmtFolder = $this->db->prepare($sqlFolder);
+        // Fetch existing folder metadata
+        $stmtFolder = $this->db->prepare("SELECT folder_id, folder_data FROM folder_structure WHERE folder_name = ?");
         $stmtFolder->execute([$safeFolderName]);
         $folderData = $stmtFolder->fetch(PDO::FETCH_ASSOC);
 
         $folderId = $folderData['folder_id'] ?? null;
-        $existingMetadata = $folderData ? json_decode($folderData['folder_data'], true) : [];
-        if (!is_array($existingMetadata))
-            $existingMetadata = [];
+        $existingMetadata = [];
+        if (!empty($folderData['folder_data'])) {
+            $existingMetadata = json_decode($folderData['folder_data'], true);
+            if (!is_array($existingMetadata))
+                $existingMetadata = [];
+        }
 
         $uploadedFiles = [];
         $uploadedCovers = [];
 
+        // Random code generator
         $generateRandomCode = function ($length = 8): string {
             $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             $code = '';
@@ -855,12 +869,16 @@ class Action
             return $code;
         };
 
+        // === Upload files safely ===
         if (!empty($_FILES['files']['name'])) {
             foreach ($_FILES['files']['name'] as $i => $filename) {
-                if ($_FILES['files']['error'][$i] !== UPLOAD_ERR_OK)
+                if (empty($filename) || ($_FILES['files']['error'][$i] ?? 1) !== UPLOAD_ERR_OK)
                     continue;
 
-                $tmpName = $_FILES['files']['tmp_name'][$i];
+                $tmpName = $_FILES['files']['tmp_name'][$i] ?? '';
+                if (!$tmpName)
+                    continue;
+
                 $ext = pathinfo($filename, PATHINFO_EXTENSION) ?: 'pdf';
                 $newFileName = $generateRandomCode(12) . '.' . $ext;
                 $destination = $targetDir . $newFileName;
@@ -871,12 +889,16 @@ class Action
             }
         }
 
+        // === Upload covers safely ===
         if (!empty($_FILES['covers']['name'])) {
             foreach ($_FILES['covers']['name'] as $i => $filename) {
-                if ($_FILES['covers']['error'][$i] !== UPLOAD_ERR_OK)
+                if (empty($filename) || ($_FILES['covers']['error'][$i] ?? 1) !== UPLOAD_ERR_OK)
                     continue;
 
-                $tmpName = $_FILES['covers']['tmp_name'][$i];
+                $tmpName = $_FILES['covers']['tmp_name'][$i] ?? '';
+                if (!$tmpName)
+                    continue;
+
                 $ext = pathinfo($filename, PATHINFO_EXTENSION) ?: 'png';
                 $newCoverName = $generateRandomCode(8) . '.' . $ext;
                 $destination = $coverDir . $newCoverName;
@@ -887,25 +909,29 @@ class Action
             }
         }
 
+        // === Process metadata safely ===
         $newMetadata = [];
         if (!empty($_POST['metadata'])) {
             $metadataJson = $_POST['metadata'];
             $decodedMetadata = json_decode($metadataJson, true);
             if (is_array($decodedMetadata)) {
                 foreach ($decodedMetadata as $meta) {
+                    if (!is_array($meta))
+                        continue;
                     $metaId = $generateRandomCode(12);
                     $originalFile = $meta['filename'] ?? '';
                     $meta['id'] = $metaId;
                     $meta['folder_id'] = $folderId;
 
-                    if (isset($uploadedFiles[$originalFile])) {
+                    if (!empty($originalFile) && isset($uploadedFiles[$originalFile])) {
                         $meta['filename'] = $uploadedFiles[$originalFile];
                         $meta['file_path'] = 'files/' . $safeFolderName . '/' . $uploadedFiles[$originalFile];
                     }
 
-                    if (isset($meta['cover']) && isset($uploadedCovers[$meta['cover']])) {
-                        $meta['cover'] = $uploadedCovers[$meta['cover']];
-                        $meta['cover_path'] = 'files/' . $safeFolderName . '/covers/' . $uploadedCovers[$meta['cover']];
+                    if (!empty($meta['cover']) && isset($uploadedCovers[$meta['cover']])) {
+                        $coverKey = $meta['cover'];
+                        $meta['cover'] = $uploadedCovers[$coverKey];
+                        $meta['cover_path'] = 'files/' . $safeFolderName . '/covers/' . $uploadedCovers[$coverKey];
                     }
 
                     $newMetadata[] = $meta;
@@ -913,55 +939,71 @@ class Action
             }
         }
 
+        // Merge with existing metadata avoiding duplicates
         $existingFilenames = array_column($existingMetadata, 'filename');
         foreach ($newMetadata as $meta) {
-            if (!in_array($meta['filename'], $existingFilenames)) {
+            if (!empty($meta['filename']) && !in_array($meta['filename'], $existingFilenames)) {
                 $existingMetadata[] = $meta;
             }
         }
 
-        $sqlUpdate = "UPDATE folder_structure SET folder_data = ? WHERE folder_name = ?";
-        $stmtUpdate = $this->db->prepare($sqlUpdate);
+        // Update database
+        $stmtUpdate = $this->db->prepare("UPDATE folder_structure SET folder_data = ? WHERE folder_name = ?");
         $stmtUpdate->execute([json_encode($existingMetadata, JSON_UNESCAPED_UNICODE), $safeFolderName]);
 
+        // Save metadata JSON file
         file_put_contents(
             $targetDir . 'metadata.json',
             json_encode($existingMetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
 
+        // Clean any stray output and return JSON
+        ob_clean();
         return json_encode([
             'status' => 1,
-            'message' => 'Files, covers, and metadata uploaded successfully with generated file IDs.',
+            'message' => 'Uploaded successfully',
             'folder_name' => $safeFolderName,
             'folder_id' => $folderId,
             'files' => $uploadedFiles,
             'covers' => $uploadedCovers,
             'metadata_count' => count($existingMetadata)
         ]);
+        
     }
+
+
 
 
     function uploadFolder()
     {
+        header('Content-Type: application/json'); // force JSON output
+        ini_set('display_errors', 0); // suppress PHP warnings/notices
+
         $baseDir = __DIR__ . '/files/';
         $rootFolderName = $_POST['folder'] ?? null;
 
         if (!$rootFolderName) {
             return json_encode(['status' => 0, 'message' => 'Target folder name not provided.']);
+
         }
 
         $safeRootFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $rootFolderName);
         if (empty($safeRootFolderName)) {
             return json_encode(['status' => 0, 'message' => 'Invalid folder name after sanitization.']);
+
         }
 
         $targetDir = $baseDir . $safeRootFolderName . '/';
         $coverDir = $targetDir . 'covers/';
+
         if (!is_dir($targetDir) && !mkdir($targetDir, 0777, true)) {
             return json_encode(['status' => 0, 'message' => 'Failed to create target folder.']);
+
         }
-        if (!is_dir($coverDir))
+
+        if (!is_dir($coverDir)) {
             mkdir($coverDir, 0777, true);
+        }
 
         $uploadedFiles = [];
         $uploadedCovers = [];
@@ -975,6 +1017,7 @@ class Action
             return $id;
         };
 
+        // === Fetch existing folder or create new ===
         $stmt = $this->db->prepare("SELECT folder_id, folder_data FROM folder_structure WHERE folder_name = ?");
         $stmt->execute([$safeRootFolderName]);
         $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -989,9 +1032,10 @@ class Action
             $existingMetadata = [];
         }
 
+        // === Upload main files ===
         if (!empty($_FILES['files']['name'][0])) {
             foreach ($_FILES['files']['name'] as $i => $name) {
-                if ($_FILES['files']['error'][$i] !== UPLOAD_ERR_OK)
+                if (!isset($_FILES['files']['error'][$i]) || $_FILES['files']['error'][$i] !== UPLOAD_ERR_OK)
                     continue;
 
                 $tmpName = $_FILES['files']['tmp_name'][$i];
@@ -1005,9 +1049,10 @@ class Action
             }
         }
 
+        // === Upload covers safely ===
         if (!empty($_FILES['covers']['name'])) {
             foreach ($_FILES['covers']['name'] as $i => $filename) {
-                if ($_FILES['covers']['error'][$i] !== UPLOAD_ERR_OK)
+                if (!isset($_FILES['covers']['error'][$i]) || $_FILES['covers']['error'][$i] !== UPLOAD_ERR_OK)
                     continue;
 
                 $tmpName = $_FILES['covers']['tmp_name'][$i];
@@ -1024,6 +1069,7 @@ class Action
             }
         }
 
+        // === Handle metadata safely ===
         $newMetadata = [];
         if (!empty($_POST['metadata'])) {
             $decoded = json_decode($_POST['metadata'], true);
@@ -1035,14 +1081,23 @@ class Action
                     $meta['folder_id'] = $folderId;
                     $meta['foldername'] = $safeRootFolderName;
 
-                    if (isset($uploadedFiles[$originalFile])) {
+                    // Safe file assignment
+                    if (!empty($originalFile) && isset($uploadedFiles[$originalFile])) {
                         $meta['filename'] = $uploadedFiles[$originalFile];
                         $meta['file_path'] = 'files/' . $safeRootFolderName . '/' . $uploadedFiles[$originalFile];
+                    } else {
+                        $meta['filename'] = null;
+                        $meta['file_path'] = null;
                     }
 
-                    if (isset($meta['cover']) && isset($uploadedCovers[$meta['cover']])) {
-                        $meta['cover'] = $uploadedCovers[$meta['cover']];
-                        $meta['cover_path'] = 'files/' . $safeRootFolderName . '/covers/' . $uploadedCovers[$meta['cover']];
+                    // Safe cover assignment
+                    $coverFile = $meta['cover'] ?? '';
+                    if (!empty($coverFile) && isset($uploadedCovers[$coverFile])) {
+                        $meta['cover'] = $uploadedCovers[$coverFile];
+                        $meta['cover_path'] = 'files/' . $safeRootFolderName . '/covers/' . $uploadedCovers[$coverFile];
+                    } else {
+                        $meta['cover'] = null;
+                        $meta['cover_path'] = null;
                     }
 
                     $newMetadata[] = $meta;
@@ -1050,32 +1105,37 @@ class Action
             }
         }
 
+        // Merge with existing metadata safely
         $existingFilenames = array_column($existingMetadata, 'filename');
         foreach ($newMetadata as $meta) {
-            if (!in_array($meta['filename'], $existingFilenames)) {
+            if (!in_array($meta['filename'], $existingFilenames, true) && !empty($meta['filename'])) {
                 $existingMetadata[] = $meta;
             }
         }
 
-        $this->db->prepare("UPDATE folder_structure SET folder_data = ? WHERE folder_id = ?")
-            ->execute([json_encode($existingMetadata, JSON_UNESCAPED_UNICODE), $folderId]);
+        // Update DB
+        $stmtUpdate = $this->db->prepare("UPDATE folder_structure SET folder_data = ? WHERE folder_id = ?");
+        $stmtUpdate->execute([json_encode($existingMetadata, JSON_UNESCAPED_UNICODE), $folderId]);
 
+        // Save metadata JSON file
         file_put_contents(
             $targetDir . 'metadata.json',
             json_encode($existingMetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
 
-        // === 🔟 Return JSON response ===
         return json_encode([
             'status' => 1,
-            'message' => 'Folder and books uploaded successfully with generated file IDs.',
+            'message' => 'Folder Uploaded successfully',
             'folder_id' => $folderId,
             'folder_name' => $safeRootFolderName,
             'files_uploaded' => $uploadedFiles,
             'covers_uploaded' => $uploadedCovers,
             'total_books' => count($existingMetadata)
         ]);
+
     }
+
+
 
 
 
@@ -1795,7 +1855,7 @@ class Action
         $user = $_SESSION['student'] ?? $_SESSION['faculty'] ?? null;
         if (!$user || empty($user['user_id'])) {
             return json_encode(['status' => 0, 'message' => 'User not logged in.']);
-            
+
         }
 
         $user_id = $user['user_id'];
@@ -1819,7 +1879,7 @@ class Action
 
             if (!$row) {
                 return json_encode(['status' => 0, 'message' => 'User not found.']);
-                
+
             }
 
             $personal = json_decode($row['personal_details'], true) ?? [];
@@ -1829,15 +1889,15 @@ class Action
             if (!empty($current_password) || !empty($new_password) || !empty($confirm_password)) {
                 if (empty($auth['password']) || !password_verify($current_password, $auth['password'])) {
                     return json_encode(['status' => 0, 'message' => 'Current password is incorrect.']);
-                    
+
                 }
                 if ($new_password !== $confirm_password) {
                     return json_encode(['status' => 0, 'message' => 'New passwords do not match.']);
-                    
+
                 }
                 if (strlen($new_password) < 6) {
                     return json_encode(['status' => 0, 'message' => 'Password must be at least 6 characters long.']);
-                    
+
                 }
                 $auth['password'] = password_hash($new_password, PASSWORD_DEFAULT);
             }
@@ -1850,7 +1910,7 @@ class Action
 
                 if (!in_array($ext, $allowed)) {
                     return json_encode(['status' => 0, 'message' => 'Invalid image type.']);
-                    
+
                 }
 
                 $uploadDir = __DIR__ . '/uploads/' . ($role === 'faculty' ? 'faculty_profiles/' : 'student_profiles/');
@@ -1862,12 +1922,12 @@ class Action
 
                 if (!move_uploaded_file($file['tmp_name'], $destPath)) {
                     return json_encode(['status' => 0, 'message' => 'Failed to upload profile picture.']);
-                    
+
                 }
 
                 // Delete old image if exists
                 if (!empty($personal['profile_pic']) && file_exists(__DIR__ . '/' . $personal['profile_pic'])) {
-                    unlink(__DIR__ . '/' . $personal['profile_pic']);
+                    @unlink(__DIR__ . '/' . $personal['profile_pic']);
                 }
 
                 $personal['profile_pic'] = 'uploads/' . ($role === 'faculty' ? 'faculty_profiles/' : 'student_profiles/') . $filename;

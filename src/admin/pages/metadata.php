@@ -112,7 +112,7 @@
                             Author</th>
                         <th
                             class="w-[15%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            ISBN</th>
+                            Folder</th>
                         <th
                             class="w-[20%] px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Actions</th>
@@ -248,7 +248,7 @@
                                             <td class="px-4 py-2 truncate max-w-xs" title="${bookId}">${bookId}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${title}">${title}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${author}">${author}</td>
-                                            <td class="px-4 py-2 truncate max-w-xs" title="${isbn}">${isbn}</td>
+                                            <td class="px-4 py-2 truncate max-w-xs" title="${folder}">${folder}</td>
                                             <td class="px-4 py-2 text-center space-x-1">
                                                 <button class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs view-btn" data-id="${bookId}">View</button>
                                                 <button class="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs edit-btn" data-id="${bookId}">Edit</button>
@@ -279,15 +279,17 @@
                         method: "POST",
                         data: { book_id: bookId },
                         dataType: "json",
+                        beforeSend: function () {
+                            $("#upload-spinner").removeClass("hidden"); // show spinner
+                        },
                         success: function (res) {
                             if (res.status === 1) {
                                 const data = res.data;
                                 const meta = data.metadata || {};
 
-                                // === Book cover ===
                                 const coverPath = data.cover_path
-                                    ? base_url + 'auth/' + data.cover_path + data.cover
-                                    : "https://via.placeholder.com/150x200?text=No+Cover"; // fallback
+                                    ? base_url + 'auth/' + data.cover_path
+                                    : "https://via.placeholder.com/150x200?text=No+Cover";
 
                                 $("#viewMetaCover")
                                     .attr("src", coverPath)
@@ -295,39 +297,20 @@
                                         $(this).attr("src", "https://via.placeholder.com/150x200?text=No+Cover");
                                     });
 
-                                // === Basic metadata ===
-                                let rawTitle =
-                                    meta.Title ||
-                                    meta.title ||
-                                    (data.filename ? data.filename.replace(/\.[^/.]+$/, "") : "") ||
-                                    meta["dc:title"] ||
-                                    "—";
-
-                                // Extract author inside parentheses from title (e.g. "(Sam Grubb)")
+                                let rawTitle = meta.Title || meta.title || (data.filename ? data.filename.replace(/\.[^/.]+$/, "") : "") || meta["dc:title"] || "—";
                                 let extractedAuthor = "—";
                                 const authorMatch = rawTitle.match(/\(([^)]+)\)/);
                                 if (authorMatch) {
-                                    extractedAuthor = authorMatch[1].trim(); // get what's inside ()
-                                    rawTitle = rawTitle.replace(/\s*\([^)]+\)\s*$/, "").trim(); // remove it from title
+                                    extractedAuthor = authorMatch[1].trim();
+                                    rawTitle = rawTitle.replace(/\s*\([^)]+\)\s*$/, "").trim();
                                 }
 
-                                // === Set Title & Author ===
                                 $("#viewMetaTitle").text(rawTitle);
-                                $("#viewMetaAuthor").text(
-                                    meta.Author ||
-                                    meta.author ||
-                                    extractedAuthor ||
-                                    "—"
-                                );
-
-
-                                $("#viewMetaISBN").text(
-                                    meta["prism:isbn"]?.ISBN || meta["pdfx:isbn"] || "—"
-                                );
+                                $("#viewMetaAuthor").text(meta.Author || meta.author || extractedAuthor || "—");
+                                $("#viewMetaISBN").text(meta["prism:isbn"]?.ISBN || meta["pdfx:isbn"] || "—");
                                 $("#viewMetaFolder").text(data.foldername || "—");
                                 $("#viewMetaFilename").text(data.filename || "—");
 
-                                // === Other metadata ===
                                 let otherMeta = "";
                                 for (let key in meta) {
                                     if (!["Title", "Author", "prism:isbn", "pdfx:isbn"].includes(key)) {
@@ -338,7 +321,6 @@
                                 }
                                 $("#viewMetaOther").text(otherMeta || "No other metadata available.");
 
-                                // === Show modal ===
                                 $("#viewMetaModal").fadeIn(200);
                             } else {
                                 alert(res.message || "Failed to load metadata");
@@ -346,14 +328,15 @@
                         },
                         error: function () {
                             alert("Server error while fetching metadata");
+                        },
+                        complete: function () {
+                            $("#upload-spinner").addClass("hidden"); // hide spinner
                         }
                     });
 
-
-
                 } else if ($(this).hasClass("edit-btn")) {
                     // --- Edit Metadata ---
-                    openEditModal(bookId);
+                    openEditModal(bookId); // optional spinner if fetching data
 
                 } else if ($(this).hasClass("delete-btn")) {
                     // --- Delete Metadata ---
@@ -364,6 +347,9 @@
                         method: "POST",
                         data: { book_id: bookId },
                         dataType: "json",
+                        beforeSend: function () {
+                            $("#upload-spinner").removeClass("hidden"); // show spinner
+                        },
                         success: function (res) {
                             if (res.status === 1) {
                                 alert("Book deleted successfully");
@@ -374,10 +360,14 @@
                         },
                         error: function () {
                             alert("Server error while deleting metadata");
+                        },
+                        complete: function () {
+                            $("#upload-spinner").addClass("hidden"); // hide spinner
                         }
                     });
                 }
             });
+
 
             // --- Edit Modal Logic ---
             function openEditModal(bookId) {
@@ -444,7 +434,6 @@
                 addMetaRow();
             });
 
-            // Submit edit form
             $("#editMetaForm").submit(function (e) {
                 e.preventDefault();
 
@@ -857,9 +846,6 @@
 
                             console.log('Clicked file:', filename, 'in folder:', folderName);
 
-                            // Do something with the file click, e.g., download, preview, or show metadata
-                            // Example:
-                            // openFile(folderName, filename);
                         });
                     });
                 });

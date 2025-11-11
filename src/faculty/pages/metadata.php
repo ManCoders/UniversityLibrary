@@ -112,7 +112,7 @@
                             Author</th>
                         <th
                             class="w-[15%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            ISBN</th>
+                            Folder</th>
                         <th
                             class="w-[20%] px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Actions</th>
@@ -248,7 +248,7 @@
                                             <td class="px-4 py-2 truncate max-w-xs" title="${bookId}">${bookId}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${title}">${title}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${author}">${author}</td>
-                                            <td class="px-4 py-2 truncate max-w-xs" title="${isbn}">${isbn}</td>
+                                            <td class="px-4 py-2 truncate max-w-xs" title="${folder}">${folder}</td>
                                             <td class="px-4 py-2 text-center space-x-1">
                                                 <button class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs view-btn" data-id="${bookId}">View</button>
                                                 <button class="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs edit-btn" data-id="${bookId}">Edit</button>

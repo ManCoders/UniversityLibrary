@@ -30,7 +30,7 @@
 <!-- Tab Contents -->
 <div id="tab-content">
     <!-- Dashboard -->
-    <!-- <div id="dashboard-content" class="tab-panel">
+    <div id="dashboard-content" class="tab-panel">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-indigo-500">
                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</p>
@@ -82,7 +82,7 @@
                 Placeholder for User Charts/Tables
             </div>
         </div>
-    </div> -->
+    </div>
 
     <!-- Faculty Form -->
     <div id="faculty-content" class="tab-panel hidden">
