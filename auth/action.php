@@ -1,207 +1,113 @@
 <?php
 header('Content-Type: application/json');
-
-
-$action = isset($_GET['action']) ? htmlspecialchars($_GET['action']) : '';
-
 include 'admin_class.php';
 
+$action = isset($_GET['action']) ? htmlspecialchars($_GET['action']) : '';
 $crud = new Action();
 
-if ($action === 'installation') {
-	$installer = $crud->installation();
+switch ($action) {
+    case 'installation':
+        echo $crud->installation();
+        break;
 
-	if ($installer) {
-		echo $installer;
-	}
+    case 'login':
+        echo $crud->login();
+        break;
+
+    case 'logout':
+        echo $crud->logout();
+        break;
+
+    case 'Regfaculty':
+        echo $crud->register_faculty();
+        break;
+
+    case 'Regstudent':
+        echo $crud->register_users();
+        break;
+
+    case 'GetFaculty':
+        echo $crud->readUserDetails();
+        break;
+
+    case 'createFolder':
+        echo $crud->createFolder();
+        break;
+
+    case 'getFolders':
+        echo $crud->getFolders();
+        break;
+
+    case 'deleteFolder':
+        echo $crud->deleteFolder();
+        break;
+
+    case 'uploadFile':
+        echo $crud->uploadFile();
+        break;
+
+    case 'uploadFolder':
+        echo $crud->uploadFolder();
+        break;
+
+    case 'getMetadata':
+        echo $crud->getMetadata();
+        break;
+
+    case 'viewmeta':
+        echo $crud->viewmeta();
+        break;
+
+    case 'editmeta':
+        echo $crud->editmeta();
+        break;
+
+    case 'deletemeta':
+        echo $crud->deletemeta();
+        break;
+
+    case 'searching':
+        echo $crud->searching();
+        break;
+
+    case 'check_login':
+        echo $crud->check_login();
+        break;
+
+    case 'readingbooks':
+        echo $crud->readingbooks();
+        break;
+
+    case 'end_reading':
+        echo $crud->endReading();
+        break;
+
+    case 'toggle_favorite':
+        echo $crud->toggleFavorite();
+        break;
+
+    case 'get_favorite_books':
+        echo $crud->get_favorite_books();
+        break;
+
+    case 'change_password':
+        echo $crud->change_password();
+        break;
+
+    case 'register_user':
+        echo $crud->register_user();
+        break;
+
+    case 'settingupdate':
+        echo $crud->setting();
+        break;
+
+    /* ---------- USER CRUD SECTION ---------- */
+    case 'GetUser':
+        echo $crud->usercrude();
+        break;
+
+    default:
+        echo json_encode(['status' => 0, 'message' => 'Invalid or missing action.']);
+        break;
 }
-
-
-/* if ($action === 'admin_in') {
-	$installer = $crud->admin_staff_register();
-
-	if ($installer) {
-		echo $installer;
-	}
-} */
-
-if ($action === 'login') {
-	$login = $crud->login();
-	if ($login) {
-		echo $login;
-	}
-}
-
-if ($action === 'logout') {
-	$logout = $crud->logout();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'Regfaculty'){
-	$logout = $crud->register_faculty();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'Regstudent'){
-	$logout = $crud->register_student();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'GetFaculty'){
-	$logout = $crud->readUserDetails();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'createFolder'){
-	$logout = $crud->createFolder();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'getFolders'){
-	$logout = $crud->getFolders();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'deleteFolder'){
-	$logout = $crud->deleteFolder();
-	if ($logout) {
-		echo $logout;
-	}
-}
-if($action === 'uploadFile'){
-	$logout = $crud->uploadFile();
-	if ($logout) {
-		echo $logout;
-	}
-}
-if($action === 'uploadFolder'){
-	$logout = $crud->uploadFolder();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'getMetadata'){
-	$logout = $crud->getMetadata();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-
-
-
-if($action === 'viewmeta'){
-	$logout = $crud->viewmeta();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-
-if($action === 'editmeta'){
-	$logout = $crud->editmeta();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-
-if($action === 'deletemeta'){
-	$logout = $crud->deletemeta();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'searching'){
-	$logout = $crud->searching();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'check_login'){
-	$logout = $crud->check_login();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'readingbooks'){
-	$logout = $crud->readingbooks();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-
-if($action === 'end_reading'){
-	$logout = $crud->endReading();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'toggle_favorite'){
-	$logout = $crud->toggleFavorite();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'get_favorite_books'){
-	$logout = $crud->get_favorite_books();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-
-if($action === 'change_password'){
-	$logout = $crud->change_password();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'register_user'){
-	$logout = $crud->register_user();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-if($action === 'settingupdate'){
-	$logout = $crud->setting();
-	if ($logout) {
-		echo $logout;
-	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-/* ************** Start section ************** */
-
-

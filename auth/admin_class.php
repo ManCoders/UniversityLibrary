@@ -411,98 +411,105 @@ class Action
             return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
         }
     }
-    function register_student()
+    function register_users()
     {
         $input = json_decode(file_get_contents('php://input'), true);
 
-        // Validate required fields
-        if (
-            !$input ||
-            !isset($input['firstname'], $input['lastname'], $input['course'], $input['username'], $input['password'], $input['email'])
-        ) {
+        if (!$input || !isset($input['firstname'], $input['lastname'], $input['username'], $input['password'], $input['email'], $input['user_role'])) {
             return json_encode(['status' => 2, 'message' => 'Invalid input data.']);
         }
 
+        $role = $input['user_role']; // 'student' or 'faculty'
         $firstname = $input['firstname'];
         $lastname = $input['lastname'];
-        $course = $input['course'];
-        $department = $input['department'];
         $username = $input['username'];
         $password = $input['password'];
         $email = $input['email'];
-        $profilePicBase64 = isset($input['profile_pic']) ? $input['profile_pic'] : null;
+        $profilePicBase64 = $input['profile_pic'] ?? null;
 
-        // Hash password before storing it
+        // Optional fields
+        $birthdate = $input['birthdate'] ?? null;
+        $gender = $input['gender'] ?? null;
+        $phone = $input['phone'] ?? null;
+        $address = $input['address'] ?? null;
+        $department = $input['department'] ?? null;
+
+        // Student-specific
+        $course = $input['course'] ?? null;
+        $year_level = $input['year_level'] ?? null;
+        $section = $input['section'] ?? null;
+
+        // Faculty-specific
+        $position = $input['position'] ?? null;
+
+        // Hash password
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-        // Handle profile picture if it exists
+        // Handle profile picture
         $profile_pic_path = null;
         if ($profilePicBase64) {
-            $uploadDir = __DIR__ . 'uploads/student_profiles/'; // Make sure this directory exists and is writable
-
-            if (!is_dir($uploadDir)) {
-                if (!mkdir($uploadDir, 0755, true)) {
-                    return json_encode(['status' => 0, 'message' => 'Failed to create upload directory for student profile picture']);
-                }
+            $uploadDir = __DIR__ . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'profiles' . DIRECTORY_SEPARATOR;
+            if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
+                return json_encode(['status' => 0, 'message' => 'Failed to create upload directory']);
             }
 
-            // Extract base64 data from the input
             if (preg_match('/^data:image\/(\w+);base64,/', $profilePicBase64, $type)) {
                 $profilePicBase64 = substr($profilePicBase64, strpos($profilePicBase64, ',') + 1);
-                $type = strtolower($type[1]); // jpg, png, gif
-
-                // Validate image type
-                if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif'])) {
+                $type = strtolower($type[1]);
+                if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif']))
                     return json_encode(['status' => 2, 'message' => 'Invalid image type']);
-                }
 
                 $profilePicBase64 = base64_decode($profilePicBase64);
-                if ($profilePicBase64 === false) {
+                if ($profilePicBase64 === false)
                     return json_encode(['status' => 0, 'message' => 'Base64 decode failed']);
-                }
-                $fileName = uniqid('student_') . '.' . $type;
+
+                $fileName = uniqid($role . '_') . '.' . $type;
                 $filePath = $uploadDir . $fileName;
-
-                if (file_put_contents($filePath, $profilePicBase64) === false) {
+                if (file_put_contents($filePath, $profilePicBase64) === false)
                     return json_encode(['status' => 0, 'message' => 'Failed to save profile picture']);
-                }
 
-                // Store the relative path to the profile picture
-                $profile_pic_path = 'uploads/student_profiles/' . $fileName;
+                $profile_pic_path = 'uploads/profiles/' . $fileName;
             } else {
                 return json_encode(['status' => 2, 'message' => 'Invalid image format']);
             }
         }
 
+        // Prepare data arrays
+        $personal_details = [
+            'firstname' => $firstname,
+            'lastname' => $lastname,
+            'birthdate' => $birthdate,
+            'gender' => $gender,
+            'phone' => $phone,
+            'address' => $address,
+            'department' => $department,
+            'profile_pic' => $profile_pic_path
+        ];
+
+        if ($role === 'student') {
+            $personal_details['course'] = $course;
+            $personal_details['year_level'] = $year_level;
+            $personal_details['section'] = $section;
+        } elseif ($role === 'faculty') {
+            $personal_details['position'] = $position;
+        }
+
+        $authentication_data = [
+            'username' => $username,
+            'password' => $hashed_password,
+            'user_role' => $role,
+            'email' => $email
+        ];
+
         try {
-            // Prepare the SQL query to insert the user data
-            $stmt = $this->db->prepare(
-                "INSERT INTO user (personal_details, authentication_data) VALUES (?, ?)"
-            );
-
-            $personal_details = json_encode([
-                'firstname' => $firstname,
-                'lastname' => $lastname,
-                'course' => $course,
-                'department' => $department,
-                'profile_pic' => $profile_pic_path
-            ]);
-
-            $authentication_data = json_encode([
-                'username' => $username,
-                'password' => $hashed_password,
-                'user_role' => 'student',
-                'email' => $email
-            ]);
-
-            $stmt->execute([$personal_details, $authentication_data]);
-
-            return json_encode(['status' => 1, 'message' => 'Student added successfully.']);
+            $stmt = $this->db->prepare("INSERT INTO user (personal_details, authentication_data) VALUES (?, ?)");
+            $stmt->execute([json_encode($personal_details), json_encode($authentication_data)]);
+            return json_encode(['status' => 1, 'message' => ucfirst($role) . ' added successfully.']);
         } catch (PDOException $e) {
-            // Catch any database errors
             return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
         }
     }
+
     private function saveBase64ImageHelper($base64, $folder, $prefix)
     {
         if (!$base64)
@@ -778,7 +785,7 @@ class Action
         // Recursive delete function - safely remove directory and its contents
         $removeDir = function ($dir) use (&$removeDir) {
             if (!is_dir($dir)) {
-                return;
+
             }
             $items = scandir($dir);
             foreach ($items as $item) {
@@ -825,14 +832,14 @@ class Action
         if (!$folderName) {
             ob_clean();
             return json_encode(['status' => 0, 'message' => 'Folder name is required.']);
-            
+
         }
 
         $safeFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $folderName);
         if (empty($safeFolderName)) {
             ob_clean();
             return json_encode(['status' => 0, 'message' => 'Invalid folder name.']);
-            
+
         }
 
         $targetDir = $baseDir . $safeFolderName . '/';
@@ -968,7 +975,7 @@ class Action
             'covers' => $uploadedCovers,
             'metadata_count' => count($existingMetadata)
         ]);
-        
+
     }
 
 
@@ -983,12 +990,14 @@ class Action
         $rootFolderName = $_POST['folder'] ?? null;
 
         if (!$rootFolderName) {
+            ob_clean();
             return json_encode(['status' => 0, 'message' => 'Target folder name not provided.']);
 
         }
 
         $safeRootFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $rootFolderName);
         if (empty($safeRootFolderName)) {
+            ob_clean();
             return json_encode(['status' => 0, 'message' => 'Invalid folder name after sanitization.']);
 
         }
@@ -997,6 +1006,7 @@ class Action
         $coverDir = $targetDir . 'covers/';
 
         if (!is_dir($targetDir) && !mkdir($targetDir, 0777, true)) {
+            ob_clean();
             return json_encode(['status' => 0, 'message' => 'Failed to create target folder.']);
 
         }
@@ -1014,6 +1024,7 @@ class Action
             for ($i = 0; $i < $length; $i++) {
                 $id .= $chars[random_int(0, strlen($chars) - 1)];
             }
+            ob_clean();
             return $id;
         };
 
@@ -1122,7 +1133,7 @@ class Action
             $targetDir . 'metadata.json',
             json_encode($existingMetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
-
+        ob_clean();
         return json_encode([
             'status' => 1,
             'message' => 'Folder Uploaded successfully',
@@ -1976,6 +1987,121 @@ class Action
         }
     }
 
+    function usercrude()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+
+        $action = $_POST['action'] ?? '';
+        $user_id = $_POST['user_id'] ?? '';
+
+
+        switch ($action) {
+            case 'GetFaculty':
+                try {
+                    $stmt = $this->db->prepare("SELECT personal_details, authentication_data FROM user WHERE user_id = ?");
+                    $stmt->execute([$user_id]);
+                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if (!$row) {
+                        return json_encode(['status' => 0, 'message' => 'User not found.']);
+                    }
+
+                    $personal = json_decode($row['personal_details'], true) ?? [];
+                    $auth = json_decode($row['authentication_data'], true) ?? [];
+
+                    $data = array_merge($personal, $auth);
+
+                    return json_encode(['status' => 1, 'data' => $data]);
+
+                } catch (PDOException $e) {
+                    return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
+                }
+
+
+            case 'GetUser':
+                try {
+                    $userId = $_POST['user_id'] ?? 0;
+                    $stmt = $this->db->prepare("SELECT * FROM user WHERE user_id = ?");
+                    $stmt->execute([$userId]);
+                    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if ($data) {
+                        return json_encode(['status' => 1, 'data' => $data]);
+                    } else {
+                        return json_encode(['status' => 0, 'message' => 'User not found']);
+                    }
+                } catch (PDOException $e) {
+                    return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
+                }
+
+
+            case 'UpdateUser':
+                try {
+                    $userId = $_POST['user_id'] ?? 0;
+                    $firstname = trim($_POST['firstname'] ?? '');
+                    $lastname = trim($_POST['lastname'] ?? '');
+                    $email = trim($_POST['email'] ?? '');
+                    $department = trim($_POST['department'] ?? '');
+
+                    if (!$userId || !$firstname || !$lastname || !$email) {
+                        return json_encode(['status' => 0, 'message' => 'Missing required fields.']);
+
+                    }
+
+                    $stmt = $this->db->prepare("UPDATE user SET firstname=?, lastname=?, email=?, department=? WHERE user_id=?");
+                    $stmt->execute([$firstname, $lastname, $email, $department, $userId]);
+
+                    return json_encode(['status' => 1, 'message' => 'User updated successfully.']);
+                } catch (PDOException $e) {
+                    return json_encode(['status' => 0, 'message' => 'Update failed: ' . $e->getMessage()]);
+                }
+
+
+            case 'DeleteUser':
+                try {
+                    $userId = $_POST['user_id'] ?? 0;
+
+                    if (empty($userId) || !is_numeric($userId)) {
+                        return json_encode([
+                            'status' => 0,
+                            'message' => 'Invalid user ID.'
+                        ]);
+                    }
+
+                    $check = $this->db->prepare("SELECT user_id FROM user WHERE user_id = ?");
+                    $check->execute([$userId]);
+
+                    if ($check->rowCount() === 0) {
+                        return json_encode([
+                            'status' => 0,
+                            'message' => 'User not found.'
+                        ]);
+                    }
+
+                    // Delete user
+                    $stmt = $this->db->prepare("DELETE FROM user WHERE user_id = ?");
+                    $stmt->execute([$userId]);
+
+                    return json_encode([
+
+                        'status' => 1,
+                        'message' => 'User deleted successfully.'
+                    ]);
+                } catch (PDOException $e) {
+                    return json_encode([
+                        'status' => 0,
+                        'message' => 'Delete failed: ' . $e->getMessage()
+                    ]);
+                }
+
+            default:
+                return json_encode(['status' => 0, 'message' => 'Invalid action.']);
+
+        }
+    }
 
 
 

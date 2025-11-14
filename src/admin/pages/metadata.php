@@ -565,7 +565,7 @@
                                 ? folder.files.map(f => `<li class="file bg-white dark:bg-gray-800 px-3 py-1 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer items-id">${f}</li>`).join('')
                                 : `<li class="text-gray-400 text-xs italic">Empty folder</li>`}
                                 </ul>
-                                <input type="file" class="hidden folder-file-input" multiple>
+                                <input type="file" class="hidden folder-file-input" accept=".pdf">
                                 <input type="file" class="hidden folder-folder-input" webkitdirectory directory multiple>
                             </li>
                         `);
