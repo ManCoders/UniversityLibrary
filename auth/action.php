@@ -18,14 +18,8 @@ switch ($action) {
         echo $crud->logout();
         break;
 
-    case 'Regfaculty':
-        echo $crud->register_faculty();
-        break;
-
-    case 'Regstudent':
-        echo $crud->register_users();
-        break;
-
+    
+  
     case 'GetFaculty':
         echo $crud->readUserDetails();
         break;

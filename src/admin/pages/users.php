@@ -80,58 +80,74 @@
         </div>
     </div>
     <div id="user-content" class="tab-panel">
-        <form id="userForm" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-5xl mx-auto">
-            <h2 class="text-xl font-semibold mb-6 text-gray-800 dark:text-gray-100 text-center">
+        <form id="userForm" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-5xl mx-auto"
+            enctype="multipart/form-data">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">
                 Add New User
             </h2>
 
             <div id="userFormMessage" class="m-2 text-center px-4 py-1 rounded"></div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
 
                 <!-- Profile Picture -->
                 <div class="flex flex-col items-center col-span-1">
-                    <label class="mb-2 text-gray-700 dark:text-gray-200">Profile Picture</label>
-
+                    <label class="mb-2 text-gray-700 dark:text-gray-200 font-semibold">Profile Picture</label>
                     <div class="w-32 h-32 mb-3">
-                        <img id="userProfilePreview" src="https://via.placeholder.com/150"
+                        <img id="userProfilePreview" src=""
                             class="w-full h-full object-cover rounded-full border border-gray-300 shadow">
                     </div>
-
                     <input type="file" name="profile_pic" id="userProfilePic"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
                 </div>
 
-                <!-- Form Fields Section -->
+                <!-- Form Fields -->
                 <div class="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
 
                     <!-- Role -->
-                    <select id="userRole" name="user_role"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-                        <option value="">Select User Type</option>
-                        <option value="faculty">Faculty</option>
-                        <option value="student">Student</option>
-                    </select>
+                    <div class="md:col-span-2">
+                        <label class="text-gray-700 dark:text-gray-200 font-semibold">User Role</label>
+                        <select id="userRole" name="user_role"
+                            class="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
+                            <option value="">Select User Type</option>
+                            <option value="faculty">Faculty</option>
+                            <option value="student">Student</option>
+                        </select>
+                    </div>
 
+                    <!-- Basic Info -->
                     <input name="firstname" type="text" placeholder="First Name"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-
                     <input name="lastname" type="text" placeholder="Last Name"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-
                     <input name="email" type="email" placeholder="Email"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-
                     <input name="username" type="text" placeholder="Username / Student ID"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-
                     <input name="password" type="password" placeholder="Password"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-
                     <input name="confirm_password" type="password" placeholder="Confirm Password"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
 
-                    <!-- Department -->
+                    <!-- Optional Info (Shown dynamically) -->
+                    <input name="birthdate" type="date" id="birthdateField"
+                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
+                    <select name="gender" id="genderField"
+                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                    <input name="phone" type="text" id="phoneField" placeholder="Contact Number"
+                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
+                    <input name="address" type="text" id="addressField" placeholder="Address"
+                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
+
+                    <!-- Faculty ONLY -->
+                    <input name="position" type="text" id="positionField" placeholder="Faculty Position"
+                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
+
+                    <!-- Student ONLY -->
                     <select id="departmentField" name="department"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
                         <option value="">Select Department</option>
@@ -145,30 +161,6 @@
                         <option value="SHS">SHS</option>
                     </select>
 
-                    <input name="birthdate" type="date" id="birthdateField"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-
-                    <!-- Gender -->
-                    <select name="gender" id="genderField"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-                        <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                    </select>
-
-                    <!-- Phone -->
-                    <input name="phone" type="text" id="phoneField" placeholder="Contact Number"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-
-                    <!-- Address -->
-                    <input name="address" type="text" id="addressField" placeholder="Address"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-
-                    <!-- Faculty ONLY -->
-                    <input name="position" type="text" id="positionField" placeholder="Faculty Position"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-
-                    <!-- Student ONLY -->
                     <select id="courseField" name="course"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
                         <option value="">Select Course / Program</option>
@@ -190,60 +182,47 @@
 
                     <input name="section" type="text" id="sectionField" placeholder="Section"
                         class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-
                 </div>
             </div>
 
             <div class="mt-6 text-center">
-                <button type="submit" class="bg-indigo-500 text-white px-6 py-2 rounded-md hover:bg-indigo-600">
+                <button type="submit"
+                    class="bg-indigo-500 text-white px-6 py-2 rounded-md hover:bg-indigo-600 transition duration-300">
                     Add User
                 </button>
             </div>
         </form>
     </div>
 
-
     <script>
+        const roleFields = {
+            common: ["birthdateField", "genderField", "phoneField", "addressField"],
+            faculty: ["departmentField", "positionField"],
+            student: ["departmentField", "courseField", "yearField", "sectionField"]
+        };
+
         document.getElementById("userRole").addEventListener("change", function () {
             const role = this.value;
 
-            const show = (id) => document.getElementById(id).classList.remove("hidden");
-            const hide = (id) => document.getElementById(id).classList.add("hidden");
+            // Hide all optional fields
+            Object.values(roleFields).flat().forEach(id => document.getElementById(id).classList.add("hidden"));
 
-            // universal fields
-            ["birthdateField", "genderField", "phoneField", "addressField"].forEach(hide);
+            // Show common + role-specific fields
+            roleFields.common.forEach(id => document.getElementById(id).classList.remove("hidden"));
+            if (role && roleFields[role]) roleFields[role].forEach(id => document.getElementById(id).classList.remove("hidden"));
+        });
 
-            // faculty
-            hide("departmentField");
-            hide("positionField");
-
-            // student
-            hide("courseField");
-            hide("yearField");
-            hide("sectionField");
-
-            if (role === "faculty") {
-                show("birthdateField");
-                show("genderField");
-                show("phoneField");
-                show("addressField");
-                show("departmentField");
-                show("positionField");
-            }
-
-            if (role === "student") {
-                show("birthdateField");
-                show("genderField");
-                show("phoneField");
-                show("addressField");
-                show("departmentField");
-                show("courseField");
-                show("yearField");
-                show("sectionField");
-            }
+        // Profile Preview
+        const profileInput = document.getElementById('userProfilePic');
+        const profilePreview = document.getElementById('userProfilePreview');
+        profileInput.addEventListener('change', e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => profilePreview.src = e.target.result;
+            reader.readAsDataURL(file);
         });
     </script>
-
 
 
 
@@ -548,197 +527,57 @@
             }
         });
 
-        $("#userForm").on("submit", function (e) {
+        $('#userForm').on('submit', function (e) {
             e.preventDefault();
-            const $form = $(this);
-            const faculty_details = {};
-            let filesProcessed = 0;
-            const fileInputs = $form.find("input[type=file]");
-            const totalFiles = fileInputs.length;
 
-            function sendIfReady() {
-                if (filesProcessed >= totalFiles) {
-                    // Send faculty_details as JSON
-                    $.ajax({
-                        url: `${base_url}auth/action.php?action=Regfaculty`,
-                        type: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify(faculty_details),
-                        dataType: "json",
-                        beforeSend: function () {
-                            $form.find("button[type=submit]").prop("disabled", true).text("Saving...");
-                            // Hide previous messages
-                            $("#userFormMessage").addClass("hidden").removeClass("bg-green-100 text-green-800 bg-red-100 text-red-800").text("");
-                        },
-                        success: function (response) {
-                            if (response.status === 1) {
-                                $("#userFormMessage")
-                                    .removeClass("hidden bg-red-100 text-red-800")
-                                    .addClass("bg-green-100 text-green-800")
-                                    .text(response.message || "Faculty added successfully!");
+            const form = this;
+            const formData = new FormData(form); // includes files automatically
+            const userRole = $('#userRole').val();
 
-                                // Reset form and preview image
-                                $form[0].reset();
-                                $("#profilePreview").attr("src", "https://via.placeholder.com/150");
-
-                                // Reload faculty table
-                                loadFaculty();
-
-                                // Optional redirect
-                                if (response.url) {
-                                    setTimeout(() => {
-                                        window.location.href = response.url;
-                                    }, 2000);
-                                }
-                            } else {
-                                $("#userFormMessage")
-                                    .removeClass("hidden bg-green-100 text-green-800")
-                                    .addClass("bg-red-100 text-red-800")
-                                    .text(response.message || "Error: Unable to add faculty.");
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error("AJAX error:", xhr.responseText);
-                            $("#userFormMessage")
-                                .removeClass("hidden bg-green-100 text-green-800")
-                                .addClass("bg-red-100 text-red-800")
-                                .text("Error: Something went wrong. Check console for details.");
-                        },
-                        complete: function () {
-                            $form.find("button[type=submit]").prop("disabled", false).text("Add Faculty");
-                        }
-                    });
-                }
+            if (!userRole) {
+                $('#userFormMessage').addClass('text-red-500').text('Please select a user role').removeClass('hidden');
+                return;
             }
 
-            // Convert file inputs to Base64
-            fileInputs.each(function () {
-                const inputName = $(this).attr("name");
-                const file = this.files[0];
+            formData.set('user_role', userRole);
 
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        faculty_details[inputName] = e.target.result; // Base64 string
-                        filesProcessed++;
-                        sendIfReady();
-                    };
-                    reader.readAsDataURL(file); // Converts to Base64
-                } else {
-                    faculty_details[inputName] = null;
-                    filesProcessed++;
-                    sendIfReady();
+            $.ajax({
+                url: `${base_url}auth/action.php?action=register_user`,
+                type: 'POST',
+                data: formData,
+                processData: false, // do not process FormData
+                contentType: false, // set by browser
+                success: function (res) {
+                    let data;
+                    try {
+                        data = typeof res === 'string' ? JSON.parse(res) : res;
+                    } catch (err) {
+                        $('#userFormMessage').addClass('text-red-500').text('Unexpected server response').removeClass('hidden');
+                        return;
+                    }
+
+                    const msgEl = $('#userFormMessage');
+                    msgEl.removeClass('text-red-500 text-green-500 hidden');
+
+                    if (data.status === 1) {
+                        msgEl.addClass('text-green-500').text(data.message).removeClass('hidden');
+                        form.reset();
+                        $('#userProfilePreview').attr('src', 'https://via.placeholder.com/150');
+
+                        // Hide all role-specific fields
+                        ['birthdateField', 'genderField', 'phoneField', 'addressField', 'departmentField', 'positionField', 'courseField', 'yearField', 'sectionField'].forEach(id => {
+                            $('#' + id).addClass('hidden');
+                        });
+                    } else {
+                        msgEl.addClass('text-red-500').text(data.message).removeClass('hidden');
+                    }
+                },
+                error: function () {
+                    $('#userFormMessage').addClass('text-red-500').text('Failed to connect to server').removeClass('hidden');
                 }
             });
-
-            // Handle non-file inputs
-            $form.find("input:not([type=file]), select").each(function () {
-                const name = $(this).attr("name");
-                if (!name) return;
-                faculty_details[name] = $(this).val().trim() || "";
-            });
-
-            // If no file inputs, send immediately
-            if (totalFiles === 0) {
-                filesProcessed = 1;
-                sendIfReady();
-            }
-
-            console.log("Faculty payload (Base64 image included):", faculty_details);
         });
-        $("#studentForm").on("submit", function (e) {
-            e.preventDefault();
-            const $form = $(this);
-            const student_details = {};
-            let filesProcessed = 0;
-            const fileInputs = $form.find("input[type=file]");
-            const totalFiles = fileInputs.length;
 
-            function sendIfReady() {
-                if (filesProcessed >= totalFiles) {
-                    // Send student_details as JSON
-                    $.ajax({
-                        url: `${base_url}auth/action.php?action=Regstudent`,
-                        type: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify(student_details),
-                        dataType: "json",
-                        beforeSend: function () {
-                            $form.find("button[type=submit]").prop("disabled", true).text("Saving...");
-                            $("#studentFormMessage").addClass("hidden")
-                                .removeClass("bg-green-100 text-green-800 bg-red-100 text-red-800")
-                                .text("");
-                        },
-                        success: function (response) {
-                            if (response.status === 1) {
-                                $("#studentFormMessage")
-                                    .removeClass("hidden bg-red-100 text-red-800")
-                                    .addClass("bg-green-100 text-green-800")
-                                    .text(response.message || "Student added successfully!");
-
-                                // Reset form and preview image
-                                $form[0].reset();
-                                $("#studentProfilePreview").attr("src", "https://via.placeholder.com/150");
-
-                                loadFaculty();
-
-                            } else {
-                                $("#studentFormMessage")
-                                    .removeClass("hidden bg-green-100 text-green-800")
-                                    .addClass("bg-red-100 text-red-800")
-                                    .text(response.message || "Error: Unable to add student.");
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error("AJAX error:", xhr.responseText);
-                            $("#studentFormMessage")
-                                .removeClass("hidden bg-green-100 text-green-800")
-                                .addClass("bg-red-100 text-red-800")
-                                .text("Error: Something went wrong. Check console for details.");
-                        },
-                        complete: function () {
-                            $form.find("button[type=submit]").prop("disabled", false).text("Add Student");
-                        }
-                    });
-                }
-            }
-
-            // Convert file inputs to Base64
-            fileInputs.each(function () {
-                const inputName = $(this).attr("name");
-                const file = this.files[0];
-
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        student_details[inputName] = e.target.result; // Base64 string
-                        filesProcessed++;
-                        sendIfReady();
-                    };
-                    reader.readAsDataURL(file); // Converts to Base64
-                } else {
-                    student_details[inputName] = null; // No file, set null
-                    filesProcessed++;
-                    sendIfReady();
-                }
-            });
-
-            // Handle non-file inputs
-            $form.find("input:not([type=file]), select").each(function () {
-                const name = $(this).attr("name");
-                if (!name) return;
-                student_details[name] = $(this).val().trim() || "";
-            });
-
-            // If no file inputs, send immediately
-            if (totalFiles === 0) {
-                filesProcessed = 1; // No files to process
-                sendIfReady();
-            }
-
-            console.log("Student payload (Base64 image included):", student_details);
-        });
-        /* END STUDENT */
 
     });
 </script>

@@ -322,301 +322,97 @@ class Action
         file_put_contents($upload_dir . $filename, $data);
         return $filename;
     }
-    function register_faculty()
-    {
-        $input = json_decode(file_get_contents('php://input'), true);
 
-        // Validate required fields
-        $required = ['firstname', 'lastname', 'department', 'username', 'password', 'email'];
-        foreach ($required as $field) {
-            if (empty($input[$field])) {
-                return json_encode(['status' => 2, 'message' => "Missing required field: $field"]);
 
-            }
-        }
-
-        $firstname = $input['firstname'];
-        $lastname = $input['lastname'];
-        $department = $input['department'];
-        $username = $input['username'];
-        $password = $input['password'];
-        $email = $input['email'];
-        $profilePicBase64 = isset($input['profile_pic']) ? $input['profile_pic'] : null;
-
-        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-
-        // Handle Base64 image
-        $profile_pic_path = null;
-        if ($profilePicBase64) {
-            $uploadDir = __DIR__ . './auth/uploads/faculty_profiles/'; // Make sure this folder exists and is writable
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-
-            // Extract base64 data
-            if (preg_match('/^data:image\/(\w+);base64,/', $profilePicBase64, $type)) {
-                $profilePicBase64 = substr($profilePicBase64, strpos($profilePicBase64, ',') + 1);
-                $type = strtolower($type[1]); // jpg, png, gif
-
-                if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif'])) {
-                    return json_encode(['status' => 2, 'message' => 'Invalid image type']);
-
-                }
-
-                $profilePicBase64 = base64_decode($profilePicBase64);
-                if ($profilePicBase64 === false) {
-                    return json_encode(['status' => 0, 'message' => 'Base64 decode failed']);
-
-                }
-
-                $fileName = uniqid('faculty_') . '.' . $type;
-                $filePath = $uploadDir . $fileName;
-
-                if (file_put_contents($filePath, $profilePicBase64) !== false) {
-                    // Store relative path
-                    $profile_pic_path = 'uploads/faculty_profiles/' . $fileName;
-                } else {
-                    return json_encode(['status' => 0, 'message' => 'Failed to save profile picture']);
-
-                }
-            } else {
-                return json_encode(['status' => 2, 'message' => 'Invalid image format']);
-
-            }
-        }
-
-        try {
-            $stmt = $this->db->prepare(
-                "INSERT INTO user (personal_details, authentication_data) VALUES (?, ?)"
-            );
-
-            $personal_details = json_encode([
-                'firstname' => $firstname,
-                'lastname' => $lastname,
-                'department' => $department,
-                'profile_pic' => $profile_pic_path // store path instead of Base64
-            ]);
-
-            $authentication_data = json_encode([
-                'username' => $username,
-                'password' => $hashed_password,
-                'user_role' => 'faculty',
-                'email' => $email
-            ]);
-
-            $stmt->execute([$personal_details, $authentication_data]);
-
-            return json_encode(['status' => 1, 'message' => 'Faculty added successfully.', 'data' => $input]);
-        } catch (PDOException $e) {
-            return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
-        }
-    }
-    function register_users()
-    {
-        $input = json_decode(file_get_contents('php://input'), true);
-
-        if (!$input || !isset($input['firstname'], $input['lastname'], $input['username'], $input['password'], $input['email'], $input['user_role'])) {
-            return json_encode(['status' => 2, 'message' => 'Invalid input data.']);
-        }
-
-        $role = $input['user_role']; // 'student' or 'faculty'
-        $firstname = $input['firstname'];
-        $lastname = $input['lastname'];
-        $username = $input['username'];
-        $password = $input['password'];
-        $email = $input['email'];
-        $profilePicBase64 = $input['profile_pic'] ?? null;
-
-        // Optional fields
-        $birthdate = $input['birthdate'] ?? null;
-        $gender = $input['gender'] ?? null;
-        $phone = $input['phone'] ?? null;
-        $address = $input['address'] ?? null;
-        $department = $input['department'] ?? null;
-
-        // Student-specific
-        $course = $input['course'] ?? null;
-        $year_level = $input['year_level'] ?? null;
-        $section = $input['section'] ?? null;
-
-        // Faculty-specific
-        $position = $input['position'] ?? null;
-
-        // Hash password
-        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-
-        // Handle profile picture
-        $profile_pic_path = null;
-        if ($profilePicBase64) {
-            $uploadDir = __DIR__ . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'profiles' . DIRECTORY_SEPARATOR;
-            if (!is_dir($uploadDir) && !mkdir($uploadDir, 0755, true)) {
-                return json_encode(['status' => 0, 'message' => 'Failed to create upload directory']);
-            }
-
-            if (preg_match('/^data:image\/(\w+);base64,/', $profilePicBase64, $type)) {
-                $profilePicBase64 = substr($profilePicBase64, strpos($profilePicBase64, ',') + 1);
-                $type = strtolower($type[1]);
-                if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif']))
-                    return json_encode(['status' => 2, 'message' => 'Invalid image type']);
-
-                $profilePicBase64 = base64_decode($profilePicBase64);
-                if ($profilePicBase64 === false)
-                    return json_encode(['status' => 0, 'message' => 'Base64 decode failed']);
-
-                $fileName = uniqid($role . '_') . '.' . $type;
-                $filePath = $uploadDir . $fileName;
-                if (file_put_contents($filePath, $profilePicBase64) === false)
-                    return json_encode(['status' => 0, 'message' => 'Failed to save profile picture']);
-
-                $profile_pic_path = 'uploads/profiles/' . $fileName;
-            } else {
-                return json_encode(['status' => 2, 'message' => 'Invalid image format']);
-            }
-        }
-
-        // Prepare data arrays
-        $personal_details = [
-            'firstname' => $firstname,
-            'lastname' => $lastname,
-            'birthdate' => $birthdate,
-            'gender' => $gender,
-            'phone' => $phone,
-            'address' => $address,
-            'department' => $department,
-            'profile_pic' => $profile_pic_path
-        ];
-
-        if ($role === 'student') {
-            $personal_details['course'] = $course;
-            $personal_details['year_level'] = $year_level;
-            $personal_details['section'] = $section;
-        } elseif ($role === 'faculty') {
-            $personal_details['position'] = $position;
-        }
-
-        $authentication_data = [
-            'username' => $username,
-            'password' => $hashed_password,
-            'user_role' => $role,
-            'email' => $email
-        ];
-
-        try {
-            $stmt = $this->db->prepare("INSERT INTO user (personal_details, authentication_data) VALUES (?, ?)");
-            $stmt->execute([json_encode($personal_details), json_encode($authentication_data)]);
-            return json_encode(['status' => 1, 'message' => ucfirst($role) . ' added successfully.']);
-        } catch (PDOException $e) {
-            return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
-        }
-    }
-
-    private function saveBase64ImageHelper($base64, $folder, $prefix)
-    {
-        if (!$base64)
-            return null;
-        if (!is_dir($folder))
-            mkdir($folder, 0755, true);
-        if (!preg_match('/^data:image\/(\w+);base64,/', $base64, $type))
-            return null;
-        $data = substr($base64, strpos($base64, ',') + 1);
-        $type = strtolower($type[1]);
-        if (!in_array($type, ['jpg', 'jpeg', 'png', 'gif']))
-            return null;
-        $decoded = base64_decode($data);
-        if ($decoded === false)
-            return null;
-        $filename = uniqid($prefix . '_') . '.' . $type;
-        $path = $folder . $filename;
-        file_put_contents($path, $decoded);
-        return $path;
-    }
 
     function register_user()
     {
-        $input = json_decode(file_get_contents('php://input'), true);
-
-        if (!$input || !isset($input['role'])) {
-            return json_encode(['status' => 2, 'message' => 'Invalid input.']);
+        if (!isset($_POST['user_role'])) {
+            return json_encode(['status' => 2, 'message' => 'User role is required']);
         }
 
-        $role = strtolower($input['role']);
+        $role = strtolower($_POST['user_role']);
         if (!in_array($role, ['student', 'faculty'])) {
-            return json_encode(['status' => 2, 'message' => 'Invalid role specified.']);
+            return json_encode(['status' => 2, 'message' => 'Invalid role']);
         }
 
         // Common required fields
-        $required_common = ['firstname', 'lastname', 'department', 'username', 'password', 'email'];
-        foreach ($required_common as $field) {
-            if (empty($input[$field])) {
-                return json_encode(['status' => 2, 'message' => "Missing required field: $field"]);
+        $required = ['firstname', 'lastname', 'username', 'password', 'email', 'department'];
+        foreach ($required as $f) {
+            if (empty($_POST[$f])) {
+                return json_encode(['status' => 2, 'message' => "Missing required field: $f"]);
             }
         }
 
-        // Role-specific required fields
+        // Role-specific
         if ($role === 'student') {
-            foreach (['student_id', 'section'] as $field) {
-                if (empty($input[$field])) {
-                    return json_encode(['status' => 2, 'message' => "Missing required field for student: $field"]);
+            foreach (['course', 'year_level', 'section'] as $f) {
+                if (empty($_POST[$f])) {
+                    return json_encode(['status' => 2, 'message' => "Missing student field: $f"]);
                 }
             }
-        } else {
-            // Faculty requires employee_id
-            if (empty($input['employee_id'])) {
-                return json_encode(['status' => 2, 'message' => "Missing required field for faculty: employee_id"]);
+        } else { // faculty
+            if (empty($_POST['position'])) {
+                return json_encode(['status' => 2, 'message' => "Missing faculty field: position"]);
             }
         }
 
-        $firstname = $input['firstname'];
-        $lastname = $input['lastname'];
-        $middlename = $input['middlename'] ?? '';
-        $suffix = $input['suffix'] ?? '';
-        $department = $input['department'];
-        $username = $input['username'];
-        $password = $input['password'];
-        $email = $input['email'];
-        $profilePicBase64 = $input['profile_pic'] ?? null;
+        // Sanitize & gather inputs
+        $data = array_map('trim', $_POST);
+        $hashed_password = password_hash($data['password'], PASSWORD_BCRYPT);
 
-        $student_id = $input['student_id'] ?? null;
-        $section = $input['section'] ?? null;
-        $employee_id = $input['employee_id'] ?? null;
+        // Handle file upload
+        $uploadDir = __DIR__ . '/uploads/' . $role . '_profiles/';
+        if (!is_dir($uploadDir))
+            mkdir($uploadDir, 0755, true);
 
-        $hashed_password = password_hash($password, PASSWORD_BCRYPT);
+        $profile_pic = 'assets/default-profile.png';
+        if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === 0) {
+            $ext = pathinfo($_FILES['profile_pic']['name'], PATHINFO_EXTENSION);
+            if (!in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif'])) {
+                return json_encode(['status' => 2, 'message' => 'Invalid image type']);
+            }
+            $filename = uniqid($role . '_') . '.' . $ext;
+            $filepath = $uploadDir . $filename;
+            if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $filepath)) {
+                $profile_pic = 'uploads/' . $role . '_profiles/' . $filename;
+            }
+        }
 
-        // Process profile picture
-        $uploadFolder = 'uploads/' . $role . '_profiles/';
-        $profile_pic_path = $this->saveBase64ImageHelper($profilePicBase64, $uploadFolder, $role) ?? 'assets/default-profile.png';
-
-        // Prepare JSON for database
+        // Prepare DB JSON
         $personal_details = json_encode([
-            'firstname' => $firstname,
-            'lastname' => $lastname,
-            'middlename' => $middlename,
-            'suffix' => $suffix,
-            'department' => $department,
-            'student_id' => $student_id,
-            'section' => $section,
-            'employee_id' => $employee_id,
-            'profile_pic' => $profile_pic_path
+            'firstname' => $data['firstname'],
+            'lastname' => $data['lastname'],
+            'middlename' => $data['middlename'] ?? '',
+            'suffix' => $data['suffix'] ?? '',
+            'department' => $data['department'],
+            'birthdate' => $data['birthdate'] ?? null,
+            'gender' => $data['gender'] ?? null,
+            'phone' => $data['phone'] ?? null,
+            'address' => $data['address'] ?? null,
+            'position' => $data['position'] ?? null,
+            'course' => $data['course'] ?? null,
+            'year_level' => $data['year_level'] ?? null,
+            'section' => $data['section'] ?? null,
+            'profile_pic' => $profile_pic
         ]);
 
-        $authentication_data = json_encode([
-            'username' => $username,
+        $auth_data = json_encode([
+            'username' => $data['username'],
             'password' => $hashed_password,
             'user_role' => $role,
-            'email' => $email
+            'email' => $data['email']
         ]);
 
         try {
-            $stmt = $this->db->prepare(
-                "INSERT INTO user (personal_details, authentication_data) VALUES (?, ?)"
-            );
-            $stmt->execute([$personal_details, $authentication_data]);
-
-            return json_encode(['status' => 1, 'message' => ucfirst($role) . ' registered successfully.']);
+            $stmt = $this->db->prepare("INSERT INTO user (personal_details, authentication_data) VALUES (?, ?)");
+            $stmt->execute([$personal_details, $auth_data]);
+            return json_encode(['status' => 1, 'message' => ucfirst($role) . ' registered successfully']);
         } catch (PDOException $e) {
             return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
         }
     }
+
 
 
     function readUserDetails()

@@ -650,7 +650,6 @@
                 };
                 reader.readAsDataURL(fileInput);
             } else {
-                // No profile selected, send form as is
                 sendRegisterRequest(formData, role);
             }
         });
