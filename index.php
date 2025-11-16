@@ -253,8 +253,8 @@
                     <p><strong>Department:</strong><span id="profile-department">N/A</span></p>
                     <p><strong>Library ID:</strong> <span id="profile-library_id">N/A</span></p>
                     <p><strong>Email:</strong> <span id="profile-email">N/A</span></p>
-                    <p><strong>Checkouts:</strong> 5 / 10 limit</p>
-                    <p><strong>Fines:</strong> $0.00</p>
+                    <!-- <p><strong>Checkouts:</strong> 5 / 10 limit</p>
+                    <p><strong>Fines:</strong> $0.00</p> -->
                 </div>
 
                 <!-- Edit Button -->

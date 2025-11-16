@@ -129,6 +129,8 @@ $(document).ready(function () {
     isLoggedIn: false,
     username: "guest",
     user_id: "N/A",
+    student_id: "N/A",
+    employee_id: "N/A",
     email: "N/A",
     department: "N/A",
     role: "N/A",
@@ -242,6 +244,9 @@ $(document).ready(function () {
 
       $("#profile-view-username").text(userState.username); // Update profile view name
       $("#profile-department").text(userState.department);
+      $("#profile-role").text(userState.role);
+      $("#profile-status").text(userState.isLoggedIn ? "Active" : "Inactive");
+      $("#profile-library_id").text(userState.student_id || userState.employee_id || "N/A");
       $("#profile-email").text(userState.email);
       // Use a mock ID or a real one if the backend provided it
       $("#profile-view-id").text(
@@ -378,6 +383,8 @@ $(document).ready(function () {
             userState.isLoggedIn = true;
             userState.username = res.user_name || userData.username || username;
             userState.email = userData.email || "student";
+            userState.student_id = userData.student_id || "N/A";
+            userState.employee_id = userData.employee_id || "N/A";
             userState.department = userData.department || "N/A";
             userState.role = userData.user_role || "student";
             userState.profilePic = userData.profile_pic || null;
