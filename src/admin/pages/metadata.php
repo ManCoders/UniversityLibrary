@@ -4,21 +4,31 @@
 
 <!-- Tabs Navigation -->
 <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
-    <nav class="-mb-px flex space-x-4" aria-label="Tabs">
-        <!-- <button id="tab-dashboard"
-            class="tab-button border-indigo-500 text-indigo-600 dark:text-indigo-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-            Metadata Dashboard
-        </button> -->
-        <button id="tab-add-metadata"
-            class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-            Add New Metadata
-        </button>
-        <button id="tab-metadata-table"
-            class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-            Metadata Table
-        </button>
+    <nav class="flex items-center justify-between">
+        
+        <!-- Left Tabs -->
+        <div class="flex space-x-4">
+            <button id="tab-add-metadata"
+                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 py-4 px-1 border-b-2 font-medium text-sm">
+                Add New Metadata
+            </button>
+
+            <button id="tab-metadata-table"
+                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 py-4 px-1 border-b-2 font-medium text-sm">
+                Metadata Table
+            </button>
+        </div>
+
+        <!-- Search -->
+        <div class="flex items-center">
+            <input type="text"
+                placeholder="Search books"
+                class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+
     </nav>
 </div>
+
 
 <div id="tab-content">
 
@@ -108,7 +118,7 @@
                             class="w-[25%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Title</th>
                         <th
-                            class="w-[20%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            class="w-[20%] px-2 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Author</th>
                         <th
                             class="w-[15%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -335,11 +345,9 @@
                     });
 
                 } else if ($(this).hasClass("edit-btn")) {
-                    // --- Edit Metadata ---
-                    openEditModal(bookId); // optional spinner if fetching data
+                    openEditModal(bookId);
 
                 } else if ($(this).hasClass("delete-btn")) {
-                    // --- Delete Metadata ---
                     if (!confirm("Are you sure you want to delete this book?")) return;
 
                     $.ajax({
@@ -686,6 +694,7 @@
                                     } else {
                                         alert(res.message || '❌ File upload failed');
                                     }
+                                    loadFolders();
                                 },
 
                                 // 🔹 Handle any server error
@@ -814,10 +823,10 @@
                                             $fileList.append('<li class="text-gray-400 text-xs italic">No files uploaded</li>');
                                         }
 
-                                        loadFolders(); // optional refresh after upload
                                     } else {
                                         alert(res.message || '❌ Folder upload failed.');
                                     }
+                                    loadFolders();
                                 },
 
                                 // 🔹 Handle server or connection errors

@@ -3,25 +3,35 @@
 </h1>
 <!-- Tabs for Adding Accounts / Dashboard -->
 <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
-    <nav class="-mb-px flex space-x-4" aria-label="Tabs">
-        <button id="tab-dashboard"
-            class="tab-button border-indigo-500 text-indigo-600 dark:text-indigo-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-            User Dashboard
-        </button>
-        <button id="tab-faculty"
-            class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-            Add New Account
-        </button>
-        <button id="tab-student-table"
-            class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-            Student Table
-        </button>
-        <button id="tab-teacher-table"
-            class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-            Teacher Table
-        </button>
-    </nav>
+    <div class="flex justify-between items-center">
+        <!-- Tabs -->
+        <nav class="flex space-x-4" aria-label="Tabs">
+            <button id="tab-dashboard"
+                class="tab-button border-indigo-500 text-indigo-600 dark:text-indigo-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                User Dashboard
+            </button>
+            <button id="tab-faculty"
+                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Add New Account
+            </button>
+            <button id="tab-student-table"
+                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Student Table
+            </button>
+            <button id="tab-teacher-table"
+                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Teacher Table
+            </button>
+        </nav>
+
+        <!-- Search Input -->
+        <div class="flex items-center">
+            <input type="text" placeholder="Search books"
+                class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+    </div>
 </div>
+
 
 <!-- Tab Contents -->
 <div id="tab-content">
@@ -85,8 +95,7 @@
         <!-- LEFT: Profile Upload -->
         <div
             class="flex flex-col items-center justify-center w-full sm:w-[35%] border-r border-[#b03060]/40 dark:border-[#800000]/40 pr-4">
-            <div
-                class="relative w-32 h-32 rounded-full overflow-hidden border-2 border-[#b03060] dark:border-[#800000]">
+            <div class="relative w-32 h-32 rounded-full overflow-hidden border border-[#b03060] dark:border-[#ff4d6d]">
                 <img id="profile-preview" src="../../assets/default-profile.png" alt="Profile Preview"
                     class="w-full h-full object-cover">
             </div>
@@ -94,7 +103,7 @@
                 class="mt-3 cursor-pointer text-sm font-semibold text-[#b03060] dark:text-[#ff4d6d] hover:underline">
                 Upload Profile
             </label>
-            <input type="file" name="profile" id="profile" accept="image/*" class="hidden">
+            <input type="file" name="profile" id="profile" accept="image/*" class="hidden" required>
             <p class="mt-2 text-xs text-[#800000] dark:text-[#ffcccc]">JPG, PNG under 2MB</p>
         </div>
 
@@ -118,47 +127,49 @@
                 <!-- Name Fields -->
                 <div class="grid grid-cols-2 gap-3">
                     <input type="text" name="firstname" placeholder="First Name" required
-                        class="input-field rounded-lg py-3 p-2">
+                        class="input-field border  rounded-lg py-3 p-2">
                     <input type="text" name="lastname" placeholder="Last Name" required
-                        class="input-field rounded-lg py-3 p-2">
+                        class="input-field border rounded-lg py-3 p-2">
                     <input type="text" name="middlename" placeholder="Middle Name"
-                        class="input-field rounded-lg py-3 p-2">
+                        class="input-field border rounded-lg py-3 p-2">
                     <input type="text" name="suffix" placeholder="Suffix (e.g. Jr., III)"
-                        class="input-field rounded-lg py-3 p-2">
+                        class="input-field border rounded-lg py-3 p-2">
                 </div>
 
                 <!-- Department -->
                 <input type="text" name="department" placeholder="Department" required
-                    class="input-field rounded-lg py-3 p-2 w-full">
+                    class="input-field border rounded-lg py-3 p-2 w-full">
 
                 <!-- Student Section -->
                 <div id="student-fields" class="space-y-3">
                     <input type="text" name="student_id" placeholder="Student ID"
-                        class="input-field rounded-lg py-3 p-2 w-full">
+                        class="input-field border rounded-lg py-3 p-2 w-full">
+                    <input type="text" name="course" placeholder="Course"
+                        class="input-field border rounded-lg py-3 p-2 w-full">
                     <input type="text" name="section" placeholder="Section"
-                        class="input-field rounded-lg py-3 p-2 w-full">
+                        class="input-field border rounded-lg py-3 p-2 w-full">
                 </div>
 
                 <!-- Faculty Section -->
                 <div id="faculty-fields" class="hidden space-y-3">
                     <input type="text" name="employee_id" placeholder="Employee ID"
-                        class="input-field rounded-lg py-3 p-2 w-full">
+                        class="input-field border rounded-lg py-3 p-2 w-full">
                 </div>
 
                 <!-- Email & Username -->
                 <div class="grid grid-cols-2 gap-3">
                     <input type="email" name="email" placeholder="Email" required
-                        class="input-field rounded-lg py-3 p-2">
+                        class="input-field border rounded-lg py-3 p-2">
                     <input type="text" name="username" placeholder="Username" required
-                        class="input-field rounded-lg py-3 p-2">
+                        class="input-field border rounded-lg py-3 p-2">
                 </div>
 
                 <!-- Password -->
                 <div class="grid grid-cols-2 gap-3">
                     <input type="password" name="password" placeholder="Password" required
-                        class="input-field rounded-lg py-3 p-2">
+                        class="input-field border rounded-lg py-3 p-2">
                     <input type="password" name="confirm_password" placeholder="Confirm Password" required
-                        class="input-field rounded-lg py-3 p-2">
+                        class="input-field border rounded-lg py-3 p-2">
                 </div>
 
                 <!-- Message -->
@@ -312,6 +323,108 @@
         </div>
     </div>
 
+    <!-- Edit info tab -->
+    <div id="edit-content" class="tab-panel hidden">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-6xl mx-auto w-full">
+
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                    Update User Information
+                </h2>
+                <button id="closeEditBtn"
+                    class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    Back
+                </button>
+            </div>
+
+            <form id="updateForm" enctype="multipart/form-data">
+
+                <input type="hidden" name="user_id">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Left: Profile -->
+                    <div class="flex flex-col items-center bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-md">
+                        <img id="editProfilePreview" src="../../assets/default-profile.png" alt="Profile Picture"
+                            class="w-36 h-36 rounded-full object-cover border-4 border-indigo-500 shadow-lg" />
+
+                        <label class="mt-4 text-sm font-medium text-gray-700 dark:text-gray-200">
+                            Update Profile Picture
+                        </label>
+                        <input type="file" name="profile_pic" id="edit-profile_pic"
+                            class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                    </div>
+
+
+                    <!-- Right: Form Fields -->
+                    <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-md space-y-4">
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">First
+                                Name</label>
+                            <input type="text" name="firstname" id="edit-firstname"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Last
+                                Name</label>
+                            <input type="text" name="lastname" id="edit-lastname"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Email</label>
+                            <input type="email" name="email" id="edit-email"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Username</label>
+                            <input type="text" name="username" id="edit-username"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Role</label>
+                            <select name="user_role" id="edit-user_role"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                <option value="student">Student</option>
+                                <option value="faculty">Faculty</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Department</label>
+                            <input type="text" name="department" id="edit-department"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Course</label>
+                            <input type="text" name="course" id="edit-course"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Save Button -->
+                <div class="text-end mt-6">
+                    <button type="submit"
+                        class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                        Save Changes
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
 
 
 </div>
@@ -333,6 +446,11 @@
         activateTab('#tab-dashboard', '#dashboard-content');
         $('#closeViewBtn').on('click', function () {
             $('#view-content').addClass('hidden');
+            $('.tab-panel').removeClass('hidden');
+        });
+
+        $('#closeEditBtn').on('click', function () {
+            $('#edit-content').addClass('hidden');
             $('.tab-panel').removeClass('hidden');
         });
 
@@ -414,8 +532,10 @@
                             if (res.data.profile_pic) {
                                 $("#viewProfilePic").attr("src", base_url + "auth/" + res.data.profile_pic);
                             } else {
-                                $("#viewProfilePic").attr("src", base_url + "assets/default-profile.png");
+                                $("#viewProfilePic").attr("src", base_url + "../../assets/default-profile.png");
                             }
+
+
                         } else {
                             alert(res.message);
                         }
@@ -425,29 +545,42 @@
                 });
 
             } else if ($(this).hasClass("edit-btn")) {
+                activateTab(`#edit-btn-${userId}`, `#edit-content`);
                 $.ajax({
                     url: `${base_url}auth/action.php?action=GetUser`,
                     type: "POST",
                     data: {
-                        action: 'EditUser',
-                        user_id: userId
+                        user_id: userId,
+                        action: 'GetFaculty' ?? 'GetUser'
                     },
                     dataType: "json",
+
                     success: function (res) {
-                        if (res.status === 1) {
-                            const form = $("#editForm");
-                            form.find("input[name='user_id']").val(res.data.user_id);
-                            form.find("input[name='firstname']").val(res.data.firstname);
-                            form.find("input[name='lastname']").val(res.data.lastname);
-                            form.find("input[name='email']").val(res.data.email);
-                            form.find("input[name='department']").val(res.data.department);
-                            $("#editModal").fadeIn(200);
-                        } else {
-                            alert(res.message);
+                        if (res.status !== 1) {
+                            alert(res.message || "Failed to load user.");
+                            return;
                         }
-                        loadFaculty();
+                        // const form = $("#updateForm"); // new update form
+
+                        $("#edit-firstname").val(res.data.firstname);
+                        $("#edit-lastname").val(res.data.lastname);
+                        $("#edit-email").val(res.data.email);
+                        $("#edit-username").val(res.data.username);
+                        $("#edit-department").val(res.data.department);
+                        $("#edit-course").val(res.data.course);
+                        $("#edit-user_role").val(res.data.user_role);
+
+                        // profile preview logic
+                        if (res.data.profile_pic) {
+                            $("#editProfilePreview").attr("src", base_url + "auth/" + res.data.profile_pic);
+                        } else {
+                            $("#editProfilePreview").attr("src", base_url + "../../assets/default-profile.png");
+                        }
                     },
-                    error: function () { alert("Server error"); }
+
+                    error: function () {
+                        alert("Server error while loading user.");
+                    }
                 });
 
             } else if ($(this).hasClass("delete-btn")) {
@@ -516,6 +649,8 @@
                 middlename: $("input[name='middlename']").val(),
                 suffix: $("input[name='suffix']").val(),
                 department: $("input[name='department']").val(),
+                course: $("input[name='course']").val(),
+                section: $("input[name='section']").val(),
                 email: $("input[name='email']").val(),
                 username: $("input[name='username']").val(),
                 password: $("input[name='password']").val(),
@@ -540,16 +675,18 @@
             }
 
             // Convert profile image to Base64 if selected
-            if (profileInput[0].files[0]) {
+            const fileInput = $('#profile')[0].files[0];
+            if (fileInput) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
                     formData.profile_pic = e.target.result;
                     sendAjax(formData);
                 }
-                reader.readAsDataURL(profileInput[0].files[0]);
+                reader.readAsDataURL(fileInput);
             } else {
                 sendAjax(formData);
             }
+
         });
 
         function sendAjax(data) {

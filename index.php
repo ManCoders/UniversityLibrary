@@ -498,7 +498,7 @@
                     class="mt-3 cursor-pointer text-sm font-semibold text-[#b03060] dark:text-[#ff4d6d] hover:underline">
                     Upload Profile
                 </label>
-                <input type="file" name="profile" id="profile" accept="image/*" class="hidden">
+                <input type="file" name="profile" id="profile" accept="image/*" class="hidden" required>
                 <p class="mt-2 text-xs text-[#800000] dark:text-[#ffcccc]">JPG, PNG under 2MB</p>
             </div>
 
@@ -535,16 +535,22 @@
                     </div>
 
                     <!-- Common fields -->
+
+                    <!-- Student Section -->
                     <input type="text" name="department" placeholder="Department" required
                         class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
-                    <!-- Student Section -->
-                    <div id="student-fields" class="space-y-3">
+                    <div id="student-fields" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         <input type="text" name="student_id" placeholder="Student ID"
+                            class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                        <input type="text" name="course" placeholder="Course"
                             class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                         <input type="text" name="section" placeholder="Section"
                             class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                     </div>
+
+
+
 
                     <!-- Faculty Section -->
                     <div id="faculty-fields" class="hidden space-y-3">

@@ -432,7 +432,7 @@ class Action
         }
 
         // Common required fields
-        $requiredFields = ['firstname', 'lastname', 'username', 'password', 'email', 'department'];
+        $requiredFields = ['firstname', 'lastname', 'username', 'password', 'email', 'department', 'role'];
         foreach ($requiredFields as $field) {
             if (empty($input[$field])) {
                 return json_encode(['status' => 0, 'message' => "Missing required field: $field"]);
@@ -487,6 +487,7 @@ class Action
             'lastname' => $data['lastname'],
             'middlename' => $data['middlename'] ?? '',
             'suffix' => $data['suffix'] ?? '',
+            'course' => $data['course'] ?? null,
             'department' => $data['department'],
             'student_id' => $data['student_id'] ?? null,
             'section' => $data['section'] ?? null,
