@@ -119,7 +119,7 @@ class Action
         $password = $_POST['password'] ?? '';
 
         if (empty($username) || empty($password)) {
-            return json_encode(['status' => 2, 'message' => 'Username and password are required.']);
+            return json_encode(['status' => 0, 'message' => 'Username and password are required.']);
         }
 
         try {
@@ -156,7 +156,7 @@ class Action
                         'user_data' => $_SESSION['admin']
                     ]);
                 }
-                return json_encode(['status' => 2, 'message' => 'Incorrect password.']);
+                return json_encode(['status' => 0, 'message' => 'Incorrect password.']);
             }
 
             $stmt = $this->db->prepare("
@@ -169,14 +169,14 @@ class Action
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
-                return json_encode(['status' => 2, 'message' => 'Incorrect username or password.']);
+                return json_encode(['status' => 0, 'message' => 'Incorrect username or password.']);
             }
 
             $auth = json_decode($user['authentication_data'], true);
             $person = json_decode($user['personal_details'], true);
 
             if (!password_verify($password, $auth['password'] ?? '')) {
-                return json_encode(['status' => 2, 'message' => 'Incorrect username or password.']);
+                return json_encode(['status' => 0, 'message' => 'Incorrect username or password.']);
             }
 
             $role = strtolower($auth['user_role'] ?? '');
@@ -231,7 +231,7 @@ class Action
     {
         $input = json_decode(file_get_contents('php://input'), true);
         if (!$input || !isset($input['system_details'], $input['admin_details'])) {
-            return json_encode(['status' => 2, 'message' => 'Invalid input data.']);
+            return json_encode(['status' => 0, 'message' => 'Invalid input data.']);
         }
 
         $system = $input['system_details'];
@@ -243,11 +243,11 @@ class Action
 
         foreach ($required_system as $field) {
             if (empty($system[$field]))
-                return json_encode(['status' => 2, 'message' => "System field '$field' is required."]);
+                return json_encode(['status' => 0, 'message' => "System field '$field' is required."]);
         }
         foreach ($required_admin as $field) {
             if (empty($admin[$field]))
-                return json_encode(['status' => 2, 'message' => "Admin field '$field' is required."]);
+                return json_encode(['status' => 0, 'message' => "Admin field '$field' is required."]);
         }
 
         // Handle system logo
@@ -298,7 +298,7 @@ class Action
             return json_encode(['status' => 1, 'message' => 'Installation completed successfully.', 'url' => '../']);
         } catch (Exception $e) {
             $this->db->rollBack();
-            return json_encode(['status' => 2, 'message' => 'Error: ' . $e->getMessage()]);
+            return json_encode(['status' => 0, 'message' => 'Error: ' . $e->getMessage()]);
         }
     }
     private function saveBase64Image($base64, $prefix)
@@ -325,22 +325,23 @@ class Action
 
 
 
-    function register_user()
+    /* function register_user()
     {
-        if (!isset($_POST['user_role'])) {
-            return json_encode(['status' => 2, 'message' => 'User role is required']);
+        $role = json_decode($_POST['role'], true);
+        if (!isset($role['role'])) {
+            return json_encode(['status' => 0, 'message' => 'User role is required']);
         }
 
-        $role = strtolower($_POST['user_role']);
+        $role = strtolower($role['role']);
         if (!in_array($role, ['student', 'faculty'])) {
-            return json_encode(['status' => 2, 'message' => 'Invalid role']);
+            return json_encode(['status' => 0, 'message' => 'Invalid role']);
         }
 
         // Common required fields
         $required = ['firstname', 'lastname', 'username', 'password', 'email', 'department'];
         foreach ($required as $f) {
             if (empty($_POST[$f])) {
-                return json_encode(['status' => 2, 'message' => "Missing required field: $f"]);
+                return json_encode(['status' => 0, 'message' => "Missing required field: $f"]);
             }
         }
 
@@ -348,12 +349,12 @@ class Action
         if ($role === 'student') {
             foreach (['course', 'year_level', 'section'] as $f) {
                 if (empty($_POST[$f])) {
-                    return json_encode(['status' => 2, 'message' => "Missing student field: $f"]);
+                    return json_encode(['status' => 0, 'message' => "Missing student field: $f"]);
                 }
             }
         } else { // faculty
             if (empty($_POST['position'])) {
-                return json_encode(['status' => 2, 'message' => "Missing faculty field: position"]);
+                return json_encode(['status' => 0, 'message' => "Missing faculty field: position"]);
             }
         }
 
@@ -370,7 +371,7 @@ class Action
         if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === 0) {
             $ext = pathinfo($_FILES['profile_pic']['name'], PATHINFO_EXTENSION);
             if (!in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif'])) {
-                return json_encode(['status' => 2, 'message' => 'Invalid image type']);
+                return json_encode(['status' => 0, 'message' => 'Invalid image type']);
             }
             $filename = uniqid($role . '_') . '.' . $ext;
             $filepath = $uploadDir . $filename;
@@ -411,8 +412,105 @@ class Action
         } catch (PDOException $e) {
             return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
         }
-    }
+    } */
 
+    function register_user()
+    {
+        // Get raw JSON input from frontend
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!$input) {
+            return json_encode(['status' => 0, 'message' => 'Invalid input data']);
+        }
+
+        // Validate role
+        if (!isset($input['role'])) {
+            return json_encode(['status' => 0, 'message' => 'User role is required']);
+        }
+        $role = strtolower($input['role']);
+        if (!in_array($role, ['student', 'faculty'])) {
+            return json_encode(['status' => 0, 'message' => 'Invalid role']);
+        }
+
+        // Common required fields
+        $requiredFields = ['firstname', 'lastname', 'username', 'password', 'email', 'department'];
+        foreach ($requiredFields as $field) {
+            if (empty($input[$field])) {
+                return json_encode(['status' => 0, 'message' => "Missing required field: $field"]);
+            }
+        }
+
+        // Role-specific fields
+        if ($role === 'student') {
+            foreach (['student_id', 'section'] as $field) {
+                if (empty($input[$field])) {
+                    return json_encode(['status' => 0, 'message' => "Missing student field: $field"]);
+                }
+            }
+        } else { // faculty
+            if (empty($input['employee_id'])) {
+                return json_encode(['status' => 0, 'message' => "Missing faculty field: employee_id"]);
+            }
+        }
+
+        // Sanitize inputs
+        $data = array_map('trim', $input);
+
+        // Hash password
+        $hashed_password = password_hash($data['password'], PASSWORD_BCRYPT);
+
+        // Handle profile pic (Base64)
+        $profile_pic = 'assets/default-profile.png';
+        if (!empty($data['profile_pic'])) {
+            $uploadDir = __DIR__ . '/uploads/' . $role . '_profiles/';
+            if (!is_dir($uploadDir))
+                mkdir($uploadDir, 0755, true);
+
+            // Extract base64 data
+            if (preg_match('/^data:image\/(\w+);base64,/', $data['profile_pic'], $type)) {
+                $imgData = substr($data['profile_pic'], strpos($data['profile_pic'], ',') + 1);
+                $imgData = base64_decode($imgData);
+                $ext = strtolower($type[1]);
+                if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+                    return json_encode(['status' => 0, 'message' => 'Invalid image type']);
+                }
+                $filename = uniqid($role . '_') . '.' . $ext;
+                $filepath = $uploadDir . $filename;
+                if (file_put_contents($filepath, $imgData)) {
+                    $profile_pic = 'uploads/' . $role . '_profiles/' . $filename;
+                }
+            }
+        }
+
+        // Prepare personal_details JSON
+        $personal_details = json_encode([
+            'firstname' => $data['firstname'],
+            'lastname' => $data['lastname'],
+            'middlename' => $data['middlename'] ?? '',
+            'suffix' => $data['suffix'] ?? '',
+            'department' => $data['department'],
+            'student_id' => $data['student_id'] ?? null,
+            'section' => $data['section'] ?? null,
+            'employee_id' => $data['employee_id'] ?? null,
+            'profile_pic' => $profile_pic
+        ]);
+
+        // Prepare authentication_data JSON
+        $auth_data = json_encode([
+            'username' => $data['username'],
+            'password' => $hashed_password,
+            'user_role' => $role,
+            'email' => $data['email']
+        ]);
+
+        // Insert into database
+        try {
+            $stmt = $this->db->prepare("INSERT INTO user (personal_details, authentication_data) VALUES (?, ?)");
+            $stmt->execute([$personal_details, $auth_data]);
+            return json_encode(['status' => 1, 'message' => ucfirst($role) . ' registered successfully']);
+        } catch (PDOException $e) {
+            return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
+        }
+    }
 
 
     function readUserDetails()
@@ -1259,6 +1357,8 @@ class Action
 
         header('Content-Type: application/json');
 
+        $book_title = $_POST['book_title'] ?? 'Unknown Title';
+        $book_author = $_POST['book_author'] ?? 'Unknown Author';
         $file = $_POST['file'] ?? null;
         if (!$file) {
             return json_encode([
@@ -1284,6 +1384,8 @@ class Action
             $token = bin2hex(random_bytes(16));
             $_SESSION['pdf_tokens'][$token] = [
                 'file' => $file,
+                'book_title' => $book_title,
+                'book_author' => $book_author,
                 'created' => time(),
                 'expires' => time() + 300
             ];
@@ -1304,10 +1406,10 @@ class Action
             } else {
                 // ✅ Insert new reading session
                 $insert = $this->db->prepare("
-                INSERT INTO reading_logs (user_id, file, start_time, is_favorite) 
-                VALUES (?, ?, NOW(), 0)
+                INSERT INTO reading_logs (user_id, book_title, book_author, file, start_time, is_favorite) 
+                VALUES (?, ?, ?, ?, NOW(), 0)
             ");
-                $insert->execute([$user_id, $file]);
+                $insert->execute([$user_id, $book_title, $book_author, $file]);
             }
 
             // ✅ Build secure viewer URL
@@ -1338,6 +1440,9 @@ class Action
 
         $file = $_POST['file'] ?? null;
         $duration = (int) ($_POST['duration'] ?? 0);
+        // $book_title = $_POST['book_title'] ?? 'Unknown Title';
+        // $book_author = $_POST['book_author'] ?? 'Unknown Author';
+
 
         $user_id = $_SESSION['student']['user_id'] ?? null;
         if (!$user_id) {
@@ -1400,6 +1505,8 @@ class Action
         }
 
         header('Content-Type: application/json');
+        $book_title = $_POST['book_title'] ?? 'Unknown Title';
+        $book_author = $_POST['book_author'] ?? 'Unknown Author';
 
         $file = $_POST['file'] ?? null;
         $favorite = isset($_POST['favorite']) ? (int) $_POST['favorite'] : 0;
@@ -1426,13 +1533,11 @@ class Action
             $log = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($log) {
-                // ✅ Update favorite status
-                $update = $this->db->prepare("UPDATE reading_logs SET is_favorite = ?, updated_at = NOW() WHERE id = ?");
-                $update->execute([$favorite, $log['id']]);
+                $update = $this->db->prepare("UPDATE reading_logs SET is_favorite = ?, SET 	book_title = ?, book_author = ?, updated_at = updated_at = NOW() WHERE id = ?");
+                $update->execute([$favorite, $book_title, $book_author, $log['id']]);
             } else {
-                // ✅ Create new log entry if not found
-                $insert = $this->db->prepare("INSERT INTO reading_logs (user_id, file, is_favorite, start_time) VALUES (?, ?, ?, NOW())");
-                $insert->execute([$user_id, $file, $favorite]);
+                $insert = $this->db->prepare("INSERT INTO reading_logs (user_id, book_title, book_author, file, is_favorite,  start_time) VALUES (?, ?, ?, ?, ?, NOW())");
+                $insert->execute([$user_id, $book_title, $book_author, $file, $favorite]);
             }
 
             return json_encode([
@@ -1459,13 +1564,13 @@ class Action
         header('Content-Type: application/json');
 
         $user_id = $_SESSION['student']['user_id'] ?? $_SESSION['faculty']['user_id'] ?? null;
-        /* if (!$user_id) {
+        if (!$user_id) {
             return json_encode([
                 'status' => 0,
                 'message' => 'User not logged in.'
             ]);
 
-        } */
+        }
 
         try {
             $baseURL = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}/UniversityLibrary/";
@@ -1547,6 +1652,8 @@ class Action
                 }
                 $token = bin2hex(random_bytes(16));
                 $_SESSION['pdf_tokens'][$token] = [
+                    'title' => $title,
+                    'author' => $author,
                     'file' => $baseURL . "auth/" . $log['file'],
                     'created' => time(),
                     'expires' => time() + 300
@@ -1823,6 +1930,21 @@ class Action
                     $stmt = $this->db->prepare("SELECT * FROM user WHERE user_id = ?");
                     $stmt->execute([$userId]);
                     $data = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                    if ($data) {
+                        return json_encode(['status' => 1, 'data' => $data]);
+                    } else {
+                        return json_encode(['status' => 0, 'message' => 'User not found']);
+                    }
+                } catch (PDOException $e) {
+                    return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
+                }
+            case 'retrieveLogs':
+                try {
+                    $userId = $_POST['user_id'] ?? 0;
+                    $stmt = $this->db->prepare("SELECT * FROM reading_logs WHERE user_id = ?");
+                    $stmt->execute([$userId]);
+                    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                     if ($data) {
                         return json_encode(['status' => 1, 'data' => $data]);

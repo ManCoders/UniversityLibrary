@@ -227,7 +227,7 @@
                     <!-- Profile Picture -->
                     <div class="relative">
                         <img id="profile-picture"
-                            src="<?php echo isset($_SESSION['student']['profile_pic']) ? $_SESSION['student']['profile_pic'] : ''?>"
+                            src="<?php echo isset($_SESSION['student']['profile_pic']) ? $_SESSION['student']['profile_pic'] : '' ?>"
                             alt="Profile Picture"
                             class="w-32 h-32 rounded-full border-4 border-[#b03060] shadow-md object-cover">
                         <button
@@ -553,12 +553,12 @@
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <input type="email" name="email" placeholder="Email" required
-                        class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                         <input type="text" name="username" placeholder="Username" required
-                        class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
-                        
+                            class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+
                     </div>
-                    
+
                     <div class="grid grid-cols-2 gap-3">
                         <input type="password" name="password" placeholder="Password" required
                             class="w-full border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
@@ -585,127 +585,104 @@
 
 
     <script>
-        $('#profile').on('change', function (e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => $('#profile-preview').attr('src', e.target.result);
-            reader.readAsDataURL(file);
-        });
-        $('#role').on('change', function () {
-            const role = $(this).val();
-            if (role === 'student') {
-                $('#student-fields').removeClass('hidden');
-                $('#faculty-fields').addClass('hidden');
-            } else if (role === 'faculty') {
-                $('#faculty-fields').removeClass('hidden');
-                $('#student-fields').addClass('hidden');
-            } else {
-                $('#student-fields, #faculty-fields').addClass('hidden');
-            }
-        });
-        // Open Register Modal from Login
-        $('#open-register').on('click', function () {
-            $('#login-modal').addClass('hidden').attr('aria-expanded', 'false');
-            $('#register-modal').removeClass('hidden').attr('aria-expanded', 'true');
-        });
-
-        // Open Login from Register
-        $('#open-login-from-register').on('click', function () {
-            $('#register-modal').addClass('hidden').attr('aria-expanded', 'false');
-            $('#login-modal').removeClass('hidden').attr('aria-expanded', 'true');
-        });
-
-        // Close Register Modal
-        $('#close-register').on('click', function () {
-            $('#register-modal').addClass('hidden').attr('aria-expanded', 'false');
-        });
-
-        // Role switch logic
-        $('input[name="role"]').on('change', function () {
-            if ($(this).val() === 'student') {
-                $('#student-fields').removeClass('hidden');
-                $('#faculty-fields').addClass('hidden');
-            } else {
-                $('#faculty-fields').removeClass('hidden');
-                $('#student-fields').addClass('hidden');
-            }
-        });
-
-
-        $('#register').on('submit', function (e) {
-            e.preventDefault();
-
-            const form = this;
-            const formData = new FormData(form);
-            const role = $('input[name="role"]:checked').val();
-
-            // Convert profile image to Base64 if selected
-            const fileInput = $('#profile')[0].files[0];
-            if (fileInput) {
+        $(document).ready(function () {
+            // ===== Profile Preview =====
+            $('#profile').on('change', function (e) {
+                const file = e.target.files[0];
+                if (!file) return;
                 const reader = new FileReader();
-                reader.onload = function (e) {
-                    formData.set('profile_pic', e.target.result);
-                    sendRegisterRequest(formData, role);
-                };
-                reader.readAsDataURL(fileInput);
-            } else {
-                sendRegisterRequest(formData, role);
-            }
-        });
-
-        function sendRegisterRequest(formData, role) {
-            // Convert FormData to JSON
-            const jsonData = {};
-            formData.forEach((value, key) => {
-                jsonData[key] = value;
+                reader.onload = e => $('#profile-preview').attr('src', e.target.result);
+                reader.readAsDataURL(file);
             });
 
-            $.ajax({
-                url: `${base_url}auth/action.php?action=register_user`, // adjust this path to your backend
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(jsonData),
-                success: function (res) {
-                    try {
-                        const data = typeof res === 'string' ? JSON.parse(res) : res;
-                        if (data.status === 1) {
-                            $('#register-message')
-                                .removeClass('text-red-500')
-                                .addClass('text-green-500')
-                                .text(data.message)
-                                .removeClass('hidden');
+            // ===== Role Toggle =====
+            function toggleRoleFields(role) {
+                $('#student-fields, #faculty-fields').addClass('hidden');
+                if (role === 'student') $('#student-fields').removeClass('hidden');
+                else if (role === 'faculty') $('#faculty-fields').removeClass('hidden');
+            }
 
-                            // Optionally, clear form
-                            $('#register')[0].reset();
-                            $('#profile-preview').attr('src', 'assets/default-profile.png');
+            $('input[name="role"]').on('change', function () {
+                toggleRoleFields($(this).val());
+            });
 
-                            setTimeout(() => {
-                                $('#register-modal').addClass('hidden').attr('aria-expanded', 'false');
-                                $('#login-modal').removeClass('hidden').attr('aria-expanded', 'true');
-                            }, 1500);
-                        } else {
-                            $('#register-message')
-                                .removeClass('hidden text-green-500')
-                                .addClass('text-red-500')
-                                .text(data.message);
-                        }
-                    } catch (err) {
-                        $('#register-message')
-                            .removeClass('hidden text-green-500')
-                            .addClass('text-red-500')
-                            .text('Unexpected server response.');
-                    }
-                },
-                error: function () {
-                    $('#register-message')
-                        .removeClass('hidden text-green-500')
-                        .addClass('text-red-500')
-                        .text('Failed to connect to the server.');
+            toggleRoleFields($('input[name="role"]:checked').val()); // init on load
+
+            // ===== Modal Controls =====
+            function toggleModal(showSelector, hideSelector) {
+                $(hideSelector).addClass('hidden').attr('aria-expanded', 'false');
+                $(showSelector).removeClass('hidden').attr('aria-expanded', 'true');
+            }
+
+            // Open/Close Modals
+            $('#open-register').on('click', () => toggleModal('#register-modal', '#login-modal'));
+            $('#open-login-from-register').on('click', () => toggleModal('#login-modal', '#register-modal'));
+            $('#close-register').on('click', () => $('#register-modal').addClass('hidden').attr('aria-expanded', 'false'));
+
+            // ===== Registration Form =====
+            $('#register').on('submit', function (e) {
+                e.preventDefault();
+
+                const role = $('input[name="role"]:checked').val();
+                const formDataObj = {};
+
+                // Collect all input fields
+                $(this).find('input').each(function () {
+                    formDataObj[this.name] = this.value;
+                });
+
+                formDataObj.role = role;
+
+                const fileInput = $('#profile')[0].files[0];
+                if (fileInput) {
+                    const reader = new FileReader();
+                    reader.onload = e => {
+                        formDataObj.profile_pic = e.target.result;
+                        sendRegisterRequest(formDataObj);
+                    };
+                    reader.readAsDataURL(fileInput);
+                } else {
+                    sendRegisterRequest(formDataObj);
                 }
             });
-        }
+
+            function sendRegisterRequest(data) {
+                $.ajax({
+                    url: `${base_url}auth/action.php?action=register_user`,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    success: function (res) {
+                        let response;
+                        try {
+                            response = typeof res === 'string' ? JSON.parse(res) : res;
+                        } catch {
+                            response = { status: 0, message: 'Unexpected server response.' };
+                        }
+
+                        $('#register-message')
+                            .removeClass('hidden text-red-500 text-green-500')
+                            .addClass(response.status === 1 ? 'text-green-500' : 'text-red-500')
+                            .text(response.message);
+
+                        if (response.status === 1) {
+                            $('#register')[0].reset();
+                            $('#profile-preview').attr('src', 'assets/default-profile.png');
+                            setTimeout(() => toggleModal('#login-modal', '#register-modal'), 1500);
+                        }
+                    },
+                    error: function () {
+                        $('#register-message')
+                            .removeClass('hidden text-red-500 text-green-500')
+                            .addClass('text-red-500')
+                            .text('Failed to connect to the server.');
+                    }
+                });
+            }
+        });
     </script>
+
+
 
 
     <!-- Search Modal -->

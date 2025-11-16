@@ -600,13 +600,11 @@ $(document).ready(function () {
 
             const coverPath = book.cover_path || "";
             const coverFile = book.cover || "default-cover.png";
+
             const cover =
               base_url +
               "auth/" +
-              (coverPath + coverFile)
-                .split("/")
-                .map(encodeURIComponent)
-                .join("/");
+              coverPath.split("/").map(encodeURIComponent).join("/");
 
             html += `
             <div class='p-3 border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 rounded transition flex items-center space-x-3'>
@@ -615,7 +613,9 @@ $(document).ready(function () {
                 <button 
                   type="button" 
                   class="font-semibold text-indigo-700 dark:text-indigo-400 hover:underline text-left w-full file-link"
-                  data-file="${book.file_path}"  
+                  data-file="${book.file_path} data-title='${encodeURIComponent(
+              title
+            )}' data-author='${book}'"  
                 >
                   ${title}
                 </button>
@@ -636,6 +636,8 @@ $(document).ready(function () {
           .off("click")
           .on("click", function () {
             const filePath = $(this).data("file");
+            const title = $(this).data("title");
+            const author = $(this).data("author");
             if (!filePath) {
               alert("File not found.");
               return;
@@ -643,30 +645,29 @@ $(document).ready(function () {
 
             // Check login before starting reading session
             checkLogin(() => {
-              startReadingSession(filePath);
+              $.ajax({
+                type: "POST",
+                url: `${base_url}auth/action.php?action=readingbooks`,
+                data: { 
+                  file: filePath,
+                  book_title: title,
+                  book_author: author
+                 }, // relative path
+                dataType: "json",
+                success: function (res) {
+                  if (res.status === 1 && res.data) {
+                    window.open(res.data, "_blank");
+                  } else {
+                    alert(res.message || "Cannot open book.");
+                  }
+                },
+                error: function (_xhr, _status, error) {
+                  console.error("AJAX error:", error);
+                  alert("Server error while opening the book.");
+                },
+              });
             });
           });
-
-        // ---------- START READING SESSION ----------
-        function startReadingSession(filePath) {
-          $.ajax({
-            type: "POST",
-            url: `${base_url}auth/action.php?action=readingbooks`,
-            data: { file: filePath }, // relative path
-            dataType: "json",
-            success: function (res) {
-              if (res.status === 1 && res.data) {
-                window.open(res.data, "_blank");
-              } else {
-                alert(res.message || "Cannot open book.");
-              }
-            },
-            error: function (_xhr, _status, error) {
-              console.error("AJAX error:", error);
-              alert("Server error while opening the book.");
-            },
-          });
-        }
 
         // ---------- LOGIN CHECK ----------
         function checkLogin(callback) {
@@ -728,38 +729,6 @@ $(document).ready(function () {
       toggleModal(searchModal, false);
     }
   });
-  tailwind.config = {
-    darkMode: "class",
-    theme: {
-      extend: {
-        fontFamily: {
-          sans: ["Inter", "sans-serif"],
-        },
-        colors: {
-          "indigo-700": "#4338ca",
-          "indigo-600": "#4f46e5",
-          "indigo-50": "#eef2ff",
-        },
-      },
-    },
-  };
-
-  // --- Apply theme early (before paint) ---
-  $(function () {
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    const storedTheme = localStorage.getItem(THEME_KEY);
-    const isDark =
-      storedTheme === "dark" || (storedTheme === null && prefersDark);
-
-    // Apply dark or light mode
-    if (isDark) {
-      $("html").addClass("dark");
-    } else {
-      $("html").removeClass("dark");
-    }
-  });
 
   $("#change-password-form").on("submit", function (e) {
     e.preventDefault();
@@ -791,4 +760,6 @@ $(document).ready(function () {
       },
     });
   });
+
+  
 });

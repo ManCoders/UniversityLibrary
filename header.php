@@ -17,79 +17,102 @@ if (session_status() === PHP_SESSION_NONE) {
     <?php render_scripts(); ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <script>
-
         var base_url = '<?php echo base_url() ?>';
 
         const THEME_KEY = "theme";
 
-        // ✅ Apply theme *before paint* to prevent flashing
+        // Tailwind config
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "Noto Sans", "sans-serif", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"],
+                        serif: ["ui-serif", "Georgia", "Cambria", "Times New Roman", "Times", "serif"],
+                    },
+                    colors: {
+                        "indigo-700": "#4338ca",
+                        "indigo-600": "#4f46e5",
+                        "indigo-50": "#eef2ff",
+                    },
+                },
+            },
+        };
+
+        // ---------------------------
+        //  PRE-PAINT THEME SETUP
+        // ---------------------------
         (function () {
-            const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
             const storedTheme = localStorage.getItem(THEME_KEY);
+            const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
             const isDark = storedTheme === "dark" || (storedTheme === null && prefersDark);
 
-            // Set correct background color *before* visibility
+            const html = document.documentElement;
+
             if (isDark) {
-                document.documentElement.classList.add("dark");
-                document.documentElement.style.backgroundColor = "#111827"; // gray-900 for dark mode
-                document.documentElement.style.colorScheme = "dark";
+                html.classList.add("dark");
+                html.style.backgroundColor = "#111827";
+                html.style.colorScheme = "dark";
             } else {
-                document.documentElement.classList.remove("dark");
-                document.documentElement.style.backgroundColor = "#f3f4f6"; // gray-100 for light mode
-                document.documentElement.style.colorScheme = "light";
+                html.classList.remove("dark");
+                html.style.backgroundColor = "#f3f4f6";
+                html.style.colorScheme = "light";
             }
 
-            if (!isDark) {
-
-                document.documentElement.classList.remove("dark");
-                document.documentElement.style.backgroundColor = "#f3f4f6"; // gray-100 for light mode
-                document.documentElement.style.colorScheme = "light";
-            } else {
-
-                document.documentElement.classList.add("dark");
-                document.documentElement.style.backgroundColor = "#111827"; // gray-900 for dark mode
-                document.documentElement.style.colorScheme = "dark";
-            }
-
-            // Hide until ready
-            document.documentElement.style.visibility = "hidden";
+            // hide until ready → avoid flash
+            html.style.visibility = "hidden";
 
             window.addEventListener("DOMContentLoaded", () => {
-                document.documentElement.style.visibility = "visible";
+                html.style.visibility = "visible";
             });
         })();
 
-        // ✅ Theme handling functions
+
+        // ---------------------------
+        //  THEME APPLY FUNCTION
+        // ---------------------------
         const applyTheme = (isDark) => {
+            const html = document.documentElement;
+
             if (isDark) {
-                document.documentElement.classList.add("dark");
-                document.documentElement.style.backgroundColor = "#111827";
-                document.documentElement.style.colorScheme = "dark";
+                html.classList.add("dark");
+                html.style.backgroundColor = "#111827";
+                html.style.colorScheme = "dark";
             } else {
-                document.documentElement.classList.remove("dark");
-                document.documentElement.style.backgroundColor = "#f3f4f6";
-                document.documentElement.style.colorScheme = "light";
+                html.classList.remove("dark");
+                html.style.backgroundColor = "#f3f4f6";
+                html.style.colorScheme = "light";
             }
         };
 
+
+        // ---------------------------
+        //  DARK MODE TOGGLE HANDLER
+        // ---------------------------
         const initializeDarkModeToggle = () => {
             const toggleButton = document.getElementById("dark-mode-toggle");
             if (!toggleButton) return;
 
             toggleButton.addEventListener("click", () => {
-                const isCurrentlyDark = document.documentElement.classList.contains("dark");
-                const newIsDark = !isCurrentlyDark;
-                applyTheme(newIsDark);
-                localStorage.setItem(THEME_KEY, newIsDark ? "dark" : "light");
+                const currentlyDark = document.documentElement.classList.contains("dark");
+                const newTheme = !currentlyDark;
+
+                applyTheme(newTheme);
+                localStorage.setItem(THEME_KEY, newTheme ? "dark" : "light");
             });
         };
 
+
+        // ---------------------------
+        //  APP BOOTSTRAP
+        // ---------------------------
         const renderApp = () => {
             if (window.lucide) lucide.createIcons();
             initializeSidebarToggle?.();
             initializeDarkModeToggle();
         };
     </script>
+
 </head>
 
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">

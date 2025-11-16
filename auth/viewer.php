@@ -4,12 +4,17 @@ include "../header.php";
 // --- Token validation ---
 $token = $_GET['token'] ?? null;
 $pdfFile = null;
+$title = null;
+$author = null;
 
 if ($token && isset($_SESSION['pdf_tokens'][$token])) {
   $tokenData = $_SESSION['pdf_tokens'][$token];
 
+
   if ($tokenData['expires'] >= time()) {
     $pdfFile = $tokenData['file'];
+    $title = $tokenData['book_titlev'] ?? 'Unknown Title';
+    $author = $tokenData['book_author'] ?? 'Unknown Author';
   } else {
     unset($_SESSION['pdf_tokens'][$token]);
   }
@@ -69,6 +74,7 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
 
       let pdfDoc = null, seconds = 0, timerInterval = null, isFavorite = false;
       const pdfUrl = "<?php echo $pdfUrl; ?>";
+
 
       if (!pdfUrl) {
         $loader.html(`<p class='text-red-500 font-semibold'>⚠️ Invalid or expired token.</p>`);
@@ -136,6 +142,8 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
           type: "POST",
           data: {
             file: "<?php echo $pdfFile; ?>",
+            book_title: <?php echo $title; ?>,
+            book_author: <?php echo $author; ?>,
             favorite: isFavorite ? 1 : 0
           },
           dataType: "json",
@@ -159,6 +167,8 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
           type: "POST",
           data: {
             file: "<?php echo $pdfFile; ?>",
+            book_title: <?php echo $title; ?>,
+            book_author: <?php echo $author; ?>,
             duration: seconds
           },
           dataType: "json",

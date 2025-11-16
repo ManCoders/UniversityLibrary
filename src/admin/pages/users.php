@@ -79,150 +79,99 @@
             </div>
         </div>
     </div>
-    <div id="user-content" class="tab-panel">
-        <form id="userForm" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-5xl mx-auto"
-            enctype="multipart/form-data">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100 text-center">
-                Add New User
-            </h2>
+    <div id="user-content"
+        class="tab-panel flex flex-col sm:flex-row gap-6 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
 
-            <div id="userFormMessage" class="m-2 text-center px-4 py-1 rounded"></div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
-
-                <!-- Profile Picture -->
-                <div class="flex flex-col items-center col-span-1">
-                    <label class="mb-2 text-gray-700 dark:text-gray-200 font-semibold">Profile Picture</label>
-                    <div class="w-32 h-32 mb-3">
-                        <img id="userProfilePreview" src=""
-                            class="w-full h-full object-cover rounded-full border border-gray-300 shadow">
-                    </div>
-                    <input type="file" name="profile_pic" id="userProfilePic"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                </div>
-
-                <!-- Form Fields -->
-                <div class="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                    <!-- Role -->
-                    <div class="md:col-span-2">
-                        <label class="text-gray-700 dark:text-gray-200 font-semibold">User Role</label>
-                        <select id="userRole" name="user_role"
-                            class="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-                            <option value="">Select User Type</option>
-                            <option value="faculty">Faculty</option>
-                            <option value="student">Student</option>
-                        </select>
-                    </div>
-
-                    <!-- Basic Info -->
-                    <input name="firstname" type="text" placeholder="First Name"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-                    <input name="lastname" type="text" placeholder="Last Name"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-                    <input name="email" type="email" placeholder="Email"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-                    <input name="username" type="text" placeholder="Username / Student ID"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-                    <input name="password" type="password" placeholder="Password"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-                    <input name="confirm_password" type="password" placeholder="Confirm Password"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200">
-
-                    <!-- Optional Info (Shown dynamically) -->
-                    <input name="birthdate" type="date" id="birthdateField"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-                    <select name="gender" id="genderField"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-                        <option value="">Select Gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                    </select>
-                    <input name="phone" type="text" id="phoneField" placeholder="Contact Number"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-                    <input name="address" type="text" id="addressField" placeholder="Address"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-
-                    <!-- Faculty ONLY -->
-                    <input name="position" type="text" id="positionField" placeholder="Faculty Position"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-
-                    <!-- Student ONLY -->
-                    <select id="departmentField" name="department"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-                        <option value="">Select Department</option>
-                        <option value="CTE">CTE</option>
-                        <option value="CICS">CICS</option>
-                        <option value="ITE">ITE</option>
-                        <option value="SBC">SBC</option>
-                        <option value="BSMT">BSMT</option>
-                        <option value="CAHS">CAHS</option>
-                        <option value="CET">CET</option>
-                        <option value="SHS">SHS</option>
-                    </select>
-
-                    <select id="courseField" name="course"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-                        <option value="">Select Course / Program</option>
-                        <option value="bsc_computer_science">BSc Computer Science</option>
-                        <option value="bsc_mathematics">BSc Mathematics</option>
-                        <option value="bsc_physics">BSc Physics</option>
-                        <option value="bsc_chemistry">BSc Chemistry</option>
-                        <option value="bsc_biology">BSc Biology</option>
-                    </select>
-
-                    <select id="yearField" name="year_level"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-                        <option value="">Select Year Level</option>
-                        <option value="1">1st Year</option>
-                        <option value="2">2nd Year</option>
-                        <option value="3">3rd Year</option>
-                        <option value="4">4th Year</option>
-                    </select>
-
-                    <input name="section" type="text" id="sectionField" placeholder="Section"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 hidden">
-                </div>
+        <!-- LEFT: Profile Upload -->
+        <div
+            class="flex flex-col items-center justify-center w-full sm:w-[35%] border-r border-[#b03060]/40 dark:border-[#800000]/40 pr-4">
+            <div
+                class="relative w-32 h-32 rounded-full overflow-hidden border-2 border-[#b03060] dark:border-[#800000]">
+                <img id="profile-preview" src="../../assets/default-profile.png" alt="Profile Preview"
+                    class="w-full h-full object-cover">
             </div>
+            <label for="profile"
+                class="mt-3 cursor-pointer text-sm font-semibold text-[#b03060] dark:text-[#ff4d6d] hover:underline">
+                Upload Profile
+            </label>
+            <input type="file" name="profile" id="profile" accept="image/*" class="hidden">
+            <p class="mt-2 text-xs text-[#800000] dark:text-[#ffcccc]">JPG, PNG under 2MB</p>
+        </div>
 
-            <div class="mt-6 text-center">
+        <!-- RIGHT: Registration Form -->
+        <div class="flex-1">
+            <h3 class="text-2xl font-bold text-center mb-4 text-[#b03060] dark:text-[#ff4d6d]">
+                <i data-lucide="user-plus" class="inline-block w-4 h-4 mr-1 align-text-bottom"></i> Campus Registration
+            </h3>
+
+            <form id="register" class="space-y-4" enctype="multipart/form-data">
+                <!-- Role Selector -->
+                <div class="flex gap-6 justify-center mb-4">
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="role" value="student" class="accent-[#b03060]" checked> Student
+                    </label>
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="role" value="faculty" class="accent-[#b03060]"> Faculty
+                    </label>
+                </div>
+
+                <!-- Name Fields -->
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" name="firstname" placeholder="First Name" required
+                        class="input-field rounded-lg py-3 p-2">
+                    <input type="text" name="lastname" placeholder="Last Name" required
+                        class="input-field rounded-lg py-3 p-2">
+                    <input type="text" name="middlename" placeholder="Middle Name"
+                        class="input-field rounded-lg py-3 p-2">
+                    <input type="text" name="suffix" placeholder="Suffix (e.g. Jr., III)"
+                        class="input-field rounded-lg py-3 p-2">
+                </div>
+
+                <!-- Department -->
+                <input type="text" name="department" placeholder="Department" required
+                    class="input-field rounded-lg py-3 p-2 w-full">
+
+                <!-- Student Section -->
+                <div id="student-fields" class="space-y-3">
+                    <input type="text" name="student_id" placeholder="Student ID"
+                        class="input-field rounded-lg py-3 p-2 w-full">
+                    <input type="text" name="section" placeholder="Section"
+                        class="input-field rounded-lg py-3 p-2 w-full">
+                </div>
+
+                <!-- Faculty Section -->
+                <div id="faculty-fields" class="hidden space-y-3">
+                    <input type="text" name="employee_id" placeholder="Employee ID"
+                        class="input-field rounded-lg py-3 p-2 w-full">
+                </div>
+
+                <!-- Email & Username -->
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="email" name="email" placeholder="Email" required
+                        class="input-field rounded-lg py-3 p-2">
+                    <input type="text" name="username" placeholder="Username" required
+                        class="input-field rounded-lg py-3 p-2">
+                </div>
+
+                <!-- Password -->
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="password" name="password" placeholder="Password" required
+                        class="input-field rounded-lg py-3 p-2">
+                    <input type="password" name="confirm_password" placeholder="Confirm Password" required
+                        class="input-field rounded-lg py-3 p-2">
+                </div>
+
+                <!-- Message -->
+                <p id="register-message" class="text-sm text-red-500 hidden"></p>
+
+                <!-- Buttons -->
                 <button type="submit"
-                    class="bg-indigo-500 text-white px-6 py-2 rounded-md hover:bg-indigo-600 transition duration-300">
-                    Add User
+                    class="w-full bg-[#b03060] text-white font-semibold py-3 rounded-lg hover:bg-[#800000] transition transform hover:scale-[1.01]">
+                    Register Account
                 </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-
-    <script>
-        const roleFields = {
-            common: ["birthdateField", "genderField", "phoneField", "addressField"],
-            faculty: ["departmentField", "positionField"],
-            student: ["departmentField", "courseField", "yearField", "sectionField"]
-        };
-
-        document.getElementById("userRole").addEventListener("change", function () {
-            const role = this.value;
-
-            // Hide all optional fields
-            Object.values(roleFields).flat().forEach(id => document.getElementById(id).classList.add("hidden"));
-
-            // Show common + role-specific fields
-            roleFields.common.forEach(id => document.getElementById(id).classList.remove("hidden"));
-            if (role && roleFields[role]) roleFields[role].forEach(id => document.getElementById(id).classList.remove("hidden"));
-        });
-
-        // Profile Preview
-        const profileInput = document.getElementById('userProfilePic');
-        const profilePreview = document.getElementById('userProfilePreview');
-        profileInput.addEventListener('change', e => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = e => profilePreview.src = e.target.result;
-            reader.readAsDataURL(file);
-        });
-    </script>
 
 
 
@@ -250,8 +199,6 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="studentTableBody">
-
-
             </tbody>
         </table>
     </div>
@@ -337,24 +284,30 @@
 
                 <!-- Right Column: Activities -->
                 <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-md">
-                    <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100 text-center">
-                        Recent Activities
+
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 text-center mb-6">
+                        Recent Activity
                     </h2>
-                    <div class="space-y-3">
-                        <p class="text-sm text-gray-700 dark:text-gray-300 border-b dark:border-gray-600 pb-2">
-                            Book 1
-                            <span class="float-right text-xs text-gray-500 dark:text-gray-400">2 min ago</span>
-                        </p>
-                        <p class="text-sm text-gray-700 dark:text-gray-300 border-b dark:border-gray-600 pb-2">
-                            Book 2
-                            <span class="float-right text-xs text-gray-500 dark:text-gray-400">1 hour ago</span>
-                        </p>
-                        <p class="text-sm text-gray-700 dark:text-gray-300 border-b dark:border-gray-600 pb-2">
-                            Book 3
-                            <span class="float-right text-xs text-gray-500 dark:text-gray-400">3 hours ago</span>
-                        </p>
+
+                    <!-- Read Logs Section -->
+                    <div class="mb-4">
+                        <h3
+                            class="text-md text-end font-semibold text-gray-700 dark:text-gray-200 mb-3 border-b dark:border-gray-600 pb-1">
+                            Read Logs
+                        </h3>
+
+                        <div id="book_logs" class="space-y-3">
+                            <p class="text-sm text-gray-700 dark:text-gray-300 border-b dark:border-gray-600 pb-2">
+                                Book 1
+                                <span class="float-right text-xs text-gray-500 dark:text-gray-400">
+                                    2 min ago
+                                </span>
+                            </p>
+                        </div>
                     </div>
+
                 </div>
+
             </div>
         </div>
     </div>
@@ -374,7 +327,6 @@
             $(contentId).removeClass('hidden');
             $(tabId).addClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
                 .removeClass('border-transparent  dark:text-gray-400');
-
         }
 
         // Initial tab
@@ -382,7 +334,6 @@
         $('#closeViewBtn').on('click', function () {
             $('#view-content').addClass('hidden');
             $('.tab-panel').removeClass('hidden');
-
         });
 
         $('#tab-dashboard').click(function () { activateTab('#tab-dashboard', '#dashboard-content'); });
@@ -399,41 +350,32 @@
                 dataType: "json",
                 success: function (response) {
                     if (response.status === 1) {
-                        const tbody = $("#teacherTableBody");
-                        tbody.empty();
+                        const facultyTbody = $("#teacherTableBody");
+                        const studentTbody = $("#studentTableBody");
 
-                        tbody.empty();
-                        response.data.forEach((faculty, index) => {
-                            if (faculty.user_role == 'faculty') {
-                                tbody.append(`
-                                <tr class="text-white" data-id="${faculty.user_id}">
-                                    <td class="px-4 py-2">${index + 1}</td>
-                                    <td class="px-4 py-2">${faculty.firstname} ${faculty.lastname}</td>
-                                    <td class="px-4 py-2">${faculty.email}</td>
-                                    <td class="px-4 py-2">${faculty.department}</td>
-                                    <td class="px-2 py-2 text-center space-x-1">
-                                        <button id="view-btn-${faculty.user_id}" class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                        <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                        <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                                    </td>
-                                </tr>
-                            `);
-                            } else {
-                                const tbody = $("#studentTableBody");
-                                tbody.empty();
-                                tbody.append(`
-                                <tr class="text-white" data-id="${faculty.user_id}">
-                                    <td class="px-4 py-2">${index + 1}</td>
-                                    <td class="px-4 py-2">${faculty.firstname} ${faculty.lastname}</td>
-                                    <td class="px-4 py-2">${faculty.email}</td>
-                                    <td class="px-4 py-2">${faculty.department}</td>
-                                    <td class="px-2 py-2 text-center space-x-1">
-                                        <button id="view-btn-${faculty.user_id}" class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                        <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                        <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                                    </td>
-                                </tr>
-                            `);
+                        // Clear tables once before appending
+                        facultyTbody.empty();
+                        studentTbody.empty();
+
+                        response.data.forEach((user, index) => {
+                            const row = `
+                        <tr class="text-white" data-id="${user.user_id}">
+                            <td class="px-4 py-2">${index + 1}</td>
+                            <td class="px-4 py-2">${user.firstname} ${user.lastname}</td>
+                            <td class="px-4 py-2">${user.email}</td>
+                            <td class="px-4 py-2">${user.department}</td>
+                            <td class="px-2 py-2 text-center space-x-1">
+                                <button id="view-btn-${user.user_id}" class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
+                                <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
+                                <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+
+                            if (user.user_role === 'faculty') {
+                                facultyTbody.append(row);
+                            } else if (user.user_role === 'student') {
+                                studentTbody.append(row);
                             }
                         });
                     }
@@ -443,6 +385,7 @@
                 }
             });
         }
+
         $(document).on("click", ".view-btn, .edit-btn, .delete-btn", function () {
             const tr = $(this).closest("tr");
             const userId = tr.data("id");
@@ -450,8 +393,6 @@
             if ($(this).hasClass("view-btn")) {
 
                 activateTab(`#view-btn-${userId}`, `#view-content`);
-
-
                 $.ajax({
                     url: `${base_url}auth/action.php?action=GetUser`,
                     type: "POST",
@@ -472,14 +413,17 @@
 
                             if (res.data.profile_pic) {
                                 $("#viewProfilePic").attr("src", base_url + "auth/" + res.data.profile_pic);
+                            } else {
+                                $("#viewProfilePic").attr("src", base_url + "assets/default-profile.png");
                             }
-
                         } else {
                             alert(res.message);
                         }
+                        loadFaculty();
                     },
                     error: function () { alert("Server error"); }
                 });
+
             } else if ($(this).hasClass("edit-btn")) {
                 $.ajax({
                     url: `${base_url}auth/action.php?action=GetUser`,
@@ -501,9 +445,11 @@
                         } else {
                             alert(res.message);
                         }
+                        loadFaculty();
                     },
                     error: function () { alert("Server error"); }
                 });
+
             } else if ($(this).hasClass("delete-btn")) {
                 if (!confirm("Are you sure you want to delete this user?")) return;
                 $.ajax({
@@ -521,63 +467,117 @@
                             loadFaculty();
 
                         } else alert(res.message);
+                        loadFaculty();
                     },
                     error: function () { alert("Server error"); }
                 });
             }
         });
 
-        $('#userForm').on('submit', function (e) {
+
+
+        const studentFields = $("#student-fields");
+        const facultyFields = $("#faculty-fields");
+        const profileInput = $("#profile");
+        const profilePreview = $("#profile-preview");
+        const registerMessage = $("#register-message");
+
+        // Toggle student/faculty fields
+        $('input[name="role"]').change(function () {
+            if ($(this).val() === "student") {
+                studentFields.removeClass("hidden");
+                facultyFields.addClass("hidden");
+            } else {
+                facultyFields.removeClass("hidden");
+                studentFields.addClass("hidden");
+            }
+        });
+
+        // Profile preview
+        profileInput.on('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                profilePreview.attr("src", e.target.result);
+            }
+            reader.readAsDataURL(file);
+        });
+
+        // Register form submission
+        $("#register").submit(function (e) {
             e.preventDefault();
 
-            const form = this;
-            const formData = new FormData(form); // includes files automatically
-            const userRole = $('#userRole').val();
+            const role = $('input[name="role"]:checked').val();
+            const formData = {
+                role: role,
+                firstname: $("input[name='firstname']").val(),
+                lastname: $("input[name='lastname']").val(),
+                middlename: $("input[name='middlename']").val(),
+                suffix: $("input[name='suffix']").val(),
+                department: $("input[name='department']").val(),
+                email: $("input[name='email']").val(),
+                username: $("input[name='username']").val(),
+                password: $("input[name='password']").val(),
+                confirm_password: $("input[name='confirm_password']").val(),
+                profile_pic: ""
+            };
 
-            if (!userRole) {
-                $('#userFormMessage').addClass('text-red-500').text('Please select a user role').removeClass('hidden');
+            // Add role-specific fields
+            if (role === "student") {
+                formData.student_id = $("input[name='student_id']").val();
+                formData.section = $("input[name='section']").val();
+            } else {
+                formData.employee_id = $("input[name='employee_id']").val();
+            }
+
+            // Password confirmation check
+            if (formData.password !== formData.confirm_password) {
+                registerMessage.text("Passwords do not match")
+                    .removeClass("hidden text-green-500")
+                    .addClass("text-red-500");
                 return;
             }
 
-            formData.set('user_role', userRole);
-
-            $.ajax({
-                url: `${base_url}auth/action.php?action=register_user`,
-                type: 'POST',
-                data: formData,
-                processData: false, // do not process FormData
-                contentType: false, // set by browser
-                success: function (res) {
-                    let data;
-                    try {
-                        data = typeof res === 'string' ? JSON.parse(res) : res;
-                    } catch (err) {
-                        $('#userFormMessage').addClass('text-red-500').text('Unexpected server response').removeClass('hidden');
-                        return;
-                    }
-
-                    const msgEl = $('#userFormMessage');
-                    msgEl.removeClass('text-red-500 text-green-500 hidden');
-
-                    if (data.status === 1) {
-                        msgEl.addClass('text-green-500').text(data.message).removeClass('hidden');
-                        form.reset();
-                        $('#userProfilePreview').attr('src', 'https://via.placeholder.com/150');
-
-                        // Hide all role-specific fields
-                        ['birthdateField', 'genderField', 'phoneField', 'addressField', 'departmentField', 'positionField', 'courseField', 'yearField', 'sectionField'].forEach(id => {
-                            $('#' + id).addClass('hidden');
-                        });
-                    } else {
-                        msgEl.addClass('text-red-500').text(data.message).removeClass('hidden');
-                    }
-                },
-                error: function () {
-                    $('#userFormMessage').addClass('text-red-500').text('Failed to connect to server').removeClass('hidden');
+            // Convert profile image to Base64 if selected
+            if (profileInput[0].files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    formData.profile_pic = e.target.result;
+                    sendAjax(formData);
                 }
-            });
+                reader.readAsDataURL(profileInput[0].files[0]);
+            } else {
+                sendAjax(formData);
+            }
         });
 
-
+        function sendAjax(data) {
+            $.ajax({
+                url: `${base_url}auth/action.php?action=register_user`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                dataType: 'json',
+                success: function (result) {
+                    registerMessage.text(result.message).removeClass("hidden");
+                    if (result.status === 1) {
+                        registerMessage.removeClass("text-red-500").addClass("text-green-500");
+                        $("#register")[0].reset();
+                        profilePreview.attr("src", "../../assets/default-profile.png");
+                        studentFields.removeClass("hidden");
+                        facultyFields.addClass("hidden");
+                    } else {
+                        registerMessage.removeClass("text-green-500").addClass("text-red-500");
+                    }
+                    loadFaculty();
+                },
+                error: function () {
+                    registerMessage.text("An error occurred. Please try again.")
+                        .removeClass("hidden text-green-500")
+                        .addClass("text-red-500");
+                }
+            });
+        }
     });
 </script>

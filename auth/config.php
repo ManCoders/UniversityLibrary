@@ -55,12 +55,16 @@ function db_connect()
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
                 file VARCHAR(255) NOT NULL,
+                book_title VARCHAR(255) NOT NULL,
                 duration INT DEFAULT 0,
                 is_favorite TINYINT(1) DEFAULT 0,
                 start_time DATETIME NOT NULL,
                 end_time DATETIME DEFAULT NULL,
                 total_read_time INT DEFAULT 0,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT fk_readinglogs_user FOREIGN KEY (user_id) REFERENCES user(user_id)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )"
         ];
