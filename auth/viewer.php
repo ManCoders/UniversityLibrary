@@ -142,8 +142,8 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
           type: "POST",
           data: {
             file: "<?php echo $pdfFile; ?>",
-            book_title: <?php echo $title; ?>,
-            book_author: <?php echo $author; ?>,
+            book_title: "<?php echo $title; ?>",
+            book_author: "<?php echo $author; ?>",
             favorite: isFavorite ? 1 : 0
           },
           dataType: "json",
@@ -167,8 +167,8 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
           type: "POST",
           data: {
             file: "<?php echo $pdfFile; ?>",
-            book_title: <?php echo $title; ?>,
-            book_author: <?php echo $author; ?>,
+            book_title: "<?php echo $title; ?>",
+            book_author: "<?php echo $author; ?>",
             duration: seconds
           },
           dataType: "json",

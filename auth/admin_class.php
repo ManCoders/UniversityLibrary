@@ -1978,6 +1978,31 @@ class Action
                     return json_encode(['status' => 0, 'message' => 'Update failed: ' . $e->getMessage()]);
                 }
 
+            case 'recently_viewed':
+                try {
+                    $userId = $_POST['user_id'] ?? 0;
+
+                    if (empty($userId) || !is_numeric($userId)) {
+                        return json_encode([
+                            'status' => 0,
+                            'message' => 'Invalid user ID.'
+                        ]);
+                    }
+
+                    $stmt = $this->db->prepare("SELECT * FROM reading_logs WHERE user_id = ? ORDER BY updated_at DESC LIMIT 10");
+                    $stmt->execute([$userId]);
+                    $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                    return json_encode([
+                        'status' => 1,
+                        'data' => $data
+                    ]);
+                } catch (PDOException $e) {
+                    return json_encode([
+                        'status' => 0,
+                        'message' => 'Error retrieving logs: ' . $e->getMessage()
+                    ]);
+                }
 
             case 'DeleteUser':
                 try {

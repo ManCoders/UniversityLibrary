@@ -103,6 +103,9 @@ switch ($action) {
     case 'retrieveLogs':
         echo $crud->usercrude();
         break;
+    case 'recently_viewed':
+        echo $crud->usercrude();
+        break;
     default:
         echo json_encode(['status' => 0, 'message' => 'Invalid or missing action.']);
         break;

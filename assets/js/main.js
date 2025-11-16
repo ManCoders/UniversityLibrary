@@ -613,10 +613,7 @@ $(document).ready(function () {
                 <button 
                   type="button" 
                   class="font-semibold text-indigo-700 dark:text-indigo-400 hover:underline text-left w-full file-link"
-                  data-file="${book.file_path} data-title='${encodeURIComponent(
-              title
-            )}' data-author='${book}'"  
-                >
+                  data-file="${book.file_path}" data-title='${title}' data-author='${author}'>
                   ${title}
                 </button>
                 <p class='text-sm text-gray-700 dark:text-gray-300'>${author}</p>

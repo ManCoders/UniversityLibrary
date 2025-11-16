@@ -56,6 +56,7 @@ function db_connect()
                 user_id INT NOT NULL,
                 file VARCHAR(255) NOT NULL,
                 book_title VARCHAR(255) NOT NULL,
+                book_author VARCHAR(255) NOT NULL,
                 duration INT DEFAULT 0,
                 is_favorite TINYINT(1) DEFAULT 0,
                 start_time DATETIME NOT NULL,

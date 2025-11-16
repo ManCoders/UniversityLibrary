@@ -91,7 +91,6 @@
     </div>
     <div id="user-content"
         class="tab-panel flex flex-col sm:flex-row gap-6 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-
         <!-- LEFT: Profile Upload -->
         <div
             class="flex flex-col items-center justify-center w-full sm:w-[35%] border-r border-[#b03060]/40 dark:border-[#800000]/40 pr-4">
@@ -106,7 +105,6 @@
             <input type="file" name="profile" id="profile" accept="image/*" class="hidden" required>
             <p class="mt-2 text-xs text-[#800000] dark:text-[#ffcccc]">JPG, PNG under 2MB</p>
         </div>
-
         <!-- RIGHT: Registration Form -->
         <div class="flex-1">
             <h3 class="text-2xl font-bold text-center mb-4 text-[#b03060] dark:text-[#ff4d6d]">
@@ -296,24 +294,19 @@
                 <!-- Right Column: Activities -->
                 <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-md">
 
-                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 text-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 text-center mb-2">
                         Recent Activity
                     </h2>
 
                     <!-- Read Logs Section -->
-                    <div class="mb-4">
+                    <div class="mb-2">
                         <h3
                             class="text-md text-end font-semibold text-gray-700 dark:text-gray-200 mb-3 border-b dark:border-gray-600 pb-1">
                             Read Logs
                         </h3>
 
-                        <div id="book_logs" class="space-y-3">
-                            <p class="text-sm text-gray-700 dark:text-gray-300 border-b dark:border-gray-600 pb-2">
-                                Book 1
-                                <span class="float-right text-xs text-gray-500 dark:text-gray-400">
-                                    2 min ago
-                                </span>
-                            </p>
+                        <div id="book_logs" class="space-y-3  h-64 overflow-y-auto">
+                            <!-- Logs will be injected here via JS -->
                         </div>
                     </div>
 
@@ -477,24 +470,25 @@
 
                         response.data.forEach((user, index) => {
                             const row = `
-                        <tr class="text-indigo" data-id="${user.user_id}">
-                            <td class="px-4 py-2">${index + 1}</td>
-                            <td class="px-4 py-2">${user.firstname} ${user.lastname}</td>
-                            <td class="px-4 py-2">${user.email}</td>
-                            <td class="px-4 py-2">${user.department}</td>
-                            <td class="px-2 py-2 text-center space-x-1">
-                                <button id="view-btn-${user.user_id}" class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                            </td>
-                        </tr>
-                    `;
+                                    <tr class="text-indigo" data-id="${user.user_id}">
+                                        <td class="px-4 py-2">${index + 1}</td>
+                                        <td class="px-4 py-2">${user.firstname} ${user.lastname}</td>
+                                        <td class="px-4 py-2">${user.email}</td>
+                                        <td class="px-4 py-2">${user.department}</td>
+                                        <td class="px-2 py-2 text-center space-x-1">
+                                            <button id="view-btn-${user.user_id}" class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
+                                            <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
+                                            <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
+                                        </td>
+                                    </tr>
+                                `;
 
                             if (user.user_role === 'faculty') {
                                 facultyTbody.append(row);
                             } else if (user.user_role === 'student') {
                                 studentTbody.append(row);
                             }
+                            
                         });
                     }
                 },
@@ -534,12 +528,12 @@
                             } else {
                                 $("#viewProfilePic").attr("src", base_url + "../../assets/default-profile.png");
                             }
-
-
                         } else {
                             alert(res.message);
                         }
+                        loadReadLogs(userId);
                         loadFaculty();
+                        
                     },
                     error: function () { alert("Server error"); }
                 });
@@ -606,6 +600,44 @@
                 });
             }
         });
+
+
+        function loadReadLogs(userId) {
+            $.ajax({
+                url: `${base_url}auth/action.php?action=recently_viewed`,
+                method: 'POST',
+                data: {
+                    action: 'recently_viewed',
+                    user_id: userId
+                },
+                dataType: 'json',
+                success: function (result) {
+                    const container = $("#book_logs");
+                    container.empty(); // Clear previous logs
+
+                    if (result.status === 1 && result.data.length > 0) {
+                        result.data.forEach(log => {
+                            const logItem = `
+                            <p class="text-sm text-gray-700 truncate w-50 dark:text-gray-300 border-b dark:border-gray-600 pb-2">
+                                ${log.book_title}
+                                <span class="float-right text-xs text-gray-500  dark:text-gray-400">
+                                    ${log.duration < 60 ? log.duration + 's ago' : log.duration < 3600 ? Math.floor(log.duration / 60) + ' min ago' : Math.floor(log.duration / 3600) + 'h ' + Math.floor((log.duration % 3600) / 60) + 'm ago'}
+                                </span>
+                            </p>
+                            `;
+                            container.append(logItem);
+                        });
+                    } else {
+                        container.append(`
+                    <p class="text-sm text-gray-700 dark:text-gray-300 italic mx-auto">No read logs found.</p>
+                `);
+                    }
+                },
+                error: function () {
+                    console.error("Failed to load read logs.");
+                }
+            });
+        }
 
 
 
@@ -716,5 +748,8 @@
                 }
             });
         }
+
+
+
     });
 </script>
