@@ -359,7 +359,7 @@
 
                         response.data.forEach((user, index) => {
                             const row = `
-                        <tr class="text-white" data-id="${user.user_id}">
+                        <tr class="text-indigo" data-id="${user.user_id}">
                             <td class="px-4 py-2">${index + 1}</td>
                             <td class="px-4 py-2">${user.firstname} ${user.lastname}</td>
                             <td class="px-4 py-2">${user.email}</td>
