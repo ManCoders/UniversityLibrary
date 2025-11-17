@@ -24,11 +24,11 @@
             </button>
         </nav>
 
-        <!-- Search Input -->
         <div class="flex items-center">
-            <input type="text" placeholder="Search books"
+            <input id="searchFaculty" type="text" placeholder="Search user"
                 class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
         </div>
+
     </div>
 </div>
 
@@ -333,7 +333,7 @@
 
             <form id="updateForm" enctype="multipart/form-data">
 
-                <input type="hidden" name="user_id">
+                <input type="hidden" name="user_id" id="edit-user_id" value="" />
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -452,23 +452,35 @@
         $('#tab-student-table').click(function () { activateTab('#tab-student-table', '#student-table-content'); });
         $('#tab-teacher-table').click(function () { activateTab('#tab-teacher-table', '#teacher-table-content'); });
 
-
+        $("#searchFaculty").on("keyup", function () {
+            loadFaculty($(this).val());
+        });
         loadFaculty();
-        function loadFaculty() {
+        function loadFaculty(query = "") {
             $.ajax({
                 url: `${base_url}auth/action.php?action=GetFaculty`,
                 type: "GET",
                 dataType: "json",
                 success: function (response) {
                     if (response.status === 1) {
+
                         const facultyTbody = $("#teacherTableBody");
                         const studentTbody = $("#studentTableBody");
 
                         // Clear tables once before appending
                         facultyTbody.empty();
                         studentTbody.empty();
+                        const q = query.toLowerCase();
 
-                        response.data.forEach((user, index) => {
+                        response.data.filter(user => {
+                            return (
+                                user.firstname.toLowerCase().includes(q) ||
+                                user.lastname.toLowerCase().includes(q) ||
+                                user.email.toLowerCase().includes(q) ||
+                                user.department.toLowerCase().includes(q) ||
+                                user.user_role.toLowerCase().includes(q)
+                            );
+                        }).forEach((user, index) => {
                             const row = `
                                     <tr class="text-indigo" data-id="${user.user_id}">
                                         <td class="px-4 py-2">${index + 1}</td>
@@ -488,7 +500,7 @@
                             } else if (user.user_role === 'student') {
                                 studentTbody.append(row);
                             }
-                            
+
                         });
                     }
                 },
@@ -533,19 +545,21 @@
                         }
                         loadReadLogs(userId);
                         loadFaculty();
-                        
+
                     },
                     error: function () { alert("Server error"); }
                 });
 
-            } else if ($(this).hasClass("edit-btn")) {
-                activateTab(`#edit-btn-${userId}`, `#edit-content`);
+            }
+            else if ($(this).hasClass("edit-btn")) {
+                activateTab(`#tab-student-table`, `#edit-content`);
+
                 $.ajax({
                     url: `${base_url}auth/action.php?action=GetUser`,
                     type: "POST",
                     data: {
                         user_id: userId,
-                        action: 'GetFaculty' ?? 'GetUser'
+                        action: 'GetFaculty'
                     },
                     dataType: "json",
 
@@ -563,6 +577,7 @@
                         $("#edit-department").val(res.data.department);
                         $("#edit-course").val(res.data.course);
                         $("#edit-user_role").val(res.data.user_role);
+                        $("#edit-user_id").val(userId);
 
                         // profile preview logic
                         if (res.data.profile_pic) {
@@ -571,7 +586,6 @@
                             $("#editProfilePreview").attr("src", base_url + "../../assets/default-profile.png");
                         }
                     },
-
                     error: function () {
                         alert("Server error while loading user.");
                     }
@@ -643,7 +657,6 @@
 
         const studentFields = $("#student-fields");
         const facultyFields = $("#faculty-fields");
-        const profileInput = $("#profile");
         const profilePreview = $("#profile-preview");
         const registerMessage = $("#register-message");
 
@@ -659,7 +672,7 @@
         });
 
         // Profile preview
-        profileInput.on('change', function () {
+        $("#profile").on('change', function () {
             const file = this.files[0];
             if (!file) return;
             const reader = new FileReader();
@@ -748,6 +761,40 @@
                 }
             });
         }
+
+        $("#edit-profile_pic").on("change", function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            $("#editProfilePreview").attr("src", URL.createObjectURL(file));
+        });
+
+        $("#updateForm").on("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            $.ajax({
+                url: `${base_url}auth/action.php?action=updateUser`,
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                dataType: "json",
+                success: function (res) {
+                    if (res.status === 1) {
+                        alert("Updated successfully.");
+                        loadFaculty(); // refresh table
+                    } else {
+                        alert(res.message || "Update failed.");
+                    }
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    alert("Server error while updating.");
+                }
+            });
+        });
 
 
 

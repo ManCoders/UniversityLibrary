@@ -5,7 +5,7 @@
 <!-- Tabs Navigation -->
 <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
     <nav class="flex items-center justify-between">
-        
+
         <!-- Left Tabs -->
         <div class="flex space-x-4">
             <button id="tab-add-metadata"
@@ -21,10 +21,10 @@
 
         <!-- Search -->
         <div class="flex items-center">
-            <input type="text"
-                placeholder="Search books"
+            <input id="searchBooks" type="text" placeholder="Search books"
                 class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
         </div>
+
 
     </nav>
 </div>
@@ -233,8 +233,13 @@
         $(document).ready(function () {
 
             // Initial load
+            $("#searchBooks").on("keyup", function () {
+                const q = $(this).val();
+                loadMetadata(q);
+            });
+            
             loadMetadata();
-            function loadMetadata() {
+            function loadMetadata(query = "") {
                 $.ajax({
                     url: base_url + "auth/action.php?action=getMetadata",
                     method: "GET",
@@ -245,14 +250,26 @@
                             return;
                         }
                         const $tbody = $("#metadatafile").empty();
-                        res.data.forEach((item, index) => {
-                            const bookId = item.book_id && item.book_id.trim() !== '' ? item.book_id : '—';
-                            const folder = item.foldername && item.foldername.trim() !== '' ? item.foldername : '—';
-                            const title = item.title && item.title.trim() !== '' ? item.title : '—';
-                            const author = item.author && item.author.trim() !== '' ? item.author : '—';
-                            const isbn = item.isbn && item.isbn.trim() !== '' ? item.isbn : '—';
 
-                            const row = `
+                        const q = query.toLowerCase();
+
+                        res.data
+                            .filter(item => {
+                                return (
+                                    item.title?.toLowerCase().includes(q) ||
+                                    item.author?.toLowerCase().includes(q) ||
+                                    item.book_id?.toLowerCase().includes(q) ||
+                                    item.foldername?.toLowerCase().includes(q) ||
+                                    item.isbn?.toLowerCase().includes(q)
+                                );
+                            }).forEach((item, index) => {
+                                const bookId = item.book_id && item.book_id.trim() !== '' ? item.book_id : '—';
+                                const folder = item.foldername && item.foldername.trim() !== '' ? item.foldername : '—';
+                                const title = item.title && item.title.trim() !== '' ? item.title : '—';
+                                const author = item.author && item.author.trim() !== '' ? item.author : '—';
+                                const isbn = item.isbn && item.isbn.trim() !== '' ? item.isbn : '—';
+
+                                const row = `
                                         <tr>
                                             <td class="px-4 py-2 text-center">${index + 1}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${bookId}">${bookId}</td>
@@ -267,8 +284,8 @@
                                         </tr>
                                         `;
 
-                            $tbody.append(row);
-                        });
+                                $tbody.append(row);
+                            });
                     },
                     error: function () {
                         alert("Server error while loading metadata");
@@ -299,12 +316,12 @@
 
                                 const coverPath = data.cover_path
                                     ? base_url + 'auth/' + data.cover_path
-                                    : "https://via.placeholder.com/150x200?text=No+Cover";
+                                    : "../../assets/images/no-cover.png";
 
                                 $("#viewMetaCover")
                                     .attr("src", coverPath)
                                     .on("error", function () {
-                                        $(this).attr("src", "https://via.placeholder.com/150x200?text=No+Cover");
+                                        $(this).attr("src", "../../assets/images/no-cover.png");
                                     });
 
                                 let rawTitle = meta.Title || meta.title || (data.filename ? data.filename.replace(/\.[^/.]+$/, "") : "") || meta["dc:title"] || "—";
@@ -317,7 +334,7 @@
 
                                 $("#viewMetaTitle").text(rawTitle);
                                 $("#viewMetaAuthor").text(meta.Author || meta.author || extractedAuthor || "—");
-                                $("#viewMetaISBN").text(meta["prism:isbn"]?.ISBN || meta["pdfx:isbn"] || "—");
+                                $("#viewMetaISBN").text(meta["prism:isbn"]?.ISBN || meta["pdfx:isbn"] || meta["dc:identifier"] || meta["isbn"] || meta["dc:source"] || meta["dc:source"] || "—");
                                 $("#viewMetaFolder").text(data.foldername || "—");
                                 $("#viewMetaFilename").text(data.filename || "—");
 

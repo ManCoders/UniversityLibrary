@@ -717,10 +717,6 @@ class Action
     }
     function uploadFile()
     {
-        // Suppress notices/warnings for clean JSON output
-        error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
-        ob_start(); // start output buffering
-
         $baseDir = __DIR__ . '/files/';
         $folderName = $_POST['folder'] ?? null;
 
@@ -1891,6 +1887,111 @@ class Action
         }
     }
 
+    function updatedetails()
+    {
+
+        try {
+
+            $userId = (int) ($_POST['user_id'] ?? 0);
+            if ($userId <= 0) {
+                return json_encode(['status' => 0, 'message' => 'Invalid user ID.']);
+            }
+
+            // Fetch user
+            $stmt = $this->db->prepare("SELECT personal_details, authentication_data FROM user WHERE user_id = ?");
+            $stmt->execute([$userId]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                return json_encode(['status' => 0, 'message' => 'User not found.']);
+            }
+
+            $personal = json_decode($row['personal_details'], true) ?: [];
+            $auth = json_decode($row['authentication_data'], true) ?: [];
+
+            // Role used for folder placement
+            $role = $_POST['role'] ?? ($auth['role'] ?? 'student');
+
+            // Update personal fields
+            $personal['firstname'] = $_POST['firstname'] ?? ($personal['firstname'] ?? '');
+            $personal['lastname'] = $_POST['lastname'] ?? ($personal['lastname'] ?? '');
+            $personal['middlename'] = $_POST['middlename'] ?? ($personal['middlename'] ?? '');
+            $personal['suffix'] = $_POST['suffix'] ?? ($personal['suffix'] ?? '');
+            $personal['course'] = $_POST['course'] ?? ($personal['course'] ?? '');
+            $personal['department'] = $_POST['department'] ?? ($personal['department'] ?? '');
+
+            // Handle profile picture
+            if (!empty($_FILES['profile_pic']['name']) && $_FILES['profile_pic']['error'] === 0) {
+
+                $file = $_FILES['profile_pic'];
+                $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+                $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+
+                if (!in_array($ext, $allowed)) {
+                    return json_encode(['status' => 0, 'message' => 'Invalid image type.']);
+                }
+
+                // Where to store
+                $uploadDir = __DIR__ . '/uploads/' . ($role === 'faculty' ? 'faculty_profiles/' : 'student_profiles/');
+
+                if (!is_dir($uploadDir)) {
+                    mkdir($uploadDir, 0755, true);
+                }
+
+                // New filename
+                $filename = uniqid($role . '_') . '.' . $ext;
+                $destPath = $uploadDir . $filename;
+
+                if (!move_uploaded_file($file['tmp_name'], $destPath)) {
+                    return json_encode(['status' => 0, 'message' => 'Failed to upload profile picture.']);
+                }
+
+                // Delete old file if exists
+                if (!empty($personal['profile_pic'])) {
+                    $oldFullPath = __DIR__ . '/' . $personal['profile_pic'];
+                    if (file_exists($oldFullPath)) {
+                        @unlink($oldFullPath);
+                    }
+                }
+
+                // Save relative path
+                $personal['profile_pic'] = 'uploads/' . ($role === 'faculty' ? 'faculty_profiles/' : 'student_profiles/') . $filename;
+            }
+
+            // Update auth fields
+            $auth['email'] = $_POST['email'] ?? ($auth['email'] ?? '');
+            $auth['role'] = $role;
+            $auth['username'] = $_POST['username'] ?? ($auth['username'] ?? '');
+
+            // Save JSON back to DB
+            $stmt = $this->db->prepare("
+                        UPDATE user 
+                        SET personal_details = ?, authentication_data = ?
+                        WHERE user_id = ?
+                    ");
+
+            $stmt->execute([
+                json_encode($personal, JSON_UNESCAPED_UNICODE),
+                json_encode($auth, JSON_UNESCAPED_UNICODE),
+                $userId
+            ]);
+
+            return json_encode([
+                'status' => 1,
+                'message' => 'User updated successfully.',
+                'data' => [
+                    'personal' => $personal,
+                    'auth' => $auth
+                ]
+            ]);
+
+        } catch (PDOException $e) {
+            return json_encode(['status' => 0, 'message' => 'Update failed: ' . $e->getMessage()]);
+        }
+
+
+    }
+
     function usercrude()
     {
         if (session_status() === PHP_SESSION_NONE) {
@@ -1955,29 +2056,6 @@ class Action
                 } catch (PDOException $e) {
                     return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
                 }
-
-
-            case 'UpdateUser':
-                try {
-                    $userId = $_POST['user_id'] ?? 0;
-                    $firstname = trim($_POST['firstname'] ?? '');
-                    $lastname = trim($_POST['lastname'] ?? '');
-                    $email = trim($_POST['email'] ?? '');
-                    $department = trim($_POST['department'] ?? '');
-
-                    if (!$userId || !$firstname || !$lastname || !$email) {
-                        return json_encode(['status' => 0, 'message' => 'Missing required fields.']);
-
-                    }
-
-                    $stmt = $this->db->prepare("UPDATE user SET firstname=?, lastname=?, email=?, department=? WHERE user_id=?");
-                    $stmt->execute([$firstname, $lastname, $email, $department, $userId]);
-
-                    return json_encode(['status' => 1, 'message' => 'User updated successfully.']);
-                } catch (PDOException $e) {
-                    return json_encode(['status' => 0, 'message' => 'Update failed: ' . $e->getMessage()]);
-                }
-
             case 'recently_viewed':
                 try {
                     $userId = $_POST['user_id'] ?? 0;

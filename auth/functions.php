@@ -9,22 +9,24 @@ function initInstaller()
 
     try {
         // Check if admin exists
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM admin WHERE JSON_EXTRACT(personal_details, '$.user_role') = ?");
+        $stmt = $pdo->prepare(
+            "SELECT COUNT(*) 
+             FROM admin 
+             WHERE JSON_EXTRACT(personal_details, '$.user_role') = ?"
+        );
         $stmt->execute(['Admin']);
         $adminCount = $stmt->fetchColumn();
 
-        // Current request path
+        // Paths
         $currentPath = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
-        $installerPath = 'installation'; // no leading slash, match after trim
+        $installerPath = 'installation/';
 
         if ($adminCount > 0) {
-            // Admin exists → block access to installer
             if (strpos($currentPath, $installerPath) === 0) {
-                header("Location: " . base_url() . "/");
+                header("Location: " . base_url() . "src/");
                 exit;
             }
         } else {
-            // No admin → force installer page
             if (strpos($currentPath, $installerPath) !== 0) {
                 header("Location: " . base_url() . "installation/");
                 exit;
@@ -34,9 +36,8 @@ function initInstaller()
     } catch (PDOException $e) {
         die("Installer check failed: " . $e->getMessage());
     }
-
-    $pdo = null;
 }
+
 
 
 
@@ -103,8 +104,8 @@ function render_scripts()
         base_url() . 'assets/js/tailwindcss.js',
         base_url() . 'assets/js/landingpage.js',
         base_url() . 'assets/js/lucide.js'/* ,
-        base_url() . 'assets/js/build/pdf.mjs',
-        base_url() . 'assets/js/build/pdf.worker.mjs' */
+base_url() . 'assets/js/build/pdf.mjs',
+base_url() . 'assets/js/build/pdf.worker.mjs' */
     ];
 
     foreach ($scripts as $script) {

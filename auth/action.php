@@ -106,6 +106,9 @@ switch ($action) {
     case 'recently_viewed':
         echo $crud->usercrude();
         break;
+    case 'updateUser':
+        echo $crud->updatedetails();
+        break;
     default:
         echo json_encode(['status' => 0, 'message' => 'Invalid or missing action.']);
         break;
