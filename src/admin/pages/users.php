@@ -6,10 +6,10 @@
     <div class="flex justify-between items-center">
         <!-- Tabs -->
         <nav class="flex space-x-4" aria-label="Tabs">
-            <button id="tab-dashboard"
+            <!-- <button id="tab-dashboard"
                 class="tab-button border-indigo-500 text-indigo-600 dark:text-indigo-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                 User Dashboard
-            </button>
+            </button> -->
             <button id="tab-faculty"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                 Add New Account
@@ -36,7 +36,7 @@
 <!-- Tab Contents -->
 <div id="tab-content">
     <!-- Dashboard -->
-    <div id="dashboard-content" class="tab-panel">
+    <!-- <div id="dashboard-content" class="tab-panel">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-indigo-500">
                 <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</p>
@@ -88,7 +88,7 @@
                 Placeholder for User Charts/Tables
             </div>
         </div>
-    </div>
+    </div> -->
     <div id="user-content"
         class="tab-panel flex flex-col sm:flex-row gap-6 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
         <!-- LEFT: Profile Upload -->
@@ -436,7 +436,8 @@
         }
 
         // Initial tab
-        activateTab('#tab-dashboard', '#dashboard-content');
+        // activateTab('#tab-dashboard', '#dashboard-content');
+        activateTab('#tab-faculty', '#user-content');
         $('#closeViewBtn').on('click', function () {
             $('#view-content').addClass('hidden');
             $('.tab-panel').removeClass('hidden');
@@ -552,7 +553,7 @@
 
             }
             else if ($(this).hasClass("edit-btn")) {
-                activateTab(`#tab-student-table`, `#edit-content`);
+                activateTab(`.tab-panel`, `#edit-content`);
 
                 $.ajax({
                     url: `${base_url}auth/action.php?action=GetUser`,
