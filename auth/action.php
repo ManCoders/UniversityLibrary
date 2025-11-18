@@ -83,6 +83,9 @@ switch ($action) {
     case 'get_favorite_books':
         echo $crud->get_favorite_books();
         break;
+    case 'remove_favorite':
+        echo $crud->remove_favorite();
+        break;
 
     case 'change_password':
         echo $crud->change_password();

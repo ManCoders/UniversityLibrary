@@ -127,7 +127,7 @@ class Action
             $stmt = $this->db->prepare("
             SELECT * FROM admin 
             WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) = ? 
-               OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ? 
+               OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ?
             LIMIT 1
         ");
             $stmt->execute([$username, $username]);
@@ -162,10 +162,12 @@ class Action
             $stmt = $this->db->prepare("
             SELECT * FROM user 
             WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) = ? 
-            OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ? 
+                OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ? 
+               OR JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.student_id')) = ?
+               OR JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.employee_id')) = ?
             LIMIT 1
                 ");
-            $stmt->execute([$username, $username]);
+            $stmt->execute([$username, $username,$username, $username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
@@ -195,6 +197,11 @@ class Action
                 'department' => $person['department'] ?? '',
                 'email' => $auth['email'] ?? '',
                 'username' => $auth['username'] ?? '',
+                'library_id' => $person['library_id'] ?? null,
+                'student_id' => $person['student_id'] ?? null,
+                'section' => $person['section'] ?? null,
+                'employee_id' => $person['employee_id'] ?? null,
+                'course' => $person['course'] ?? null,
                 'user_role' => $role,
                 'user_id' => $user['user_id'] ?? null,
                 'created_date' => $user['created_date'] ?? '',
@@ -205,7 +212,7 @@ class Action
             $_SESSION[$role] = $sessionData;
 
             // Determine redirect path
-            $redirect = ($role === 'faculty') ? 'src/faculty/' : './';
+            $redirect = ($role === 'faculty') ? './' : './';
 
             $_SESSION['user'] = [
                 'role' => $role,
@@ -217,6 +224,12 @@ class Action
                 'message' => 'Login successful.',
                 'redirect_url' => $redirect,
                 'user_role' => $role,
+                'library_id' => $person['library_id'] ?? null,
+                'student_id' => $person['student_id'] ?? null,
+                'section' => $person['section'] ?? null,
+                'employee_id' => $person['employee_id'] ?? null,
+                'course' => $person['course'] ?? null,
+                'department' => $person['department'] ?? null,
                 'user_id' => $user['user_id'] ?? null,
                 'user_name' => trim(($person['firstname'] ?? '') . ' ' . ($person['lastname'] ?? '')),
                 'user_data' => $sessionData
@@ -324,96 +337,6 @@ class Action
     }
 
 
-
-    /* function register_user()
-    {
-        $role = json_decode($_POST['role'], true);
-        if (!isset($role['role'])) {
-            return json_encode(['status' => 0, 'message' => 'User role is required']);
-        }
-
-        $role = strtolower($role['role']);
-        if (!in_array($role, ['student', 'faculty'])) {
-            return json_encode(['status' => 0, 'message' => 'Invalid role']);
-        }
-
-        // Common required fields
-        $required = ['firstname', 'lastname', 'username', 'password', 'email', 'department'];
-        foreach ($required as $f) {
-            if (empty($_POST[$f])) {
-                return json_encode(['status' => 0, 'message' => "Missing required field: $f"]);
-            }
-        }
-
-        // Role-specific
-        if ($role === 'student') {
-            foreach (['course', 'year_level', 'section'] as $f) {
-                if (empty($_POST[$f])) {
-                    return json_encode(['status' => 0, 'message' => "Missing student field: $f"]);
-                }
-            }
-        } else { // faculty
-            if (empty($_POST['position'])) {
-                return json_encode(['status' => 0, 'message' => "Missing faculty field: position"]);
-            }
-        }
-
-        // Sanitize & gather inputs
-        $data = array_map('trim', $_POST);
-        $hashed_password = password_hash($data['password'], PASSWORD_BCRYPT);
-
-        // Handle file upload
-        $uploadDir = __DIR__ . '/uploads/' . $role . '_profiles/';
-        if (!is_dir($uploadDir))
-            mkdir($uploadDir, 0755, true);
-
-        $profile_pic = 'assets/default-profile.png';
-        if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === 0) {
-            $ext = pathinfo($_FILES['profile_pic']['name'], PATHINFO_EXTENSION);
-            if (!in_array(strtolower($ext), ['jpg', 'jpeg', 'png', 'gif'])) {
-                return json_encode(['status' => 0, 'message' => 'Invalid image type']);
-            }
-            $filename = uniqid($role . '_') . '.' . $ext;
-            $filepath = $uploadDir . $filename;
-            if (move_uploaded_file($_FILES['profile_pic']['tmp_name'], $filepath)) {
-                $profile_pic = 'uploads/' . $role . '_profiles/' . $filename;
-            }
-        }
-
-        // Prepare DB JSON
-        $personal_details = json_encode([
-            'firstname' => $data['firstname'],
-            'lastname' => $data['lastname'],
-            'middlename' => $data['middlename'] ?? '',
-            'suffix' => $data['suffix'] ?? '',
-            'department' => $data['department'],
-            'birthdate' => $data['birthdate'] ?? null,
-            'gender' => $data['gender'] ?? null,
-            'phone' => $data['phone'] ?? null,
-            'address' => $data['address'] ?? null,
-            'position' => $data['position'] ?? null,
-            'course' => $data['course'] ?? null,
-            'year_level' => $data['year_level'] ?? null,
-            'section' => $data['section'] ?? null,
-            'profile_pic' => $profile_pic
-        ]);
-
-        $auth_data = json_encode([
-            'username' => $data['username'],
-            'password' => $hashed_password,
-            'user_role' => $role,
-            'email' => $data['email']
-        ]);
-
-        try {
-            $stmt = $this->db->prepare("INSERT INTO user (personal_details, authentication_data) VALUES (?, ?)");
-            $stmt->execute([$personal_details, $auth_data]);
-            return json_encode(['status' => 1, 'message' => ucfirst($role) . ' registered successfully']);
-        } catch (PDOException $e) {
-            return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
-        }
-    } */
-
     function register_user()
     {
         // Get raw JSON input from frontend
@@ -481,8 +404,12 @@ class Action
             }
         }
 
+        $account_id = 'lib-' . str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+
         // Prepare personal_details JSON
         $personal_details = json_encode([
+            'library_id' => $account_id,
             'firstname' => $data['firstname'],
             'lastname' => $data['lastname'],
             'middlename' => $data['middlename'] ?? '',
@@ -1500,11 +1427,6 @@ class Action
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-
-        header('Content-Type: application/json');
-        $book_title = $_POST['book_title'] ?? 'Unknown Title';
-        $book_author = $_POST['book_author'] ?? 'Unknown Author';
-
         $file = $_POST['file'] ?? null;
         $favorite = isset($_POST['favorite']) ? (int) $_POST['favorite'] : 0;
         $user_id = $_SESSION['student']['user_id'] ?? null;
@@ -1530,11 +1452,11 @@ class Action
             $log = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($log) {
-                $update = $this->db->prepare("UPDATE reading_logs SET is_favorite = ?, SET 	book_title = ?, book_author = ?, updated_at = updated_at = NOW() WHERE id = ?");
-                $update->execute([$favorite, $book_title, $book_author, $log['id']]);
+                $update = $this->db->prepare("UPDATE reading_logs SET is_favorite = ?, updated_at = NOW() WHERE id = ?");
+                $update->execute([$favorite, $log['id']]);
             } else {
-                $insert = $this->db->prepare("INSERT INTO reading_logs (user_id, book_title, book_author, file, is_favorite,  start_time) VALUES (?, ?, ?, ?, ?, NOW())");
-                $insert->execute([$user_id, $book_title, $book_author, $file, $favorite]);
+                $insert = $this->db->prepare("INSERT INTO reading_logs (user_id, file, is_favorite,  start_time) VALUES (?, ?, ?, NOW())");
+                $insert->execute([$user_id, $file, $favorite]);
             }
 
             return json_encode([
@@ -1603,6 +1525,7 @@ class Action
             $cover_url = null;
             $folder_name = '';
             $file_name = '';
+            $book_id = '';  
             foreach ($readingLogs as $log) {
                 $log_file_name = pathinfo($log['file'], PATHINFO_BASENAME);
 
@@ -1617,7 +1540,7 @@ class Action
                             $folderData = [];
                         if (($file['filename'] ?? '') === $log_file_name) {
                             $metadata = $file['metadata'] ?? [];
-
+                            $book_id = $user_id;
                             // Title extraction
                             $title = $metadata['Title']
                                 ?? ($metadata['dc:title'] ?? null)
@@ -1649,6 +1572,7 @@ class Action
                 }
                 $token = bin2hex(random_bytes(16));
                 $_SESSION['pdf_tokens'][$token] = [
+                    'book_id' => $book_id,
                     'title' => $title,
                     'author' => $author,
                     'file' => $baseURL . "auth/" . $log['file'],
@@ -1657,6 +1581,7 @@ class Action
                 ];
 
                 $result[] = [
+                    'book_id' => $book_id,
                     'file' => pathinfo($log['file'], PATHINFO_FILENAME),
                     'title' => $title,
                     'author' => $author,
@@ -2125,6 +2050,53 @@ class Action
         }
     }
 
+
+    function remove_favorite(){
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json');
+
+        $file = $_POST['file'] ?? null;
+        $user_id = $_SESSION['student']['user_id'] ?? null;
+
+        if (!$user_id) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'User not logged in.'
+            ]);
+        }
+
+        if (!$file) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Missing file parameter.'
+            ]);
+        }
+
+        try {
+            // ✅ Check if entry exists
+            $stmt = $this->db->prepare("SELECT * FROM reading_logs WHERE user_id = ? AND book_title = ? LIMIT 1");
+            $stmt->execute([$user_id, $file]);
+            $log = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($log) {
+                $update = $this->db->prepare("UPDATE reading_logs SET is_favorite = 0, updated_at = NOW() WHERE id = ?");
+                $update->execute([$log['id']]);
+            }
+
+            return json_encode([
+                'status' => 1,
+                'message' => 'Removed from favorites.'
+            ]);
+
+        } catch (Exception $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+    }
 
 
 

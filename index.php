@@ -491,7 +491,7 @@
                 class="flex flex-col items-center justify-center w-full sm:w-[35%] border-r border-[#b03060]/40 dark:border-[#800000]/40 pr-4">
                 <div
                     class="relative w-32 h-32 rounded-full overflow-hidden border-2 border-[#b03060] dark:border-[#800000]">
-                    <img id="profile-preview" src="assets/default-profile.png" alt="Profile Preview"
+                    <img id="profile-preview" src="./assets/default-profile.png" alt="Profile Preview"
                         class="w-full h-full object-cover">
                 </div>
                 <label for="profile"
@@ -749,17 +749,26 @@
                         $container.empty();
                         res.data.forEach(book => {
                             const bookHtml = `
-                        <div class="bg-[#fff0f0] dark:bg-[#330000] p-4 rounded-xl shadow-lg flex flex-col items-center text-center">
-                            <img src="${book.cover_url || base_url + 'assets/image/library.png'}" 
-                                alt="${book.title} Cover" 
-                                class="w-25 h-40 object-cover rounded-lg mb-3">
-                            <p class="font-semibold text-[#660000] dark:text-[#ffd1d1] mb-1">${book.title}</p>
-                            <p class="text-sm text-[#800000] dark:text-[#ffcccc] mb-3">${book.author}</p>
-                            <button class="read-btn text-[#b03060] hover:text-[#800000] dark:text-[#ff4d6d] dark:hover:text-[#ff9999] text-sm border border-[#b03060] dark:border-[#800000] rounded-full px-3 py-1 transition"
-                                    data-file="${book.file_url}">
-                                Read
-                            </button>
-                        </div>
+                                <div class="relative bg-[#fff0f0] dark:bg-[#330000] p-4 rounded-xl shadow-lg flex flex-col items-center text-center">
+
+                                <!-- X BUTTON -->
+                                <button  data-title="${book.title}" data-id="${book.book_id}" class="remove-btn absolute top-2 right-2 text-[#b03060] dark:text-[#ff4d6d] hover:text-[#800000] dark:hover:text-[#ff9999] text-lg font-bold close-card-btn">
+                                    ✕
+                                </button>
+
+                                <img src="${book.cover_url || base_url + 'assets/image/library.png'}" 
+                                    alt="${book.title} Cover" 
+                                    class=" w-25 h-40 object-cover rounded-lg mb-3">
+
+                                <p class="font-semibold text-[#660000] dark:text-[#ffd1d1] mb-1">${book.title}</p>
+                                <p class="text-sm text-[#800000] dark:text-[#ffcccc] mb-3">${book.author}</p>
+
+                                <button class="read-btn text-[#b03060] hover:text-[#800000] dark:text-[#ff4d6d] dark:hover:text-[#ff9999] text-sm border border-[#b03060] dark:border-[#800000] rounded-full px-3 py-1 transition"
+                                        data-file="${book.file_url}">
+                                    Read
+                                </button>
+                            </div>
+
                         `;
                             $container.append(bookHtml);
                         });
@@ -796,6 +805,34 @@
                     if (res && res.status === 1 && res.data) {
                         console.log("Received token:", res.data);
                         window.open(res.data, "_blank");
+                    } else {
+                        alert(res?.message || "Failed to open the book.");
+                    }
+                },
+                error: function (err) {
+                    console.error("Error starting reading session:", err);
+                    alert("Failed to open the book.");
+                },
+                complete: function () {
+                    $btn.prop("disabled", false).text("Read"); // reset button text
+                }
+            });
+        });
+
+        $container.on("click", ".remove-btn", function () {
+            const title = $(this).data("title");
+
+            if (!title) return;
+
+            $.ajax({
+                url: base_url + "auth/action.php?action=remove_favorite",
+                type: "POST",
+                data: { file: title },
+                dataType: "json",
+                success: function (res) {
+                    if (res && res.status === 1 && res.data) {
+                        alert(res.message);
+                        location.reload();
                     } else {
                         alert(res?.message || "Failed to open the book.");
                     }

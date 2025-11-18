@@ -38,20 +38,20 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
   <header
     class="sticky top-0 z-50 flex items-center justify-between px-2 py-1 bg-gray-800/20 backdrop-blur-sm shadow-sm">
     <div class="flex flex-col md:flex-row md:items-center gap-1">
-      <div id="timer" class="text-[10px] md:text-xs font-semibold text-gray-200">⏱ 00:00</div>
-      <div id="pageInfo" class="text-[10px] md:text-xs text-gray-300 md:ml-2">📖 Pages: 0</div>
+      <div id="timer" class="text-[10px] md:text-xs font-semibold text-black-200">⏱ 00:00</div>
+      <div id="pageInfo" class="text-[10px] md:text-xs text-black-300 md:ml-2">📖 Pages: 0</div>
     </div>
     <div class="flex gap-1">
       <button id="favoriteBtn"
-        class="flex items-center gap-1 text-yellow-400 text-xs font-semibold py-1 px-2 rounded hover:bg-gray-700/20 transition duration-150"
+        class="flex items-center gap-1 text-orange-400 text-xs font-semibold py-1 px-2 rounded hover:bg-gray-700/20 transition duration-150"
         title="Add to Favorites">
-        <span>★</span>
+        <span>★ Favorite</span>
       </button>
 
       <button id="endBtn"
         class="flex items-center gap-1 text-red-400 text-xs font-semibold py-1 px-2 rounded hover:bg-gray-700/20 transition duration-150"
         title="End Reading">
-        <span>⏹</span>
+        <span>⏹ End</span>
       </button>
     </div>
   </header>
@@ -138,18 +138,18 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
         btn.toggleClass("bg-blue-600", !isFavorite);
 
         $.ajax({
-          url: "<?php echo base_url(); ?>/auth/action.php?action=toggle_favorite",
+          url: `${base_url}auth/action.php?action=toggle_favorite`, 
           type: "POST",
           data: {
             file: "<?php echo $pdfFile; ?>",
-            book_title: "<?php echo $title; ?>",
-            book_author: "<?php echo $author; ?>",
-            favorite: isFavorite ? 1 : 0
+            favorite: isFavorite ? 1 : 1
           },
           dataType: "json",
           success: function (response) {
             if (response.status === 1) {
-              alert("Favorite updated successfully");
+              alert(response.message);
+            }else{
+              alert(response.message);
             }
           },
           error: function (err) {

@@ -135,6 +135,7 @@ $(document).ready(function () {
     department: "N/A",
     role: "N/A",
     profilePic: null,
+    library_id: "N/A",
   };
   const savedState = localStorage.getItem("userState");
   if (savedState) {
@@ -246,7 +247,7 @@ $(document).ready(function () {
       $("#profile-department").text(userState.department);
       $("#profile-role").text(userState.role);
       $("#profile-status").text(userState.isLoggedIn ? "Active" : "Inactive");
-      $("#profile-library_id").text(userState.student_id || userState.employee_id || "N/A");
+      $("#profile-library_id").text(userState.library_id || userState.library_id || "N/A");
       $("#profile-email").text(userState.email);
       // Use a mock ID or a real one if the backend provided it
       $("#profile-view-id").text(
@@ -381,6 +382,7 @@ $(document).ready(function () {
             const userData = res.user_data || {};
 
             userState.isLoggedIn = true;
+            userState.library_id = userData.library_id || null;
             userState.username = res.user_name || userData.username || username;
             userState.email = userData.email || "student";
             userState.student_id = userData.student_id || "N/A";

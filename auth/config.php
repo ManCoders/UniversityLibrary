@@ -60,6 +60,7 @@ function db_connect()
                 duration INT DEFAULT 0,
                 is_favorite TINYINT(1) DEFAULT 0,
                 start_time DATETIME NOT NULL,
+                target_time INT DEFAULT 99999,
                 end_time DATETIME DEFAULT NULL,
                 total_read_time INT DEFAULT 0,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
