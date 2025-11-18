@@ -64,6 +64,7 @@ class Action
         // ✅ Capture user role before destroying the session
         $role = isset($_SESSION['user_role']) ? strtolower($_SESSION['user_role']) : 'student';
 
+        $this->users_logs('User logged out successfully.');
         // ✅ Clear all session data
         $_SESSION = [];
         session_unset();
@@ -108,6 +109,32 @@ class Action
         }
     }
 
+    function users_logs($logs = ''){
+        $user_id = $_SESSION['student']['user_id'] ?? $_SESSION['faculty']['user_id'] ?? $_SESSION['admin']['admin_id'] ?? null;
+
+        if (!$user_id || !$logs) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'User ID and logs are required'
+            ]);
+        }
+
+        try {
+            $stmt = $this->db->prepare("INSERT INTO user_logs (user_id, activity) VALUES (?, ?)");
+            $stmt->execute([$user_id, $logs]);
+
+            return json_encode([
+                'status' => 1,
+                'message' => 'User activity logged successfully',
+                'data' => $logs
+            ]);
+        } catch (PDOException $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Database error: ' . $e->getMessage()
+            ]);
+        }
+    }
 
     function login()
     {
@@ -149,6 +176,7 @@ class Action
                         'created_date' => $admin['created_date'] ?? '',
                         'profile_pic' => $per['admin_profile_pic'] ?? null  // <-- added profile pic
                     ];
+                    $this->users_logs('Admin logged in successfully.');
                     return json_encode([
                         'status' => 1,
                         'message' => 'Admin login successful',
@@ -167,7 +195,7 @@ class Action
                OR JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.employee_id')) = ?
             LIMIT 1
                 ");
-            $stmt->execute([$username, $username,$username, $username]);
+            $stmt->execute([$username, $username, $username, $username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
@@ -218,7 +246,10 @@ class Action
                 'role' => $role,
                 'user_id' => $user['user_id'] ?? null
             ];
-
+            $completename = trim(($person['firstname'] ?? '') . ' ' . ($person['lastname'] ?? ''));
+            
+            $this->users_logs("{$completename} logged in successfully.");
+            
             return json_encode([
                 'status' => 1,
                 'message' => 'Login successful.',
@@ -231,7 +262,7 @@ class Action
                 'course' => $person['course'] ?? null,
                 'department' => $person['department'] ?? null,
                 'user_id' => $user['user_id'] ?? null,
-                'user_name' => trim(($person['firstname'] ?? '') . ' ' . ($person['lastname'] ?? '')),
+                'user_name' =>$completename,
                 'user_data' => $sessionData
             ]);
 
@@ -461,6 +492,7 @@ class Action
             $stmt->execute();
             $faculties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            $this->users_logs('Fetched user details successfully.');
             return json_encode([
                 'status' => 1,
                 'data' => $faculties
@@ -530,6 +562,7 @@ class Action
         try {
             $sql = "INSERT INTO folder_structure (folder_name) VALUES (?)";
             $stmt = $this->db->prepare($sql);
+            $this->users_logs("Folder '$folderName' created successfully.");
             if ($stmt->execute([$folderName])) {
                 return json_encode([
                     'status' => 1,
@@ -796,9 +829,6 @@ class Action
 
     }
 
-
-
-
     function uploadFolder()
     {
         header('Content-Type: application/json'); // force JSON output
@@ -963,13 +993,6 @@ class Action
         ]);
 
     }
-
-
-
-
-
-
-
     function getMetadata()
     {
         $sql = "SELECT folder_name, folder_data FROM folder_structure";
@@ -1077,7 +1100,6 @@ class Action
         return json_encode(['status' => 0, 'message' => 'Book not found']);
     }
 
-
     function editmeta()
     {
         $bookId = $_POST['book_id'] ?? '';
@@ -1128,14 +1150,13 @@ class Action
 
         return json_encode(['status' => 0, 'message' => 'Book not found']);
     }
-
     function deletemeta()
     {
         $bookId = $_POST['book_id'] ?? '';
         if (!$bookId) {
             return json_encode(['status' => 0, 'message' => 'Book ID not provided']);
         }
-
+        $this->users_logs("Attempting to delete book with ID: $bookId");
         $sql = "SELECT folder_id, folder_name, folder_data FROM folder_structure";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
@@ -1219,7 +1240,7 @@ class Action
                     if (is_array($author))
                         $author = implode(', ', $author);
 
-                    $isbn = $metadata['prism:isbn'] ?? '';
+                    $isbn = $metadata['prism:isbn'] ?? $metadata['isbn'] ?? $metadata['dc:identifier'] ?? '';
                     if (is_array($isbn))
                         $isbn = implode(' ', $isbn);
 
@@ -1290,7 +1311,7 @@ class Action
                 'message' => 'Missing file parameter.'
             ]);
         }
-
+        
         $user_id = $_SESSION['student']['user_id'] ?? null;
         if (!$user_id) {
             return json_encode([
@@ -1315,10 +1336,11 @@ class Action
             ];
 
             // ✅ Check if the reading log exists
-            $stmt = $this->db->prepare("SELECT id FROM reading_logs WHERE user_id = ? AND file = ?");
+            $stmt = $this->db->prepare("SELECT * FROM reading_logs WHERE user_id = ? AND file = ?");
             $stmt->execute([$user_id, $file]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
+            $this->users_logs("User Starting Reading books title '$book_title' by '$book_author'");
             if ($row) {
                 // ✅ Update existing reading session
                 $update = $this->db->prepare("
@@ -1367,7 +1389,6 @@ class Action
         // $book_title = $_POST['book_title'] ?? 'Unknown Title';
         // $book_author = $_POST['book_author'] ?? 'Unknown Author';
 
-
         $user_id = $_SESSION['student']['user_id'] ?? null;
         if (!$user_id) {
             return json_encode([
@@ -1375,7 +1396,7 @@ class Action
                 'message' => 'User not logged in.'
             ]);
         }
-
+        $this->users_logs("User end the reading book session, time: $duration seconds");
         if (!$file) {
             return json_encode([
                 'status' => 0,
@@ -1427,6 +1448,7 @@ class Action
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+        
         $file = $_POST['file'] ?? null;
         $favorite = isset($_POST['favorite']) ? (int) $_POST['favorite'] : 0;
         $user_id = $_SESSION['student']['user_id'] ?? null;
@@ -1437,7 +1459,6 @@ class Action
                 'message' => 'User not logged in.'
             ]);
         }
-
         if (!$file) {
             return json_encode([
                 'status' => 0,
@@ -1447,16 +1468,21 @@ class Action
 
         try {
             // ✅ Check if entry exists
-            $stmt = $this->db->prepare("SELECT id FROM reading_logs WHERE user_id = ? AND file = ? LIMIT 1");
+            $stmt = $this->db->prepare("SELECT * FROM reading_logs WHERE user_id = ? AND file = ? LIMIT 1");
             $stmt->execute([$user_id, $file]);
             $log = $stmt->fetch(PDO::FETCH_ASSOC);
+            $book_title = $log['book_title'] ?? 'Unknown Title';
+            $book_author = $log['book_author'] ?? 'Unknown Author';
 
+            
             if ($log) {
                 $update = $this->db->prepare("UPDATE reading_logs SET is_favorite = ?, updated_at = NOW() WHERE id = ?");
                 $update->execute([$favorite, $log['id']]);
+                $this->users_logs("User has " . ($favorite ? "added" : "removed") . " a favorite book titled: '$book_title' by '$book_author'");
             } else {
                 $insert = $this->db->prepare("INSERT INTO reading_logs (user_id, file, is_favorite,  start_time) VALUES (?, ?, ?, NOW())");
                 $insert->execute([$user_id, $file, $favorite]);
+                $this->users_logs("User has " . ($favorite ? "added" : "removed") . " a favorite book titled: '$book_title' by '$book_author'");
             }
 
             return json_encode([
@@ -1525,7 +1551,7 @@ class Action
             $cover_url = null;
             $folder_name = '';
             $file_name = '';
-            $book_id = '';  
+            $book_id = '';
             foreach ($readingLogs as $log) {
                 $log_file_name = pathinfo($log['file'], PATHINFO_BASENAME);
 
@@ -2051,7 +2077,8 @@ class Action
     }
 
 
-    function remove_favorite(){
+    function remove_favorite()
+    {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -2059,6 +2086,8 @@ class Action
 
         $file = $_POST['file'] ?? null;
         $user_id = $_SESSION['student']['user_id'] ?? null;
+
+        
 
         if (!$user_id) {
             return json_encode([
@@ -2075,7 +2104,6 @@ class Action
         }
 
         try {
-            // ✅ Check if entry exists
             $stmt = $this->db->prepare("SELECT * FROM reading_logs WHERE user_id = ? AND book_title = ? LIMIT 1");
             $stmt->execute([$user_id, $file]);
             $log = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -2096,6 +2124,129 @@ class Action
                 'message' => 'Error: ' . $e->getMessage()
             ]);
         }
+    }
+
+    function get_activity_log()
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        header('Content-Type: application/json');
+
+        $user_id = $_SESSION['student']['user_id'] ?? $_SESSION['faculty']['user_id'] ?? null;
+        if (!$user_id) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'User not logged in.'
+            ]);
+
+        }
+
+        try {
+            $stmt = $this->db->prepare("
+                SELECT * FROM user_logs 
+                WHERE user_id = ?
+                ORDER BY log_time DESC
+            ");
+            $stmt->execute([$user_id]);
+            $readingLogs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($readingLogs) {
+                return json_encode([
+                    'status' => 1,
+                    'message' => 'Activity log retrieved successfully.',
+                    'data' => $readingLogs
+                ]);
+
+            } else {
+                return json_encode([
+                    'status' => 1,
+                    'message' => 'No activity found.',
+                    'data' => []
+                ]);
+            }
+
+        } catch (Exception $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    function update_profile(){
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        header('Content-Type: application/json');
+
+        $user = $_SESSION['student'] ?? $_SESSION['faculty'] ?? null;
+        if (!$user || empty($user['user_id'])) {
+            return json_encode(['status' => 0, 'message' => 'User not logged in.']);
+
+        }
+
+        $user_id = $user['user_id'];
+        $role = $user['role'] ?? ($user['user_role'] ?? 'student');
+
+        $firstname = trim($_POST['firstname'] ?? '');
+        $lastname = trim($_POST['lastname'] ?? '');
+        $middlename = trim($_POST['middlename'] ?? '');
+        $suffix = trim($_POST['suffix'] ?? '');
+        $department = trim($_POST['department'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+
+        try {
+            // Fetch current data
+            $stmt = $this->db->prepare("SELECT personal_details, authentication_data FROM user WHERE user_id = ?");
+            $stmt->execute([$user_id]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$row) {
+                return json_encode(['status' => 0, 'message' => 'User not found.']);
+
+            }
+
+            $personal = json_decode($row['personal_details'], true) ?? [];
+            $auth = json_decode($row['authentication_data'], true) ?? [];
+
+            // Update personal details
+            $personal['firstname'] = $firstname;
+            $personal['lastname'] = $lastname;
+            $personal['middlename'] = $middlename;
+            $personal['suffix'] = $suffix;
+            $personal['department'] = $department;
+            $auth['email'] = $email;
+            // Update database
+            $update = $this->db->prepare("UPDATE user SET personal_details = ?, authentication_data = ? WHERE user_id = ?");
+            $update->execute([
+                json_encode($personal, JSON_UNESCAPED_UNICODE),
+                json_encode($auth, JSON_UNESCAPED_UNICODE),
+                $user_id
+            ]);
+
+            // Update session
+            $updatedSession = $user;
+            $updatedSession['firstname'] = $firstname;
+            $updatedSession['lastname'] = $lastname;
+            $updatedSession['middlename'] = $middlename;
+            $updatedSession['suffix'] = $suffix;
+            $updatedSession['department'] = $department;
+            $updatedSession['email'] = $email;
+            if ($role === 'faculty')
+                $_SESSION['faculty'] = $updatedSession;
+            else
+                $_SESSION['student'] = $updatedSession;
+            return json_encode([
+                'status' => 1,
+                'message' => 'Profile updated successfully.'
+            ]);
+        } catch (PDOException $e) {
+            return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
+        }
+        
     }
 
 

@@ -128,6 +128,10 @@ $(document).ready(function () {
   let userState = {
     isLoggedIn: false,
     username: "guest",
+    lastname: "Guest",
+    firstname: "Guest",
+    middlename: "Guest",
+    suffix: "Guest",
     user_id: "N/A",
     student_id: "N/A",
     employee_id: "N/A",
@@ -243,12 +247,17 @@ $(document).ready(function () {
           );
         });
 
-      $("#profile-view-username").text(userState.username); // Update profile view name
-      $("#profile-department").text(userState.department);
+      $("#profile-view-username").val(userState.username); // Update profile view name
+      $("#edit-firstname").val(userState.firstname || "");
+      $("#edit-lastname").val(userState.lastname || "");
+      $("#edit-middlename").val(userState.middlename || "");
+      $("#edit-suffix").val(userState.suffix || "");
+      
+      $("#profile-department").val(userState.department);
       $("#profile-role").text(userState.role);
-      $("#profile-status").text(userState.isLoggedIn ? "Active" : "Inactive");
-      $("#profile-library_id").text(userState.library_id || userState.library_id || "N/A");
-      $("#profile-email").text(userState.email);
+      $("#profile-status").val(userState.isLoggedIn ? "Active" : "Inactive");
+      $("#profile-library_id").val(userState.library_id || userState.library_id || "N/A");
+      $("#profile-email").val(userState.email);
       // Use a mock ID or a real one if the backend provided it
       $("#profile-view-id").text(
         userState.user_id ||
@@ -387,6 +396,10 @@ $(document).ready(function () {
             userState.email = userData.email || "student";
             userState.student_id = userData.student_id || "N/A";
             userState.employee_id = userData.employee_id || "N/A";
+            userState.lastname = userData.lastname || "N/A";
+            userState.firstname = userData.firstname || "N/A";
+            userState.middlename = userData.middlename || "N/A";
+            userState.suffix = userData.suffix || "N/A";
             userState.department = userData.department || "N/A";
             userState.role = userData.user_role || "student";
             userState.profilePic = userData.profile_pic || null;

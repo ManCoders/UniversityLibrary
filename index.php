@@ -219,67 +219,104 @@
         <section id="profile-section" class="view-section hidden pt-8 pb-20 max-w-4xl mx-auto px-6">
             <h2 class="text-4xl font-bold mb-6 text-[#b03060] dark:text-[#ff4d6d]">My Profile</h2>
 
-            <div
+            <form id="profile-edit-form" enctype="multipart/form-data"
                 class="border-2 border-[#b03060] dark:border-[#800000] bg-[#fff0f0] dark:bg-[#330000] p-8 rounded-2xl shadow-lg space-y-6 max-w-3xl mx-auto">
 
                 <!-- Profile Header -->
                 <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+
                     <!-- Profile Picture -->
                     <div class="relative">
-                        <img id="profile-picture"
-                            src="<?php echo isset($_SESSION['student']['profile_pic']) ? $_SESSION['student']['profile_pic'] : '' ?>"
-                            alt="Profile Picture"
+                        <img id="profile-picture" alt="Profile Picture"
                             class="w-32 h-32 rounded-full border-4 border-[#b03060] shadow-md object-cover">
-                        <button
-                            class="absolute bottom-1 right-1 bg-[#b03060] text-white p-2 rounded-full text-xs hover:bg-[#800000] transition"
-                            title="Change Photo">
+
+                        <label for="profile-picture-input"
+                            class="absolute bottom-1 right-1 bg-[#b03060] text-white p-2 rounded-full text-xs hover:bg-[#800000] transition cursor-pointer">
                             <i data-lucide="camera" class="w-4 h-4"></i>
-                        </button>
+                        </label>
+
+                        <input type="file" id="profile-picture-input" name="profile_pic" class="hidden"
+                            accept="image/*">
                     </div>
 
-                    <!-- Welcome Text -->
                     <div class="flex-1 text-center sm:text-left">
-                        <p class="text-2xl font-semibold text-[#660000] dark:text-[#ffd1d1]">
-                            Welcome back,
-                            <span id="profile-view-username" class="text-[#b03060] dark:text-[#ff4d6d]">Guest</span>!
+                        <label class="block text-[#660000] dark:text-[#ffd1d1] font-medium mb-1">Full Name</label>
+
+                        <input type="text" name="firstname" id="edit-firstname"
+                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a] mb-2"
+                            placeholder="Enter your first name">
+
+                        <input type="text" name="middlename" id="edit-middlename"
+                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a] mb-2"
+                            placeholder="Enter your middle name">
+
+                        <input type="text" name="lastname" id="edit-lastname"
+                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a] mb-2"
+                            placeholder="Enter your last name">
+
+                        <input type="text" name="suffix" id="edit-suffix"
+                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]"
+                            placeholder="Suffix (Optional)">
+
+                        <p class="text-sm text-[#800000] dark:text-[#ffcccc] font-medium mt-2">
+                            Role:
+                            <span id="profile-role" class="ml-1">Student</span>
                         </p>
-                        <p class="text-[#800000] dark:text-[#ffcccc]">Glad to see you again.</p>
                     </div>
+
                 </div>
 
                 <!-- Profile Info Grid -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[#660000] dark:text-[#ffd1d1]">
-                    <p><strong>Status:</strong> <span id="profile-status">N/A</span></p>
-                    <p><strong>Department:</strong><span id="profile-department">N/A</span></p>
-                    <p><strong>Library ID:</strong> <span id="profile-library_id">N/A</span></p>
-                    <p><strong>Email:</strong> <span id="profile-email">N/A</span></p>
-                    <!-- <p><strong>Checkouts:</strong> 5 / 10 limit</p>
-                    <p><strong>Fines:</strong> $0.00</p> -->
+
+                    <div>
+                        <label class="block mb-1 font-medium">Status</label>
+                        <input type="text" name="status" id="profile-status"
+                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]"
+                            placeholder="Student / Faculty">
+                    </div>
+
+                    <div>
+                        <label class="block mb-1 font-medium">Department</label>
+                        <input type="text" name="department" id="profile-department"
+                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]"
+                            placeholder="Your department">
+                    </div>
+
+                    <div>
+                        <label class="block mb-1 font-medium">Library ID</label>
+                        <input type="text" name="library_id" id="profile-library_id"
+                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]" readonly>
+                    </div>
+
+                    <div>
+                        <label class="block mb-1 font-medium">Email</label>
+                        <input type="email" name="email" id="profile-email"
+                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]"
+                            placeholder="Enter your email">
+                    </div>
+
                 </div>
 
-                <!-- Edit Button -->
-                <div class="flex justify-center sm:justify-end">
-                    <button
-                        class="mt-4 bg-[#b03060] text-white px-6 py-2 rounded-full hover:bg-[#800000] transition font-medium flex items-center gap-2">
-                        <i data-lucide="edit-3" class="w-5 h-5"></i>
-                        Edit Profile
+                <!-- Save Buttons -->
+                <div class="flex justify-end gap-3 pt-4">
+                    <button type="submit"
+                        class="px-6 py-2 rounded-full bg-[#b03060] text-white hover:bg-[#800000] transition">
+                        Update Profile
                     </button>
                 </div>
-            </div>
+            </form>
 
+            <!-- Activity Log -->
             <div
                 class="mt-8 p-6 border-2 border-[#b03060] dark:border-[#800000] bg-[#fff0f0] dark:bg-[#330000] rounded-xl shadow-lg">
                 <h3 class="text-xl font-semibold mb-3 text-[#660000] dark:text-[#ffd1d1]">Activity Log</h3>
-                <ul class="text-sm space-y-1 text-[#660000] dark:text-[#ffd1d1]">
-                    <li><span class="font-mono text-[#800000] dark:text-[#ffcccc] mr-2">2024-10-28:</span> Renewed "Data
-                        Structures"</li>
-                    <li><span class="font-mono text-[#800000] dark:text-[#ffcccc] mr-2">2024-10-25:</span> Checked out
-                        "Literary Theory"</li>
-                    <li><span class="font-mono text-[#800000] dark:text-[#ffcccc] mr-2">2024-10-25:</span> Account
-                        logged in from campus IP</li>
+                <ul class="text-sm space-y-1 text-[#660000] dark:text-[#ffd1d1] overflow-auto h-40 max-h-40"
+                    id="activity-log">
                 </ul>
             </div>
         </section>
+
 
         <!-- MY BOOKS SECTION -->
         <section id="books-section" class="view-section hidden pt-8 pb-20 max-w-6xl mx-auto px-6">
@@ -818,7 +855,6 @@
                 }
             });
         });
-
         $container.on("click", ".remove-btn", function () {
             const title = $(this).data("title");
 
@@ -831,7 +867,7 @@
                 dataType: "json",
                 success: function (res) {
                     if (res && res.status === 1 && res.data) {
-                        alert(res.message);
+                        alert("Book removed from favorites.");
                         location.reload();
                     } else {
                         alert(res?.message || "Failed to open the book.");
@@ -846,6 +882,89 @@
                 }
             });
         });
+
+        loadActivityLog();
+        function loadActivityLog() {
+            $.ajax({
+                url: base_url + "auth/action.php?action=get_activity_log",
+                type: "GET",
+                dataType: "json",
+                success: function (res) {
+                    if (!res.status) return;
+
+                    let html = "";
+
+                    res.data.forEach(item => {
+                        html += `
+                            <li>
+                                <span class="font-mono text-[#800000] dark:text-[#ffcccc] mr-2">
+                                    ${item.log_time}:
+                                </span>
+                                ${item.activity}
+                            </li>`;
+                    });
+
+                    $("#activity-log").html(html);
+                },
+                error: function () {
+                    console.log("Failed to fetch activity log.");
+                }
+            });
+        }
+
+        // Handle Profile Update
+        $("#profile-edit-form").on("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            $.ajax({
+                url: base_url + "auth/action.php?action=update_profile",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: "json",
+
+                success: function (res) {
+                    if (!res.status) {
+                        alert(res.message || "Update failed.");
+                        return;
+                    }
+
+                    // Update fields instantly
+                    $("#profile-view-username").val(res.data.name);
+                    $("#profile-status").val(res.data.status);
+                    $("#profile-department").val(res.data.department);
+                    $("#profile-library_id").val(res.data.library_id);
+                    $("#profile-email").val(res.data.email);
+                    $("#profile-role").text(res.data.role);
+
+                    // Update the profile picture preview if backend returns file path
+                    if (res.data.profile_pic) {
+                        $("#profile-picture").attr("src", res.data.profile_pic);
+                    }
+
+                    alert("Profile updated successfully.");
+                },
+
+                error: function () {
+                    alert("Server error. Try again.");
+                }
+            });
+        });
+
+        // Live Preview for Uploaded Image
+        $("#profile-picture-input").on("change", function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = evt => $("#profile-picture").attr("src", evt.target.result);
+            reader.readAsDataURL(file);
+        });
+
+
 
     });
 </script>

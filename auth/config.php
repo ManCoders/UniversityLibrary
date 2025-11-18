@@ -68,6 +68,15 @@ function db_connect()
                 ON DELETE CASCADE
                 ON UPDATE CASCADE,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+            )",
+            "CREATE TABLE IF NOT EXISTS user_logs (
+                log_id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id INT NOT NULL,
+                activity VARCHAR(255) NOT NULL,
+                log_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT fk_userlogs_user FOREIGN KEY (user_id) REFERENCES user(user_id)
+                ON DELETE CASCADE
+                ON UPDATE CASCADE
             )"
         ];
 

@@ -112,6 +112,12 @@ switch ($action) {
     case 'updateUser':
         echo $crud->updatedetails();
         break;
+    case 'get_activity_log':
+        echo $crud->get_activity_log();
+        break;
+    case 'update_profile':
+        echo $crud->update_profile();
+        break;
     default:
         echo json_encode(['status' => 0, 'message' => 'Invalid or missing action.']);
         break;
