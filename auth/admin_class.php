@@ -109,7 +109,8 @@ class Action
         }
     }
 
-    function users_logs($logs = ''){
+    function users_logs($logs = '')
+    {
         $user_id = $_SESSION['student']['user_id'] ?? $_SESSION['faculty']['user_id'] ?? $_SESSION['admin']['admin_id'] ?? null;
 
         if (!$user_id || !$logs) {
@@ -247,9 +248,9 @@ class Action
                 'user_id' => $user['user_id'] ?? null
             ];
             $completename = trim(($person['firstname'] ?? '') . ' ' . ($person['lastname'] ?? ''));
-            
+
             $this->users_logs("{$completename} logged in successfully.");
-            
+
             return json_encode([
                 'status' => 1,
                 'message' => 'Login successful.',
@@ -262,7 +263,7 @@ class Action
                 'course' => $person['course'] ?? null,
                 'department' => $person['department'] ?? null,
                 'user_id' => $user['user_id'] ?? null,
-                'user_name' =>$completename,
+                'user_name' => $completename,
                 'user_data' => $sessionData
             ]);
 
@@ -1311,7 +1312,7 @@ class Action
                 'message' => 'Missing file parameter.'
             ]);
         }
-        
+
         $user_id = $_SESSION['student']['user_id'] ?? null;
         if (!$user_id) {
             return json_encode([
@@ -1448,7 +1449,7 @@ class Action
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        
+
         $file = $_POST['file'] ?? null;
         $favorite = isset($_POST['favorite']) ? (int) $_POST['favorite'] : 0;
         $user_id = $_SESSION['student']['user_id'] ?? null;
@@ -1474,7 +1475,7 @@ class Action
             $book_title = $log['book_title'] ?? 'Unknown Title';
             $book_author = $log['book_author'] ?? 'Unknown Author';
 
-            
+
             if ($log) {
                 $update = $this->db->prepare("UPDATE reading_logs SET is_favorite = ?, updated_at = NOW() WHERE id = ?");
                 $update->execute([$favorite, $log['id']]);
@@ -1843,7 +1844,7 @@ class Action
 
         try {
 
-            $userId = (int) ($_POST['user_id'] ?? 0);
+            $userId = $_POST['user_id'] ?? $_SESSION['admin']['user_id'] ?? $_SESSION['student']['user_id'] ?? $_SESSION['faculty']['user_id'] ?? 0;
             if ($userId <= 0) {
                 return json_encode(['status' => 0, 'message' => 'Invalid user ID.']);
             }
@@ -2087,7 +2088,7 @@ class Action
         $file = $_POST['file'] ?? null;
         $user_id = $_SESSION['student']['user_id'] ?? null;
 
-        
+
 
         if (!$user_id) {
             return json_encode([
@@ -2175,7 +2176,8 @@ class Action
         }
     }
 
-    function update_profile(){
+    function update_profile()
+    {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -2185,18 +2187,17 @@ class Action
         $user = $_SESSION['student'] ?? $_SESSION['faculty'] ?? null;
         if (!$user || empty($user['user_id'])) {
             return json_encode(['status' => 0, 'message' => 'User not logged in.']);
-
         }
 
         $user_id = $user['user_id'];
         $role = $user['role'] ?? ($user['user_role'] ?? 'student');
 
-        $firstname = trim($_POST['firstname'] ?? '');
-        $lastname = trim($_POST['lastname'] ?? '');
-        $middlename = trim($_POST['middlename'] ?? '');
-        $suffix = trim($_POST['suffix'] ?? '');
-        $department = trim($_POST['department'] ?? '');
-        $email = trim($_POST['email'] ?? '');
+        $firstname = $_POST['firstname'] ?? '';
+        $middlename = $_POST['middlename'] ?? '';
+        $lastname = $_POST['lastname'] ?? '';
+        $suffix = $_POST['suffix'] ?? '';
+        $department = $_POST['department'] ?? '';
+        $email = $_POST['email'] ?? '';
 
         try {
             // Fetch current data
@@ -2206,20 +2207,41 @@ class Action
 
             if (!$row) {
                 return json_encode(['status' => 0, 'message' => 'User not found.']);
-
             }
 
             $personal = json_decode($row['personal_details'], true) ?? [];
             $auth = json_decode($row['authentication_data'], true) ?? [];
+            // Handle profile picture upload
+            if (isset($_FILES['profile_pic']) && $_FILES['profile_pic']['error'] === UPLOAD_ERR_OK) {
+                $uploadDir = __DIR__ . '/uploads/' . $role . '_profiles/';
+                if (!is_dir($uploadDir))
+                    mkdir($uploadDir, 0755, true);
+
+                $fileTmp = $_FILES['profile_pic']['tmp_name'];
+                $fileExt = strtolower(pathinfo($_FILES['profile_pic']['name'], PATHINFO_EXTENSION));
+                $allowed = ['jpg', 'jpeg', 'png', 'gif'];
+
+                if (!in_array($fileExt, $allowed)) {
+                    return json_encode(['status' => 0, 'message' => 'Invalid image type.']);
+                }
+
+                $filename = uniqid($role . '_') . '.' . $fileExt;
+                $filepath = $uploadDir . $filename;
+                if (move_uploaded_file($fileTmp, $filepath)) {
+                    $profile_pic = 'uploads/' . $role . '_profiles/' . $filename;
+                }
+            }
 
             // Update personal details
             $personal['firstname'] = $firstname;
-            $personal['lastname'] = $lastname;
             $personal['middlename'] = $middlename;
+            $personal['lastname'] = $lastname;
             $personal['suffix'] = $suffix;
             $personal['department'] = $department;
+            $personal['profile_pic'] = $profile_pic;
             $auth['email'] = $email;
-            // Update database
+
+            // Update database (fixed: removed extra comma before WHERE)
             $update = $this->db->prepare("UPDATE user SET personal_details = ?, authentication_data = ? WHERE user_id = ?");
             $update->execute([
                 json_encode($personal, JSON_UNESCAPED_UNICODE),
@@ -2230,24 +2252,40 @@ class Action
             // Update session
             $updatedSession = $user;
             $updatedSession['firstname'] = $firstname;
-            $updatedSession['lastname'] = $lastname;
             $updatedSession['middlename'] = $middlename;
+            $updatedSession['lastname'] = $lastname;
             $updatedSession['suffix'] = $suffix;
             $updatedSession['department'] = $department;
             $updatedSession['email'] = $email;
-            if ($role === 'faculty')
+            $updatedSession['profile_pic'] = $profile_pic;
+
+            if ($role === 'faculty') {
                 $_SESSION['faculty'] = $updatedSession;
-            else
+            } else {
                 $_SESSION['student'] = $updatedSession;
+            }
+
             return json_encode([
                 'status' => 1,
-                'message' => 'Profile updated successfully.'
+                'message' => 'Profile updated successfully.',
+                'data' => [
+                    'firstname' => $firstname,
+                    'middlename' => $middlename,
+                    'lastname' => $lastname,
+                    'suffix' => $suffix,
+                    'department' => $department,
+                    'email' => $email,
+                    'role' => $role,
+                    'profile_pic' => $profile_pic
+                ]
             ]);
+
         } catch (PDOException $e) {
             return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
         }
-        
     }
+
+
 
 
 

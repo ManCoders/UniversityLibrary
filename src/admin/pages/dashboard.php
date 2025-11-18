@@ -58,6 +58,7 @@
     <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
     <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Requests</h2>
     <canvas id="requestsChart" class="mt-4"></canvas>
+    
 </div>
 
 <div id="tasksPanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
@@ -66,7 +67,7 @@
     <canvas id="tasksChart" class="mt-4"></canvas>
 </div>
 <!-- Monitoring Panel -->
-<div id="monitorPanel" class="mt-8 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+<!-- <div id="monitorPanel" class="mt-8 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
     <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Live User Monitoring</h2>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -92,7 +93,7 @@
             <li>Database connections: 0</li>
         </ul>
     </div>
-</div>
+</div> -->
 
 
 

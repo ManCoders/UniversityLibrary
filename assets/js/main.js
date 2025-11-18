@@ -252,11 +252,13 @@ $(document).ready(function () {
       $("#edit-lastname").val(userState.lastname || "");
       $("#edit-middlename").val(userState.middlename || "");
       $("#edit-suffix").val(userState.suffix || "");
-      
+
       $("#profile-department").val(userState.department);
       $("#profile-role").text(userState.role);
       $("#profile-status").val(userState.isLoggedIn ? "Active" : "Inactive");
-      $("#profile-library_id").val(userState.library_id || userState.library_id || "N/A");
+      $("#profile-library_id").val(
+        userState.library_id || userState.library_id || "N/A"
+      );
       $("#profile-email").val(userState.email);
       // Use a mock ID or a real one if the backend provided it
       $("#profile-view-id").text(
@@ -667,11 +669,11 @@ $(document).ready(function () {
               $.ajax({
                 type: "POST",
                 url: `${base_url}auth/action.php?action=readingbooks`,
-                data: { 
+                data: {
                   file: filePath,
                   book_title: title,
-                  book_author: author
-                 }, // relative path
+                  book_author: author,
+                }, // relative path
                 dataType: "json",
                 success: function (res) {
                   if (res.status === 1 && res.data) {
@@ -779,6 +781,4 @@ $(document).ready(function () {
       },
     });
   });
-
-  
 });

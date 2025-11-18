@@ -235,7 +235,7 @@
                             <i data-lucide="camera" class="w-4 h-4"></i>
                         </label>
 
-                        <input type="file" id="profile-picture-input" name="profile_pic" class="hidden"
+                        <input type="file" id="profile-picture-input" name="profile_pic" accept="image/*" class="hidden"
                             accept="image/*">
                     </div>
 
@@ -868,10 +868,11 @@
                 success: function (res) {
                     if (res && res.status === 1 && res.data) {
                         alert("Book removed from favorites.");
-                        location.reload();
+                        
                     } else {
                         alert(res?.message || "Failed to open the book.");
                     }
+                    window.location.reload();
                 },
                 error: function (err) {
                     console.error("Error starting reading session:", err);
@@ -913,13 +914,15 @@
         }
 
         // Handle Profile Update
+        // Profile form submission
         $("#profile-edit-form").on("submit", function (e) {
             e.preventDefault();
 
             const formData = new FormData(this);
 
+            console.log("Submitting profile update with data:", Array.from(formData.entries()));
             $.ajax({
-                url: base_url + "auth/action.php?action=update_profile",
+                url: base_url + "auth/action.php?action=updateUser",
                 type: "POST",
                 data: formData,
                 processData: false,
@@ -932,20 +935,24 @@
                         return;
                     }
 
-                    // Update fields instantly
-                    $("#profile-view-username").val(res.data.name);
-                    $("#profile-status").val(res.data.status);
-                    $("#profile-department").val(res.data.department);
-                    $("#profile-library_id").val(res.data.library_id);
-                    $("#profile-email").val(res.data.email);
-                    $("#profile-role").text(res.data.role);
+                    // Fill form fields from returned data
+                    $("#edit-firstname").val(res.data.firstname || '');
+                    $("#edit-middlename").val(res.data.middlename || '');
+                    $("#edit-lastname").val(res.data.lastname || '');
+                    $("#edit-suffix").val(res.data.suffix || '');
+                    $("#profile-status").val(res.data.status || '');
+                    $("#profile-department").val(res.data.department || '');
+                    $("#profile-library_id").val(res.data.library_id || '');
+                    $("#profile-email").val(res.data.email || '');
+                    $("#profile-role").text(res.data.role || 'Student');
 
-                    // Update the profile picture preview if backend returns file path
-                    if (res.data.profile_pic) {
-                        $("#profile-picture").attr("src", res.data.profile_pic);
+                    // Update profile picture preview if uploaded
+                    if (res.data.personal['profile_pic']) {
+                        $("#profile-picture").attr("src", base_url + res.data.personal['profile_pic']);
                     }
 
                     alert("Profile updated successfully.");
+                    window.location.reload();
                 },
 
                 error: function () {
@@ -954,15 +961,16 @@
             });
         });
 
-        // Live Preview for Uploaded Image
-        $("#profile-picture-input").on("change", function (e) {
-            const file = e.target.files[0];
+        // Live preview for profile picture
+        $("#profile-picture-input").on("change", function () {
+            const file = this.files[0];
             if (!file) return;
 
             const reader = new FileReader();
-            reader.onload = evt => $("#profile-picture").attr("src", evt.target.result);
+            reader.onload = e => $("#profile-picture").attr("src", e.target.result);
             reader.readAsDataURL(file);
         });
+
 
 
 
