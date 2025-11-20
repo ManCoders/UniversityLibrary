@@ -80,7 +80,9 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
         $loader.html(`<p class='text-red-500 font-semibold'>⚠️ Invalid or expired token.</p>`);
         return;
       }
-
+      $(document).on("contextmenu", function (e) {
+        e.preventDefault();
+      });
       // --- Load PDF ---
       pdfjsLib.getDocument(pdfUrl).promise
         .then(pdf => {
@@ -94,7 +96,9 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
             promise = promise.then(() => renderPage(i));
           }
           promise.then(() => {
-            $(document).on("contextmenu", e => e.preventDefault());
+
+
+
             $(document).on("keydown", e => {
               if (e.ctrlKey && ["s", "p", "u", "c"].includes(e.key.toLowerCase())) e.preventDefault();
             });
@@ -138,7 +142,7 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
         btn.toggleClass("bg-blue-600", !isFavorite);
 
         $.ajax({
-          url: `${base_url}auth/action.php?action=toggle_favorite`, 
+          url: `${base_url}auth/action.php?action=toggle_favorite`,
           type: "POST",
           data: {
             file: "<?php echo $pdfFile; ?>",
@@ -148,7 +152,7 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
           success: function (response) {
             if (response.status === 1) {
               alert(response.message);
-            }else{
+            } else {
               alert(response.message);
             }
           },

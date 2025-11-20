@@ -227,17 +227,430 @@
 
 
 
+    <!-- 🆕 NEW FOLDER MODAL -->
+    <div id="new-folder-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-80 p-5">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">📁 Create New Folder</h3>
+            <input type="text" id="folder-name-input"
+                class="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 mb-4"
+                placeholder="Enter folder name">
+            <div class="flex justify-end gap-2">
+                <button id="cancel-folder-btn"
+                    class="px-3 py-1 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md text-sm">Cancel</button>
+                <button id="create-folder-btn"
+                    class="px-3 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm">Create</button>
+            </div>
+        </div>
 
+    </div>
 
     <script>
         $(document).ready(function () {
+            function activateTab(tabId, contentId) {
+                $('.tab-panel').addClass('hidden');
+                $('.tab-button').removeClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
+                    .addClass('border-transparent text-gray-500 dark:text-gray-400');
+                $(contentId).removeClass('hidden');
+                $(tabId).addClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
+                    .removeClass('border-transparent text-gray-500 dark:text-gray-400');
+            }
+
+            activateTab('#tab-add-metadata', '#add-metadata-content');
+            // $('#tab-dashboard').click(() => activateTab('#tab-dashboard', '#dashboard-content'));
+            $('#tab-add-metadata').click(() => activateTab('#tab-add-metadata', '#add-metadata-content'));
+            $('#tab-metadata-table').click(() => activateTab('#tab-metadata-table', '#metadata-table-content'));
+
+
+            const $modal = $('#new-folder-modal');
+            const $input = $('#folder-name-input');
+
+            // --- Show modal ---
+            $('#new-folder-btn').on('click', function () {
+                $modal.removeClass('hidden').addClass('flex');
+                $input.focus();
+            });
+
+            // --- Hide modal ---
+            function closeModal() {
+                $modal.addClass('hidden').removeClass('flex');
+                $input.val('');
+            }
+
+            $('#cancel-folder-btn').on('click', closeModal);
+
+            function attachFolderToggle(folderToggle) {
+                $(folderToggle).off('click').on('click', function () {
+                    const $list = $(this).next('ul');
+                    const $icon = $(this).find('.toggle-icon');
+                    $list.toggleClass('hidden');
+                    $icon.text($list.hasClass('hidden') ? '▶' : '▼');
+                });
+            }
+            loadFolders();
+            function loadFolders() {
+                $.getJSON(base_url + "auth/action.php?action=getFolders", res => {
+                    if (res.status !== 1) return;
+                    const $list = $('#folder-list').empty();
+
+                    res.folders.forEach(folder => {
+                        const $li = $(`
+                            <li class="folder">
+                                <div class="flex items-center justify-between cursor-pointer folder-toggle bg-white dark:bg-gray-800 border rounded-md px-3 py-2 hover:bg-indigo-50 dark:hover:bg-gray-700">
+                                    <div class="flex items-center">
+                                        <span class="text-gray-400 toggle-icon">▶</span>
+                                        <span class="mr-2">📂</span>
+                                        <span class="mainFolder font-medium flex-1">${folder.name}</span>
+                                    </div>
+                                    <div class="flex gap-1">
+                                        <button class="delete-folder-btn text-sm px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded">🗑️ Delete</button>
+                                        <button class="upload-file-btn text-sm px-2 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded">⬆️ File</button>
+                                        <button class="upload-folder-btn text-sm px-2 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded">⬆️ Folder</button>
+                                    </div>
+                                </div>
+                                <ul class="ml-6 mt-2 hidden space-y-1">
+                                    ${folder.files.length
+                                ? folder.files.map(f => `<li class="file bg-white dark:bg-gray-800 px-3 py-1 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer items-id">${f}</li>`).join('')
+                                : `<li class="text-gray-400 text-xs italic">Empty folder</li>`}
+                                </ul>
+                                <input type="file" class="hidden folder-file-input" accept=".pdf">
+                                <input type="file" class="hidden folder-folder-input" webkitdirectory directory multiple>
+                            </li>
+                        `);
+                        $list.append($li);
+
+                        attachFolderToggle($li.find('.folder-toggle')[0]);
+
+
+                        $li.find('.delete-folder-btn').click(function (e) {
+                            e.stopPropagation();
+
+                            if (!confirm(`Are you sure you want to delete "${folder.name}"?`)) {
+                                return; // NO spinner here
+                            }
+
+                            $('#upload-spinner').removeClass('hidden'); // show when confirmed
+
+                            $.post(
+                                base_url + "auth/action.php?action=deleteFolder",
+                                { folder_name: folder.name },
+                                res => {
+                                    $('#upload-spinner').addClass('hidden'); // hide
+
+                                    if (res.status === 1) {
+                                        alert('Folder deleted successfully');
+                                        loadFolders();
+                                        loadMetadata();
+
+                                    } else {
+                                        alert(res.message || 'Failed to delete folder');
+                                    }
+                                },
+                                'json'
+                            )
+                                .fail(() => {
+                                    $('#upload-spinner').addClass('hidden'); // hide on failure
+                                    alert('Server error during deletion');
+                                });
+                        });
+
+
+                        // Handle upload file button
+                        $li.find('.upload-file-btn').click(function (e) {
+                            e.stopPropagation();
+                            $li.find('.folder-file-input').click();
+                        });
+
+                        // Handle upload folder button
+                        $li.find('.upload-folder-btn').click(function (e) {
+                            e.stopPropagation();
+                            $li.find('.folder-folder-input').click();
+                        });
+
+
+                        $li.find('.folder-file-input').on('change', async function () {
+                            const files = this.files;
+                            if (!files.length) return;
+                            $('#upload-spinner').removeClass('hidden').show();
+                            const metadataList = [];
+                            const folderName = $li.find('.mainFolder').text();
+
+                            const formData = new FormData();
+                            formData.append('folder', folderName);
+
+                            for (let file of files) {
+                                if (file.type !== 'application/pdf') continue; // skip non-PDFs
+
+                                // Add file to FormData
+                                formData.append('files[]', file);
+
+                                // Read file as ArrayBuffer
+                                const arrayBuffer = await file.arrayBuffer();
+                                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+                                // ---------- 1️⃣ Extract Metadata ----------
+                                const meta = await pdf.getMetadata().catch(() => ({}));
+                                const info = meta?.info || {};
+                                const xmp = meta?.metadata ? meta.metadata.getAll() : {};
+                                const combinedMetadata = { ...info, ...xmp };
+                                const filteredMetadata = Object.fromEntries(
+                                    Object.entries(combinedMetadata).filter(
+                                        ([key, value]) => key && value && String(value).trim() !== ''
+                                    )
+                                );
+
+                                // ---------- 2️⃣ Extract Cover Image (first page render) ----------
+                                const page = await pdf.getPage(1);
+                                const scale = 1.5;
+                                const viewport = page.getViewport({ scale });
+
+                                // create off-screen canvas
+                                const canvas = document.createElement('canvas');
+                                const ctx = canvas.getContext('2d');
+                                canvas.width = viewport.width;
+                                canvas.height = viewport.height;
+
+                                const renderContext = { canvasContext: ctx, viewport };
+                                await page.render(renderContext).promise;
+
+                                // convert canvas to base64 image (PNG)
+                                const coverImageData = canvas.toDataURL('image/png');
+
+                                // Optional: Convert Base64 to Blob if you want to upload it separately
+                                const coverBlob = await (await fetch(coverImageData)).blob();
+                                const coverFileName = file.name.replace(/\.pdf$/i, '_cover.png');
+                                formData.append('covers[]', coverBlob, coverFileName);
+
+                                // ---------- 3️⃣ Add all metadata ----------
+                                metadataList.push({
+                                    foldername: folderName,
+                                    filename: file.name,
+                                    metadata: filteredMetadata,
+                                    cover: coverFileName // link between PDF and cover
+                                });
+                            }
+                            formData.append('metadata', JSON.stringify(metadataList));
+
+                            console.log('metadata', JSON.stringify(metadataList))
+                            // ---------- 4️⃣ Send FormData to backend ----------
+                            $.ajax({
+                                url: base_url + "auth/action.php?action=uploadFile",
+                                method: "POST",
+                                data: formData,
+                                contentType: false,
+                                processData: false,
+                                dataType: 'json',
+
+                                // 🔹 Show spinner before upload starts
+                                beforeSend: function () {
+                                    $('#upload-spinner').removeClass('hidden').show();
+                                    console.log("📤 File upload started...");
+                                },
+
+                                success: res => {
+                                    console.log("✅ Upload response:", res);
+
+                                    if (res.status === 1) {
+                                        alert(res.message || '✅ File upload success');
+                                        $('#upload-spinner').removeClass('hidden').hide();
+                                        console.log('Uploaded files:', res.files);
+                                        loadFolders();
+                                    } else {
+                                        alert(res.message || '❌ File upload failed');
+                                    }
+                                    loadFolders();
+                                    loadMetadata();
+                                },
+
+                                // 🔹 Handle any server error
+                                error: (jqXHR, textStatus, errorThrown) => {
+                                    console.error("🚨 AJAX Error:", textStatus, errorThrown, jqXHR.responseText);
+                                    alert('Server error during file upload. Check console for details.');
+                                },
+
+                                // 🔹 Always hide spinner after completion
+                                complete: function () {
+                                    $('#upload-spinner').fadeOut(200).addClass('hidden');
+                                    console.log("✅ File upload complete");
+                                }
+                            });
+
+
+                            $(this).val(''); // reset input
+                        });
+
+
+                        $li.find('.folder-folder-input').on('change', async function () {
+                            const files = this.files;
+                            if (!files.length) return;
+                            $('#upload-spinner').removeClass('hidden').show();
+                            const folderName = $li.find('.mainFolder').text().trim();
+                            if (!folderName) {
+                                alert('Could not determine the target folder name.');
+                                $(this).val('');
+                                return;
+                            }
+
+                            const formData = new FormData();
+                            formData.append('folder', folderName);
+
+                            const metadataList = [];
+
+                            for (let file of files) {
+                                if (file.type !== 'application/pdf') continue;
+
+                                formData.append('files[]', file, file.name);
+                                formData.append('filePaths[]', file.name);
+
+                                const fileMetadata = {
+                                    foldername: folderName,
+                                    filename: file.name,
+                                    metadata: {}
+                                };
+
+                                try {
+                                    // --- Read PDF and extract metadata
+                                    const arrayBuffer = await file.arrayBuffer();
+                                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                                    const meta = await pdf.getMetadata().catch(() => ({}));
+
+                                    const info = meta?.info || {};
+                                    const xmp = meta?.metadata ? meta.metadata.getAll() : {};
+                                    const combinedMetadata = { ...info, ...xmp };
+
+                                    fileMetadata.metadata = Object.fromEntries(
+                                        Object.entries(combinedMetadata).filter(([key, value]) =>
+                                            key && value && String(value).trim() !== ''
+                                        )
+                                    );
+
+                                    // --- Generate cover (client-side preview optional)
+                                    const page = await pdf.getPage(1);
+                                    const scale = 1.5;
+                                    const viewport = page.getViewport({ scale });
+
+                                    const canvas = document.createElement('canvas');
+                                    const ctx = canvas.getContext('2d');
+                                    canvas.width = viewport.width;
+                                    canvas.height = viewport.height;
+
+                                    await page.render({ canvasContext: ctx, viewport }).promise;
+
+                                    const coverBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                                    const coverBlob = await (await fetch(coverBase64)).blob();
+                                    const coverFileName = file.name.replace(/\.pdf$/i, '_cover.png');
+
+                                    formData.append('covers[]', coverBlob, coverFileName);
+                                    fileMetadata.cover = coverFileName;
+                                } catch (e) {
+                                    console.warn('⚠️ Error reading PDF metadata or cover:', file.name, e);
+                                }
+
+                                metadataList.push(fileMetadata);
+                            }
+
+                            formData.append('metadata', JSON.stringify(metadataList));
+
+                            // Show spinner before AJAX
+                            $('#upload-spinner').removeClass('hidden');
+
+                            $.ajax({
+                                url: base_url + "auth/action.php?action=uploadFolder",
+                                method: "POST",
+                                data: formData,
+                                contentType: false,
+                                processData: false,
+                                dataType: 'json',
+
+                                // 🔹 Show spinner before upload starts
+                                beforeSend: function () {
+                                    $('#upload-spinner').removeClass('hidden').show();
+                                    console.log("📤 Upload started...");
+                                },
+
+                                success: res => {
+                                    console.log('✅ Upload response:', res);
+
+                                    if (res.status === 1) {
+                                        const $fileList = $li.find('ul').empty();
+                                        alert(res.message || '✅ Folder upload success');
+                                        $('#upload-spinner').removeClass('hidden').hide();
+                                        if (res.files_uploaded?.length) {
+                                            res.files_uploaded.forEach(f => {
+                                                const $fileItem = $(`
+                                                <li class="file bg-white dark:bg-gray-800 px-3 py-1 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer flex justify-between items-center">
+                                                    <span>${f}</span>
+                                                    <span class="text-xs text-gray-400">${res.folder_name}</span>
+                                                </li>
+                                            `);
+                                                $fileList.append($fileItem);
+                                            });
+                                        } else {
+                                            $fileList.append('<li class="text-gray-400 text-xs italic">No files uploaded</li>');
+                                        }
+
+                                    } else {
+                                        alert(res.message || '❌ Folder upload failed.');
+                                    }
+                                    loadFolders();
+                                    loadMetadata();
+                                },
+
+                                // 🔹 Handle server or connection errors
+                                error: (jqXHR, textStatus, errorThrown) => {
+                                    console.error("🚨 AJAX Error:", textStatus, errorThrown, jqXHR.responseText);
+                                    alert('Server error during folder upload. Check console for details.');
+                                },
+
+                                // 🔹 Always hide spinner at the end
+                                complete: function () {
+                                    $('#upload-spinner').fadeOut(200).addClass('hidden');
+                                    console.log("✅ Upload complete");
+                                }
+                            });
+
+
+                            $(this).val(''); // reset input
+                        });
+
+
+                        $('#folder-list').on('click', '.file', function () {
+                            const $fileItem = $(this);
+                            const filename = $fileItem.text().trim(); // Get file name
+                            const $folderLi = $fileItem.closest('.folder'); // Get parent folder li
+                            const folderName = $folderLi.find('.mainFolder').text().trim();
+
+                            console.log('Clicked file:', filename, 'in folder:', folderName);
+
+                        });
+                    });
+                });
+
+            }
+            // Create folder + reload list
+            $('#create-folder-btn').click(function () {
+                const $btn = $(this);
+                const name = $('#folder-name-input').val().trim();
+                if (!name) return alert('Enter folder name');
+
+                $.post(base_url + "auth/action.php?action=createFolder", { folder_name: name }, res => {
+                    if (res.status === 1) {
+                        closeModal();
+                        loadFolders();
+                    } else alert(res.message || 'Failed to create folder');
+                }, 'json').fail(() => alert('Server error')).always(() => $btn.text("Create Folder"));
+            });
+
+
+
+
+            /* METADATA FILE HERE */
 
             // Initial load
             $("#searchBooks").on("keyup", function () {
                 const q = $(this).val();
                 loadMetadata(q);
             });
-            
+
             loadMetadata();
             function loadMetadata(query = "") {
                 $.ajax({
@@ -500,399 +913,6 @@
                 });
             });
 
-
-        });
-    </script>
-
-
-    <!-- 🆕 NEW FOLDER MODAL -->
-    <div id="new-folder-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-80 p-5">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">📁 Create New Folder</h3>
-            <input type="text" id="folder-name-input"
-                class="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 mb-4"
-                placeholder="Enter folder name">
-            <div class="flex justify-end gap-2">
-                <button id="cancel-folder-btn"
-                    class="px-3 py-1 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md text-sm">Cancel</button>
-                <button id="create-folder-btn"
-                    class="px-3 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded-md text-sm">Create</button>
-            </div>
-        </div>
-
-    </div>
-
-    <script>
-        $(document).ready(function () {
-            function activateTab(tabId, contentId) {
-                $('.tab-panel').addClass('hidden');
-                $('.tab-button').removeClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
-                    .addClass('border-transparent text-gray-500 dark:text-gray-400');
-                $(contentId).removeClass('hidden');
-                $(tabId).addClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
-                    .removeClass('border-transparent text-gray-500 dark:text-gray-400');
-            }
-
-            activateTab('#tab-add-metadata', '#add-metadata-content');
-            // $('#tab-dashboard').click(() => activateTab('#tab-dashboard', '#dashboard-content'));
-            $('#tab-add-metadata').click(() => activateTab('#tab-add-metadata', '#add-metadata-content'));
-            $('#tab-metadata-table').click(() => activateTab('#tab-metadata-table', '#metadata-table-content'));
-
-
-            const $modal = $('#new-folder-modal');
-            const $input = $('#folder-name-input');
-
-            // --- Show modal ---
-            $('#new-folder-btn').on('click', function () {
-                $modal.removeClass('hidden').addClass('flex');
-                $input.focus();
-            });
-
-            // --- Hide modal ---
-            function closeModal() {
-                $modal.addClass('hidden').removeClass('flex');
-                $input.val('');
-            }
-
-            $('#cancel-folder-btn').on('click', closeModal);
-
-            function attachFolderToggle(folderToggle) {
-                $(folderToggle).off('click').on('click', function () {
-                    const $list = $(this).next('ul');
-                    const $icon = $(this).find('.toggle-icon');
-                    $list.toggleClass('hidden');
-                    $icon.text($list.hasClass('hidden') ? '▶' : '▼');
-                });
-            }
-            loadFolders();
-            function loadFolders() {
-                $.getJSON(base_url + "auth/action.php?action=getFolders", res => {
-                    if (res.status !== 1) return;
-                    const $list = $('#folder-list').empty();
-
-                    res.folders.forEach(folder => {
-                        const $li = $(`
-                            <li class="folder">
-                                <div class="flex items-center justify-between cursor-pointer folder-toggle bg-white dark:bg-gray-800 border rounded-md px-3 py-2 hover:bg-indigo-50 dark:hover:bg-gray-700">
-                                    <div class="flex items-center">
-                                        <span class="text-gray-400 toggle-icon">▶</span>
-                                        <span class="mr-2">📂</span>
-                                        <span class="mainFolder font-medium flex-1">${folder.name}</span>
-                                    </div>
-                                    <div class="flex gap-1">
-                                        <button class="delete-folder-btn text-sm px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded">🗑️ Delete</button>
-                                        <button class="upload-file-btn text-sm px-2 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded">⬆️ File</button>
-                                        <button class="upload-folder-btn text-sm px-2 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded">⬆️ Folder</button>
-                                    </div>
-                                </div>
-                                <ul class="ml-6 mt-2 hidden space-y-1">
-                                    ${folder.files.length
-                                ? folder.files.map(f => `<li class="file bg-white dark:bg-gray-800 px-3 py-1 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer items-id">${f}</li>`).join('')
-                                : `<li class="text-gray-400 text-xs italic">Empty folder</li>`}
-                                </ul>
-                                <input type="file" class="hidden folder-file-input" accept=".pdf">
-                                <input type="file" class="hidden folder-folder-input" webkitdirectory directory multiple>
-                            </li>
-                        `);
-                        $list.append($li);
-
-                        attachFolderToggle($li.find('.folder-toggle')[0]);
-
-                        // Handle delete folder button
-                        $li.find('.delete-folder-btn').click(function (e) {
-                            e.stopPropagation();
-                            if (!confirm(`Are you sure you want to delete "${folder.name}"?`)) return;
-
-                            $.post(base_url + "auth/action.php?action=deleteFolder", { folder_name: folder.name }, res => {
-                                if (res.status === 1) loadFolders();
-                                else alert(res.message || 'Failed to delete folder');
-                            }, 'json').fail(() => alert('Server error during deletion'));
-                        });
-
-                        // Handle upload file button
-                        $li.find('.upload-file-btn').click(function (e) {
-                            e.stopPropagation();
-                            $li.find('.folder-file-input').click();
-                        });
-
-                        // Handle upload folder button
-                        $li.find('.upload-folder-btn').click(function (e) {
-                            e.stopPropagation();
-                            $li.find('.folder-folder-input').click();
-                        });
-
-
-                        $li.find('.folder-file-input').on('change', async function () {
-                            const files = this.files;
-                            if (!files.length) return;
-
-                            const metadataList = [];
-                            const folderName = $li.find('.mainFolder').text();
-
-                            const formData = new FormData();
-                            formData.append('folder', folderName);
-
-                            for (let file of files) {
-                                if (file.type !== 'application/pdf') continue; // skip non-PDFs
-
-                                // Add file to FormData
-                                formData.append('files[]', file);
-
-                                // Read file as ArrayBuffer
-                                const arrayBuffer = await file.arrayBuffer();
-                                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
-                                // ---------- 1️⃣ Extract Metadata ----------
-                                const meta = await pdf.getMetadata().catch(() => ({}));
-                                const info = meta?.info || {};
-                                const xmp = meta?.metadata ? meta.metadata.getAll() : {};
-                                const combinedMetadata = { ...info, ...xmp };
-                                const filteredMetadata = Object.fromEntries(
-                                    Object.entries(combinedMetadata).filter(
-                                        ([key, value]) => key && value && String(value).trim() !== ''
-                                    )
-                                );
-
-                                // ---------- 2️⃣ Extract Cover Image (first page render) ----------
-                                const page = await pdf.getPage(1);
-                                const scale = 1.5;
-                                const viewport = page.getViewport({ scale });
-
-                                // create off-screen canvas
-                                const canvas = document.createElement('canvas');
-                                const ctx = canvas.getContext('2d');
-                                canvas.width = viewport.width;
-                                canvas.height = viewport.height;
-
-                                const renderContext = { canvasContext: ctx, viewport };
-                                await page.render(renderContext).promise;
-
-                                // convert canvas to base64 image (PNG)
-                                const coverImageData = canvas.toDataURL('image/png');
-
-                                // Optional: Convert Base64 to Blob if you want to upload it separately
-                                const coverBlob = await (await fetch(coverImageData)).blob();
-                                const coverFileName = file.name.replace(/\.pdf$/i, '_cover.png');
-                                formData.append('covers[]', coverBlob, coverFileName);
-
-                                // ---------- 3️⃣ Add all metadata ----------
-                                metadataList.push({
-                                    foldername: folderName,
-                                    filename: file.name,
-                                    metadata: filteredMetadata,
-                                    cover: coverFileName // link between PDF and cover
-                                });
-                            }
-                            formData.append('metadata', JSON.stringify(metadataList));
-
-                            console.log('metadata', JSON.stringify(metadataList))
-                            // ---------- 4️⃣ Send FormData to backend ----------
-                            $.ajax({
-                                url: base_url + "auth/action.php?action=uploadFile",
-                                method: "POST",
-                                data: formData,
-                                contentType: false,
-                                processData: false,
-                                dataType: 'json',
-
-                                // 🔹 Show spinner before upload starts
-                                beforeSend: function () {
-                                    $('#upload-spinner').removeClass('hidden').show();
-                                    console.log("📤 File upload started...");
-                                },
-
-                                success: res => {
-                                    console.log("✅ Upload response:", res);
-
-                                    if (res.status === 1) {
-                                        alert(res.message || '✅ File upload success');
-                                        console.log('Uploaded files:', res.files);
-                                        loadFolders();
-                                    } else {
-                                        alert(res.message || '❌ File upload failed');
-                                    }
-                                    loadFolders();
-                                },
-
-                                // 🔹 Handle any server error
-                                error: (jqXHR, textStatus, errorThrown) => {
-                                    console.error("🚨 AJAX Error:", textStatus, errorThrown, jqXHR.responseText);
-                                    alert('Server error during file upload. Check console for details.');
-                                },
-
-                                // 🔹 Always hide spinner after completion
-                                complete: function () {
-                                    $('#upload-spinner').fadeOut(200).addClass('hidden');
-                                    console.log("✅ File upload complete");
-                                }
-                            });
-
-
-                            $(this).val(''); // reset input
-                        });
-
-
-                        $li.find('.folder-folder-input').on('change', async function () {
-                            const files = this.files;
-                            if (!files.length) return;
-
-                            const folderName = $li.find('.mainFolder').text().trim();
-                            if (!folderName) {
-                                alert('Could not determine the target folder name.');
-                                $(this).val('');
-                                return;
-                            }
-
-                            const formData = new FormData();
-                            formData.append('folder', folderName);
-
-                            const metadataList = [];
-
-                            for (let file of files) {
-                                if (file.type !== 'application/pdf') continue;
-
-                                formData.append('files[]', file, file.name);
-                                formData.append('filePaths[]', file.name);
-
-                                const fileMetadata = {
-                                    foldername: folderName,
-                                    filename: file.name,
-                                    metadata: {}
-                                };
-
-                                try {
-                                    // --- Read PDF and extract metadata
-                                    const arrayBuffer = await file.arrayBuffer();
-                                    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                                    const meta = await pdf.getMetadata().catch(() => ({}));
-
-                                    const info = meta?.info || {};
-                                    const xmp = meta?.metadata ? meta.metadata.getAll() : {};
-                                    const combinedMetadata = { ...info, ...xmp };
-
-                                    fileMetadata.metadata = Object.fromEntries(
-                                        Object.entries(combinedMetadata).filter(([key, value]) =>
-                                            key && value && String(value).trim() !== ''
-                                        )
-                                    );
-
-                                    // --- Generate cover (client-side preview optional)
-                                    const page = await pdf.getPage(1);
-                                    const scale = 1.5;
-                                    const viewport = page.getViewport({ scale });
-
-                                    const canvas = document.createElement('canvas');
-                                    const ctx = canvas.getContext('2d');
-                                    canvas.width = viewport.width;
-                                    canvas.height = viewport.height;
-
-                                    await page.render({ canvasContext: ctx, viewport }).promise;
-
-                                    const coverBase64 = canvas.toDataURL('image/jpeg', 0.8);
-                                    const coverBlob = await (await fetch(coverBase64)).blob();
-                                    const coverFileName = file.name.replace(/\.pdf$/i, '_cover.png');
-
-                                    formData.append('covers[]', coverBlob, coverFileName);
-                                    fileMetadata.cover = coverFileName;
-                                } catch (e) {
-                                    console.warn('⚠️ Error reading PDF metadata or cover:', file.name, e);
-                                }
-
-                                metadataList.push(fileMetadata);
-                            }
-
-                            formData.append('metadata', JSON.stringify(metadataList));
-
-                            // Show spinner before AJAX
-                            $('#upload-spinner').removeClass('hidden');
-
-                            $.ajax({
-                                url: base_url + "auth/action.php?action=uploadFolder",
-                                method: "POST",
-                                data: formData,
-                                contentType: false,
-                                processData: false,
-                                dataType: 'json',
-
-                                // 🔹 Show spinner before upload starts
-                                beforeSend: function () {
-                                    $('#upload-spinner').removeClass('hidden').show();
-                                    console.log("📤 Upload started...");
-                                },
-
-                                success: res => {
-                                    console.log('✅ Upload response:', res);
-
-                                    if (res.status === 1) {
-                                        const $fileList = $li.find('ul').empty();
-
-                                        if (res.files_uploaded?.length) {
-                                            res.files_uploaded.forEach(f => {
-                                                const $fileItem = $(`
-                                                <li class="file bg-white dark:bg-gray-800 px-3 py-1 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer flex justify-between items-center">
-                                                    <span>${f}</span>
-                                                    <span class="text-xs text-gray-400">${res.folder_name}</span>
-                                                </li>
-                                            `);
-                                                $fileList.append($fileItem);
-                                            });
-                                        } else {
-                                            $fileList.append('<li class="text-gray-400 text-xs italic">No files uploaded</li>');
-                                        }
-
-                                    } else {
-                                        alert(res.message || '❌ Folder upload failed.');
-                                    }
-                                    loadFolders();
-                                },
-
-                                // 🔹 Handle server or connection errors
-                                error: (jqXHR, textStatus, errorThrown) => {
-                                    console.error("🚨 AJAX Error:", textStatus, errorThrown, jqXHR.responseText);
-                                    alert('Server error during folder upload. Check console for details.');
-                                },
-
-                                // 🔹 Always hide spinner at the end
-                                complete: function () {
-                                    $('#upload-spinner').fadeOut(200).addClass('hidden');
-                                    console.log("✅ Upload complete");
-                                }
-                            });
-
-
-                            $(this).val(''); // reset input
-                        });
-
-
-                        $('#folder-list').on('click', '.file', function () {
-                            const $fileItem = $(this);
-                            const filename = $fileItem.text().trim(); // Get file name
-                            const $folderLi = $fileItem.closest('.folder'); // Get parent folder li
-                            const folderName = $folderLi.find('.mainFolder').text().trim();
-
-                            console.log('Clicked file:', filename, 'in folder:', folderName);
-
-                        });
-                    });
-                });
-
-            }
-
-
-
-            // Create folder + reload list
-            $('#create-folder-btn').click(function () {
-                const $btn = $(this);
-                const name = $('#folder-name-input').val().trim();
-                if (!name) return alert('Enter folder name');
-
-                $.post(base_url + "auth/action.php?action=createFolder", { folder_name: name }, res => {
-                    if (res.status === 1) {
-                        closeModal();
-                        loadFolders();
-                    } else alert(res.message || 'Failed to create folder');
-                }, 'json').fail(() => alert('Server error')).always(() => $btn.text("Create Folder"));
-            });
 
         });
     </script>
