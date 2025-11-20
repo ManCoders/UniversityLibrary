@@ -3,29 +3,35 @@
 </h1>
 <!-- Tabs for Adding Accounts / Dashboard -->
 <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
-    <nav class="-mb-px flex space-x-4" aria-label="Tabs">
-        <!-- <button id="tab-dashboard"
-            class="tab-button border-indigo-500 text-indigo-600 dark:text-indigo-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-            User Dashboard
-        </button> -->
-        <button id="tab-faculty"
-            class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-            Add New Faculty
-        </button>
-        <button id="tab-student"
-            class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-            Add New Student
-        </button>
-        <button id="tab-student-table"
-            class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-            Student Table
-        </button>
-        <button id="tab-teacher-table"
-            class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-            Teacher Table
-        </button>
-    </nav>
+    <div class="flex justify-between items-center">
+        <!-- Tabs -->
+        <nav class="flex space-x-4" aria-label="Tabs">
+            <!-- <button id="tab-dashboard"
+                class="tab-button border-indigo-500 text-indigo-600 dark:text-indigo-400 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                User Dashboard
+            </button> -->
+            <button id="tab-faculty"
+                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Add New Account
+            </button>
+            <button id="tab-student-table"
+                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Student Table
+            </button>
+            <button id="tab-teacher-table"
+                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Teacher Table
+            </button>
+        </nav>
+
+        <div class="flex items-center">
+            <input id="searchFaculty" type="text" placeholder="Search user"
+                class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        </div>
+
+    </div>
 </div>
+
 
 <!-- Tab Contents -->
 <div id="tab-content">
@@ -83,166 +89,100 @@
             </div>
         </div>
     </div> -->
-
-    <!-- Faculty Form -->
-    <div id="faculty-content" class="tab-panel hidden">
-        <form id="facultyForm" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-4xl mx-auto">
-            <h2 class="text-xl font-semibold mb-1 text-gray-800 dark:text-gray-100 text-center">Add New Faculty</h2>
-
-            <!-- Message container -->
-            <div id="facultyFormMessage" class="m-2 text-center  px-4 py-1 rounded"></div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-                <!-- Profile Picture Preview -->
-                <div class="col-span-1 flex flex-col items-center md:col-span-1">
-                    <label class="mb-2 text-gray-700 dark:text-gray-200">Profile Picture</label>
-                    <div class="w-32 h-32 mb-2">
-                        <img id="profilePreview" src="https://via.placeholder.com/150" alt="Profile Preview"
-                            class="w-full h-full object-cover rounded-full border border-gray-300">
-                    </div>
-                    <input type="file" name="profile_pic" id="profile_pic"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                </div>
-
-                <!-- Personal & Account Info -->
-                <div class="col-span-1 md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" name="firstname" placeholder="First Name"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                    <input type="text" name="lastname" placeholder="Last Name"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                    <input type="email" name="email" placeholder="Email"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                    <select name="department" class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                        <option value="">Select Department</option>
-                        <option value="CTE">CTE</option>
-                        <option value="CICS">CICS</option>
-                        <option value="ITE">ITE</option>
-                        <option value="SBC">SBC</option>
-                        <option value="BSMT">BSMT</option>
-                        <option value="CAHS">CAHS</option>
-                        <option value="CET">CET</option>
-                        <option value="SHS">SHS</option>
-                    </select>
-                    <input type="text" name="username" placeholder="Username / Student ID"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                    <input type="password" name="password" placeholder="Password"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                    <input type="password" name="confirm_password" placeholder="Confirm Password"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                    <select name="user_role" class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                        <option value="">Select User Access</option>
-                        <option value="librarian">Librarian</option>
-                        <option value="faculty">Faculty</option>
-                        <option value="student">Student</option>
-                    </select>
-                </div>
+    <div id="user-content"
+        class="tab-panel flex flex-col sm:flex-row gap-6 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+        <!-- LEFT: Profile Upload -->
+        <div
+            class="flex flex-col items-center justify-center w-full sm:w-[35%] border-r border-[#b03060]/40 dark:border-[#800000]/40 pr-4">
+            <div class="relative w-32 h-32 rounded-full overflow-hidden border border-[#b03060] dark:border-[#ff4d6d]">
+                <img id="profile-preview" src="../../assets/default-profile.png" alt="Profile Preview"
+                    class="w-full h-full object-cover">
             </div>
+            <label for="profile"
+                class="mt-3 cursor-pointer text-sm font-semibold text-[#b03060] dark:text-[#ff4d6d] hover:underline">
+                Upload Profile
+            </label>
+            <input type="file" name="profile" id="profile" accept="image/*" class="hidden" required>
+            <p class="mt-2 text-xs text-[#800000] dark:text-[#ffcccc]">JPG, PNG under 2MB</p>
+        </div>
+        <!-- RIGHT: Registration Form -->
+        <div class="flex-1">
+            <h3 class="text-2xl font-bold text-center mb-4 text-[#b03060] dark:text-[#ff4d6d]">
+                <i data-lucide="user-plus" class="inline-block w-4 h-4 mr-1 align-text-bottom"></i> Campus Registration
+            </h3>
 
-            <div class="mt-6 text-center">
+            <form id="register" class="space-y-4" enctype="multipart/form-data">
+                <!-- Role Selector -->
+                <div class="flex gap-6 justify-center mb-4">
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="role" value="student" class="accent-[#b03060]" checked> Student
+                    </label>
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="role" value="faculty" class="accent-[#b03060]"> Faculty
+                    </label>
+                </div>
+
+                <!-- Name Fields -->
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" name="firstname" placeholder="First Name" required
+                        class="input-field border  rounded-lg py-3 p-2">
+                    <input type="text" name="lastname" placeholder="Last Name" required
+                        class="input-field border rounded-lg py-3 p-2">
+                    <input type="text" name="middlename" placeholder="Middle Name"
+                        class="input-field border rounded-lg py-3 p-2">
+                    <input type="text" name="suffix" placeholder="Suffix (e.g. Jr., III)"
+                        class="input-field border rounded-lg py-3 p-2">
+                </div>
+
+                <!-- Department -->
+                <input type="text" name="department" placeholder="Department" required
+                    class="input-field border rounded-lg py-3 p-2 w-full">
+
+                <!-- Student Section -->
+                <div id="student-fields" class="space-y-3">
+                    <input type="text" name="student_id" placeholder="Student ID"
+                        class="input-field border rounded-lg py-3 p-2 w-full">
+                    <input type="text" name="course" placeholder="Course"
+                        class="input-field border rounded-lg py-3 p-2 w-full">
+                    <input type="text" name="section" placeholder="Section"
+                        class="input-field border rounded-lg py-3 p-2 w-full">
+                </div>
+
+                <!-- Faculty Section -->
+                <div id="faculty-fields" class="hidden space-y-3">
+                    <input type="text" name="employee_id" placeholder="Employee ID"
+                        class="input-field border rounded-lg py-3 p-2 w-full">
+                </div>
+
+                <!-- Email & Username -->
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="email" name="email" placeholder="Email" required
+                        class="input-field border rounded-lg py-3 p-2">
+                    <input type="text" name="username" placeholder="Username" required
+                        class="input-field border rounded-lg py-3 p-2">
+                </div>
+
+                <!-- Password -->
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="password" name="password" placeholder="Password" required
+                        class="input-field border rounded-lg py-3 p-2">
+                    <input type="password" name="confirm_password" placeholder="Confirm Password" required
+                        class="input-field border rounded-lg py-3 p-2">
+                </div>
+
+                <!-- Message -->
+                <p id="register-message" class="text-sm text-red-500 hidden"></p>
+
+                <!-- Buttons -->
                 <button type="submit"
-                    class="bg-indigo-500 text-white px-6 py-2 rounded-md hover:bg-indigo-600 transition duration-200">
-                    Add Faculty
+                    class="w-full bg-[#b03060] text-white font-semibold py-3 rounded-lg hover:bg-[#800000] transition transform hover:scale-[1.01]">
+                    Register Account
                 </button>
-            </div>
-        </form>
-
-
-        <script>
-            // Profile picture preview
-            document.getElementById('profile_pic').addEventListener('change', function (event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        document.getElementById('profilePreview').src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-        </script>
+            </form>
+        </div>
     </div>
 
-    <!-- Student Form -->
-    <div id="student-content" class="tab-panel hidden">
-        <form id="studentForm" class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg max-w-4xl mx-auto">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100 text-center">Add New Student</h2>
-            <div id="studentFormMessage" class="m-2 text-center  px-4 py-1 rounded"></div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
-                <!-- Profile Picture Preview -->
-                <div class="col-span-1 flex flex-col items-center md:col-span-1">
-                    <label class="mb-2 text-gray-700 dark:text-gray-200">Profile Picture</label>
-                    <div class="w-32 h-32 mb-2">
-                        <img id="studentProfilePreview" src="https://via.placeholder.com/150" alt="Profile Preview"
-                            class="w-full h-full object-cover rounded-full border border-gray-300">
-                    </div>
-                    <input type="file" name="profile_pic" id="studentProfilePic"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                </div>
-
-                <!-- Personal & Account Info -->
-                <div class="col-span-1 md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" name="firstname" placeholder="First Name"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                    <input type="text" name="lastname" placeholder="Last Name"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                    <input type="email" name="email" placeholder="Email"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                    <input type="text" name="username" placeholder="Username / Student ID"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                    <input type="password" name="password" placeholder="Password"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                    <input type="password" name="confirm_password" placeholder="Confirm Password"
-                        class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-
-                    <!-- Course / Program select dropdown -->
-                    <select name="course" class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                        <option value="">Select Course / Program</option>
-                        <option value="bsc_computer_science">BSc Computer Science</option>
-                        <option value="bsc_mathematics">BSc Mathematics</option>
-                        <option value="bsc_physics">BSc Physics</option>
-                        <option value="bsc_chemistry">BSc Chemistry</option>
-                        <option value="bsc_biology">BSc Biology</option>
-                    </select>
-
-                    <!-- Department select dropdown -->
-                    <select name="department" class="p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 w-full">
-                        <option value="">Select Department</option>
-                        <option value="CTE">CTE</option>
-                        <option value="CICS">CICS</option>
-                        <option value="ITE">ITE</option>
-                        <option value="SBC">SBC</option>
-                        <option value="BSMT">BSMT</option>
-                        <option value="CAHS">CAHS</option>
-                        <option value="CET">CET</option>
-                        <option value="SHS">SHS</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="mt-4 text-center">
-                <button type="submit" class="bg-emerald-500 text-white px-4 py-2 rounded-md hover:bg-emerald-600">
-                    Add Student
-                </button>
-            </div>
-        </form>
-
-
-        <!-- Optional message div -->
-
-        <script>
-            // Preview selected profile picture
-            document.getElementById('studentProfilePic').addEventListener('change', function (e) {
-                const reader = new FileReader();
-                reader.onload = function (event) {
-                    document.getElementById('studentProfilePreview').src = event.target.result;
-                };
-                if (this.files[0]) reader.readAsDataURL(this.files[0]);
-            });
-        </script>
-
-
-    </div>
 
     <!-- Student Table -->
     <div id="student-table-content" class="tab-panel hidden">
@@ -268,8 +208,6 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="studentTableBody">
-
-
             </tbody>
         </table>
     </div>
@@ -302,6 +240,211 @@
         </table>
     </div>
 
+    <!-- View info tab -->
+    <div id="view-content" class="tab-panel hidden">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-6xl mx-auto">
+            <!-- Back Button -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                    Profile Overview
+                </h2>
+                <button id="closeViewBtn"
+                    class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    Back
+                </button>
+            </div>
+
+            <!-- Grid Layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Left Column: Profile -->
+                <div
+                    class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
+
+                    <span id="viewStatus"
+                        class="mb-2 text-xs font-semibold bg-yellow-100 dark:bg-yellow-600 text-yellow-700 dark:text-yellow-200 px-2 py-0.5 rounded">
+                        Pending
+                    </span>
+
+                    <img id="viewProfilePic" src="" alt="Profile Picture"
+                        class="w-32 h-32 rounded-full object-cover border-4 border-indigo-500 shadow-md" />
+
+                    <h2 id="viewFullname" class="text-2xl font-bold mt-4 text-gray-900 dark:text-white">
+                        Loading...
+                    </h2>
+
+                    <p id="viewRole"
+                        class="text-xs uppercase tracking-wide text-indigo-600 dark:text-indigo-400 font-medium">
+                        Role
+                    </p>
+
+                    <div class="w-full mt-6 space-y-4 text-gray-700 dark:text-gray-300 text-left">
+
+                        <div>
+                            <label class="block text-xs uppercase font-semibold opacity-60">Email</label>
+                            <p id="viewEmail" class="text-sm break-words">Loading...</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs uppercase font-semibold opacity-60">Username</label>
+                            <p id="viewUsername" class="text-sm">Loading...</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs uppercase font-semibold opacity-60">Course</label>
+                            <p id="viewCourse" class="text-sm uppercase">N/A</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs uppercase font-semibold opacity-60">Department</label>
+                            <p id="viewDepartment" class="text-sm uppercase">N/A</p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Right Column: Recent Activity -->
+                <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+
+                    <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white mb-4">
+                        Recent Activity
+                    </h2>
+
+                    <div class="flex justify-between items-center mb-3">
+                        <h3
+                            class="text-sm font-semibold text-gray-600 dark:text-gray-300 border-b dark:border-gray-600 pb-1">
+                            Read Logs
+                        </h3>
+                    </div>
+
+                    <div id="book_logs"
+                        class="space-y-3 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
+
+                        <!-- Example Structure -->
+                        <!-- Dynamically inserted -->
+                        <!--
+            <div class="bg-indigo-50 dark:bg-gray-900 p-3 rounded-lg shadow flex items-center gap-3">
+                <img src="cover.jpg" class="w-10 h-14 rounded object-cover">
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">Book Title</p>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Read: 12 mins</span>
+                </div>
+            </div>
+            -->
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Edit info tab -->
+    <div id="edit-content" class="tab-panel hidden">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-6xl mx-auto w-full">
+
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                    Update User Information
+                </h2>
+                <button id="closeEditBtn"
+                    class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    Back
+                </button>
+            </div>
+
+            <form id="updateForm" enctype="multipart/form-data">
+
+                <input type="hidden" name="user_id" id="edit-user_id" value="" />
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Left: Profile -->
+                    <div class="flex flex-col items-center bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-md">
+                        <img id="editProfilePreview" src="../../assets/default-profile.png" alt="Profile Picture"
+                            class="w-36 h-36 rounded-full object-cover border-4 border-indigo-500 shadow-lg" />
+
+                        <label class="mt-4 text-sm font-medium text-gray-700 dark:text-gray-200">
+                            Update Profile Picture
+                        </label>
+                        <input type="file" name="profile_pic" id="edit-profile_pic"
+                            class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                    </div>
+
+
+                    <!-- Right: Form Fields -->
+                    <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-md space-y-4">
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">First
+                                Name</label>
+                            <input type="text" name="firstname" id="edit-firstname"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Last
+                                Name</label>
+                            <input type="text" name="lastname" id="edit-lastname"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Email</label>
+                            <input type="email" name="email" id="edit-email"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Username</label>
+                            <input type="text" name="username" id="edit-username"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Role</label>
+                            <select name="user_role" id="edit-user_role"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                <option value="student">Student</option>
+                                <option value="faculty">Faculty</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label
+                                class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Department</label>
+                            <input type="text" name="department" id="edit-department"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Course</label>
+                            <input type="text" name="course" id="edit-course"
+                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Save Button -->
+                <div class="text-end mt-6">
+                    <button type="submit"
+                        class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                        Save Changes
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+
+
 </div>
 
 <!-- jQuery Tab Script -->
@@ -310,193 +453,80 @@
         function activateTab(tabId, contentId) {
             $('.tab-panel').addClass('hidden');
             $('.tab-button').removeClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
-                .addClass('border-transparent text-gray-500 dark:text-gray-400');
+                .addClass('border-transparent  dark:text-gray-400');
+
             $(contentId).removeClass('hidden');
             $(tabId).addClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
-                .removeClass('border-transparent text-gray-500 dark:text-gray-400');
+                .removeClass('border-transparent  dark:text-gray-400');
         }
 
         // Initial tab
-        activateTab('#tab-faculty', '#faculty-content');
+        // activateTab('#tab-dashboard', '#dashboard-content');
+        activateTab('#tab-faculty', '#user-content');
+        $('#closeViewBtn').on('click', function () {
+            $('#view-content').addClass('hidden');
+            $('.tab-panel').removeClass('hidden');
+        });
 
-        // $('#tab-dashboard').click(function () { activateTab('#tab-dashboard', '#dashboard-content'); });
-        $('#tab-faculty').click(function () { activateTab('#tab-faculty', '#faculty-content'); });
-        $('#tab-student').click(function () { activateTab('#tab-student', '#student-content'); });
+        $('#closeEditBtn').on('click', function () {
+            $('#edit-content').addClass('hidden');
+            $('.tab-panel').removeClass('hidden');
+        });
+
+        $('#tab-dashboard').click(function () { activateTab('#tab-dashboard', '#dashboard-content'); });
+        $('#tab-faculty').click(function () { activateTab('#tab-faculty', '#user-content'); });
         $('#tab-student-table').click(function () { activateTab('#tab-student-table', '#student-table-content'); });
         $('#tab-teacher-table').click(function () { activateTab('#tab-teacher-table', '#teacher-table-content'); });
 
-
-        loadFaculty();
-        function loadFaculty() {
-            $.ajax({
-                url: `${base_url}auth/action.php?action=GetFaculty`,
-                type: "GET",
-                dataType: "json",
-                success: function (response) {
-                    if (response.status === 1) {
-                        const tbody = $("#teacherTableBody");
-                        tbody.empty();
-                        response.data.forEach((faculty, index) => {
-                            tbody.append(`
-                        <tr class="text-white" data-id="${faculty.user_id}">
-                            <td class="px-4 py-2">${index + 1}</td>
-                            <td class="px-4 py-2">${faculty.firstname} ${faculty.lastname}</td>
-                            <td class="px-4 py-2">${faculty.email}</td>
-                            <td class="px-4 py-2">${faculty.department}</td>
-                            <td class="px-2 py-2 text-center space-x-1">
-                                <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                            </td>
-                        </tr>
-                    `);
-                        });
-                    }
-                },
-                error: function (xhr) { console.error(xhr.responseText); }
-            });
-        }
-
-        /* FACULTY */
-        $("#facultyForm").on("submit", function (e) {
-            e.preventDefault();
-            const $form = $(this);
-            const faculty_details = {};
-            let filesProcessed = 0;
-            const fileInputs = $form.find("input[type=file]");
-            const totalFiles = fileInputs.length;
-
-            function sendIfReady() {
-                if (filesProcessed >= totalFiles) {
-                    // Send faculty_details as JSON
-                    $.ajax({
-                        url: `${base_url}auth/action.php?action=Regfaculty`,
-                        type: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify(faculty_details),
-                        dataType: "json",
-                        beforeSend: function () {
-                            $form.find("button[type=submit]").prop("disabled", true).text("Saving...");
-                            // Hide previous messages
-                            $("#facultyFormMessage").addClass("hidden").removeClass("bg-green-100 text-green-800 bg-red-100 text-red-800").text("");
-                        },
-                        success: function (response) {
-                            if (response.status === 1) {
-                                $("#facultyFormMessage")
-                                    .removeClass("hidden bg-red-100 text-red-800")
-                                    .addClass("bg-green-100 text-green-800")
-                                    .text(response.message || "Faculty added successfully!");
-
-                                // Reset form and preview image
-                                $form[0].reset();
-                                $("#profilePreview").attr("src", "https://via.placeholder.com/150");
-
-                                // Reload faculty table
-                                loadFaculty();
-
-                                // Optional redirect
-                                if (response.url) {
-                                    setTimeout(() => {
-                                        window.location.href = response.url;
-                                    }, 2000);
-                                }
-                            } else {
-                                $("#facultyFormMessage")
-                                    .removeClass("hidden bg-green-100 text-green-800")
-                                    .addClass("bg-red-100 text-red-800")
-                                    .text(response.message || "Error: Unable to add faculty.");
-                            }
-                        },
-                        error: function (xhr) {
-                            console.error("AJAX error:", xhr.responseText);
-                            $("#facultyFormMessage")
-                                .removeClass("hidden bg-green-100 text-green-800")
-                                .addClass("bg-red-100 text-red-800")
-                                .text("Error: Something went wrong. Check console for details.");
-                        },
-                        complete: function () {
-                            $form.find("button[type=submit]").prop("disabled", false).text("Add Faculty");
-                        }
-                    });
-                }
-            }
-
-            // Convert file inputs to Base64
-            fileInputs.each(function () {
-                const inputName = $(this).attr("name");
-                const file = this.files[0];
-
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        faculty_details[inputName] = e.target.result; // Base64 string
-                        filesProcessed++;
-                        sendIfReady();
-                    };
-                    reader.readAsDataURL(file); // Converts to Base64
-                } else {
-                    faculty_details[inputName] = null;
-                    filesProcessed++;
-                    sendIfReady();
-                }
-            });
-
-            // Handle non-file inputs
-            $form.find("input:not([type=file]), select").each(function () {
-                const name = $(this).attr("name");
-                if (!name) return;
-                faculty_details[name] = $(this).val().trim() || "";
-            });
-
-            // If no file inputs, send immediately
-            if (totalFiles === 0) {
-                filesProcessed = 1;
-                sendIfReady();
-            }
-
-            console.log("Faculty payload (Base64 image included):", faculty_details);
+        $("#searchFaculty").on("keyup", function () {
+            loadFaculty($(this).val());
         });
-
-        function loadFaculty() {
+        loadFaculty();
+        function loadFaculty(query = "") {
             $.ajax({
                 url: `${base_url}auth/action.php?action=GetFaculty`,
                 type: "GET",
                 dataType: "json",
                 success: function (response) {
                     if (response.status === 1) {
-                        const tbody = $("#teacherTableBody");
-                        tbody.empty();
-                        response.data.forEach((faculty, index) => {
-                            if (faculty.user_role == 'faculty') {
-                                tbody.append(`
-                                <tr class="text-white" data-id="${faculty.user_id}">
-                                    <td class="px-4 py-2">${index + 1}</td>
-                                    <td class="px-4 py-2">${faculty.firstname} ${faculty.lastname}</td>
-                                    <td class="px-4 py-2">${faculty.email}</td>
-                                    <td class="px-4 py-2">${faculty.department}</td>
-                                    <td class="px-2 py-2 text-center space-x-1">
-                                        <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                        <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                        <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                                    </td>
-                                </tr>
-                            `);
-                            } else {
-                                const tbody = $("#studentTableBody");
-                                tbody.append(`
-                                <tr class="text-white" data-id="${faculty.user_id}">
-                                    <td class="px-4 py-2">${index + 1}</td>
-                                    <td class="px-4 py-2">${faculty.firstname} ${faculty.lastname}</td>
-                                    <td class="px-4 py-2">${faculty.email}</td>
-                                    <td class="px-4 py-2">${faculty.department}</td>
-                                    <td class="px-2 py-2 text-center space-x-1">
-                                        <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                        <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                        <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                                    </td>
-                                </tr>
-                            `);
+
+                        const facultyTbody = $("#teacherTableBody");
+                        const studentTbody = $("#studentTableBody");
+
+                        // Clear tables once before appending
+                        facultyTbody.empty();
+                        studentTbody.empty();
+                        const q = query.toLowerCase();
+
+                        response.data.filter(user => {
+                            return (
+                                user.firstname.toLowerCase().includes(q) ||
+                                user.lastname.toLowerCase().includes(q) ||
+                                user.email.toLowerCase().includes(q) ||
+                                user.department.toLowerCase().includes(q) ||
+                                user.user_role.toLowerCase().includes(q)
+                            );
+                        }).forEach((user, index) => {
+                            const row = `
+                                    <tr class="text-indigo" data-id="${user.user_id}">
+                                        <td class="px-4 py-2">${index + 1}</td>
+                                        <td class="px-4 py-2">${user.firstname} ${user.lastname}</td>
+                                        <td class="px-4 py-2">${user.email}</td>
+                                        <td class="px-4 py-2">${user.department}</td>
+                                        <td class="px-2 py-2 text-center space-x-1">
+                                            <button id="view-btn-${user.user_id}" class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
+                                            <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
+                                            <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
+                                        </td>
+                                    </tr>
+                                `;
+
+                            if (user.user_role === 'faculty') {
+                                facultyTbody.append(row);
+                            } else if (user.user_role === 'student') {
+                                studentTbody.append(row);
                             }
+
                         });
                     }
                 },
@@ -506,102 +536,294 @@
             });
         }
 
-        /* FACULTY END */
+        $(document).on("click", ".view-btn, .edit-btn, .delete-btn", function () {
+            const tr = $(this).closest("tr");
+            const userId = tr.data("id");
 
-        /* STUDENT */
-        $("#studentForm").on("submit", function (e) {
-            e.preventDefault();
-            const $form = $(this);
-            const student_details = {};
-            let filesProcessed = 0;
-            const fileInputs = $form.find("input[type=file]");
-            const totalFiles = fileInputs.length;
+            if ($(this).hasClass("view-btn")) {
 
-            function sendIfReady() {
-                if (filesProcessed >= totalFiles) {
-                    // Send student_details as JSON
-                    $.ajax({
-                        url: `${base_url}auth/action.php?action=Regstudent`,
-                        type: "POST",
-                        contentType: "application/json",
-                        data: JSON.stringify(student_details),
-                        dataType: "json",
-                        beforeSend: function () {
-                            $form.find("button[type=submit]").prop("disabled", true).text("Saving...");
-                            $("#studentFormMessage").addClass("hidden")
-                                .removeClass("bg-green-100 text-green-800 bg-red-100 text-red-800")
-                                .text("");
-                        },
-                        success: function (response) {
-                            if (response.status === 1) {
-                                $("#studentFormMessage")
-                                    .removeClass("hidden bg-red-100 text-red-800")
-                                    .addClass("bg-green-100 text-green-800")
-                                    .text(response.message || "Student added successfully!");
+                activateTab(`#view-btn-${userId}`, `#view-content`);
+                $.ajax({
+                    url: `${base_url}auth/action.php?action=GetUser`,
+                    type: "POST",
+                    data: {
+                        action: 'GetFaculty',
+                        user_id: userId
+                    },
+                    dataType: "json",
 
-                                // Reset form and preview image
-                                $form[0].reset();
-                                $("#studentProfilePreview").attr("src", "https://via.placeholder.com/150");
+                    success: function (res) {
+                        if (res.status === 1) {
+                            $("#viewFullname").text(res.data.firstname + " " + res.data.lastname);
+                            $("#viewEmail").text(res.data.email);
+                            $("#viewUsername").text(res.data.username);
+                            $("#viewDepartment").text(res.data.department);
+                            $("#viewCourse").text(res.data.course);
+                            $("#viewRole").text(res.data.user_role);
+                            $("#viewStatus").text(res.data.account_status);
 
-                                loadFaculty();
-
+                            if (res.data.profile_pic) {
+                                $("#viewProfilePic").attr("src", base_url + "auth/" + res.data.profile_pic);
                             } else {
-                                $("#studentFormMessage")
-                                    .removeClass("hidden bg-green-100 text-green-800")
-                                    .addClass("bg-red-100 text-red-800")
-                                    .text(response.message || "Error: Unable to add student.");
+                                $("#viewProfilePic").attr("src", base_url + "../../assets/default-profile.png");
                             }
-                        },
-                        error: function (xhr) {
-                            console.error("AJAX error:", xhr.responseText);
-                            $("#studentFormMessage")
-                                .removeClass("hidden bg-green-100 text-green-800")
-                                .addClass("bg-red-100 text-red-800")
-                                .text("Error: Something went wrong. Check console for details.");
-                        },
-                        complete: function () {
-                            $form.find("button[type=submit]").prop("disabled", false).text("Add Student");
+                        } else {
+                            alert(res.message);
                         }
-                    });
-                }
+                        loadReadLogs(userId);
+                        loadFaculty();
+
+                    },
+                    error: function () { alert("Server error"); }
+                });
+
             }
+            else if ($(this).hasClass("edit-btn")) {
+                activateTab(`.tab-panel`, `#edit-content`);
 
-            // Convert file inputs to Base64
-            fileInputs.each(function () {
-                const inputName = $(this).attr("name");
-                const file = this.files[0];
+                $.ajax({
+                    url: `${base_url}auth/action.php?action=GetUser`,
+                    type: "POST",
+                    data: {
+                        user_id: userId,
+                        action: 'GetFaculty'
+                    },
+                    dataType: "json",
 
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        student_details[inputName] = e.target.result; // Base64 string
-                        filesProcessed++;
-                        sendIfReady();
-                    };
-                    reader.readAsDataURL(file); // Converts to Base64
-                } else {
-                    student_details[inputName] = null; // No file, set null
-                    filesProcessed++;
-                    sendIfReady();
-                }
-            });
+                    success: function (res) {
+                        if (res.status !== 1) {
+                            alert(res.message || "Failed to load user.");
+                            return;
+                        }
+                        // const form = $("#updateForm"); // new update form
 
-            // Handle non-file inputs
-            $form.find("input:not([type=file]), select").each(function () {
-                const name = $(this).attr("name");
-                if (!name) return;
-                student_details[name] = $(this).val().trim() || "";
-            });
+                        $("#edit-firstname").val(res.data.firstname);
+                        $("#edit-lastname").val(res.data.lastname);
+                        $("#edit-email").val(res.data.email);
+                        $("#edit-username").val(res.data.username);
+                        $("#edit-department").val(res.data.department);
+                        $("#edit-course").val(res.data.course);
+                        $("#edit-user_role").val(res.data.user_role);
+                        $("#edit-user_id").val(userId);
 
-            // If no file inputs, send immediately
-            if (totalFiles === 0) {
-                filesProcessed = 1; // No files to process
-                sendIfReady();
+                        // profile preview logic
+                        if (res.data.profile_pic) {
+                            $("#editProfilePreview").attr("src", base_url + "auth/" + res.data.profile_pic);
+                        } else {
+                            $("#editProfilePreview").attr("src", base_url + "../../assets/default-profile.png");
+                        }
+                    },
+                    error: function () {
+                        alert("Server error while loading user.");
+                    }
+                });
+
+            } else if ($(this).hasClass("delete-btn")) {
+                if (!confirm("Are you sure you want to delete this user?")) return;
+                $.ajax({
+                    url: `${base_url}auth/action.php?action=GetUser`,
+                    type: "POST",
+                    data: {
+                        action: 'DeleteUser',
+                        user_id: userId
+                    },
+                    dataType: "json",
+                    success: function (res) {
+                        if (res.status === 1) {
+                            alert(res.message);
+                            tr.remove();
+                            loadFaculty();
+
+                        } else alert(res.message);
+                        loadFaculty();
+                    },
+                    error: function () { alert("Server error"); }
+                });
             }
-
-            console.log("Student payload (Base64 image included):", student_details);
         });
-        /* END STUDENT */
+
+
+        function loadReadLogs(userId) {
+            $.ajax({
+                url: `${base_url}auth/action.php?action=recently_viewed`,
+                method: 'POST',
+                data: {
+                    action: 'recently_viewed',
+                    user_id: userId
+                },
+                dataType: 'json',
+                success: function (result) {
+                    const container = $("#book_logs");
+                    container.empty(); // Clear previous logs
+
+                    if (result.status === 1 && result.data.length > 0) {
+                        result.data.forEach(log => {
+                            const logItem = `
+                            <p class="text-sm text-gray-700 truncate w-50 dark:text-gray-300 border-b dark:border-gray-600 pb-2">
+                                ${log.book_title}
+                                <span class="float-right text-xs text-gray-500  dark:text-gray-400">
+                                    ${log.duration < 60 ? log.duration + 's ago' : log.duration < 3600 ? Math.floor(log.duration / 60) + ' min ago' : Math.floor(log.duration / 3600) + 'h ' + Math.floor((log.duration % 3600) / 60) + 'm ago'}
+                                </span>
+                            </p>
+                            `;
+                            container.append(logItem);
+                        });
+                    } else {
+                        container.append(`
+                    <p class="text-sm text-gray-700 dark:text-gray-300 italic mx-auto">No read logs found.</p>
+                `);
+                    }
+                },
+                error: function () {
+                    console.error("Failed to load read logs.");
+                }
+            });
+        }
+
+
+
+        const studentFields = $("#student-fields");
+        const facultyFields = $("#faculty-fields");
+        const profilePreview = $("#profile-preview");
+        const registerMessage = $("#register-message");
+
+        // Toggle student/faculty fields
+        $('input[name="role"]').change(function () {
+            if ($(this).val() === "student") {
+                studentFields.removeClass("hidden");
+                facultyFields.addClass("hidden");
+            } else {
+                facultyFields.removeClass("hidden");
+                studentFields.addClass("hidden");
+            }
+        });
+
+        // Profile preview
+        $("#profile").on('change', function () {
+            const file = this.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                profilePreview.attr("src", e.target.result);
+            }
+            reader.readAsDataURL(file);
+        });
+
+        // Register form submission
+        $("#register").submit(function (e) {
+            e.preventDefault();
+
+            const role = $('input[name="role"]:checked').val();
+            const formData = {
+                role: role,
+                firstname: $("input[name='firstname']").val(),
+                lastname: $("input[name='lastname']").val(),
+                middlename: $("input[name='middlename']").val(),
+                suffix: $("input[name='suffix']").val(),
+                department: $("input[name='department']").val(),
+                course: $("input[name='course']").val(),
+                section: $("input[name='section']").val(),
+                email: $("input[name='email']").val(),
+                username: $("input[name='username']").val(),
+                password: $("input[name='password']").val(),
+                confirm_password: $("input[name='confirm_password']").val(),
+                profile_pic: ""
+            };
+
+            // Add role-specific fields
+            if (role === "student") {
+                formData.student_id = $("input[name='student_id']").val();
+                formData.section = $("input[name='section']").val();
+            } else {
+                formData.employee_id = $("input[name='employee_id']").val();
+            }
+
+            // Password confirmation check
+            if (formData.password !== formData.confirm_password) {
+                registerMessage.text("Passwords do not match")
+                    .removeClass("hidden text-green-500")
+                    .addClass("text-red-500");
+                return;
+            }
+
+            // Convert profile image to Base64 if selected
+            const fileInput = $('#profile')[0].files[0];
+            if (fileInput) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    formData.profile_pic = e.target.result;
+                    sendAjax(formData);
+                }
+                reader.readAsDataURL(fileInput);
+            } else {
+                sendAjax(formData);
+            }
+
+        });
+
+        function sendAjax(data) {
+            $.ajax({
+                url: `${base_url}auth/action.php?action=register_user`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                dataType: 'json',
+                success: function (result) {
+                    registerMessage.text(result.message).removeClass("hidden");
+                    if (result.status === 1) {
+                        registerMessage.removeClass("text-red-500").addClass("text-green-500");
+                        $("#register")[0].reset();
+                        profilePreview.attr("src", "../../assets/default-profile.png");
+                        studentFields.removeClass("hidden");
+                        facultyFields.addClass("hidden");
+                    } else {
+                        registerMessage.removeClass("text-green-500").addClass("text-red-500");
+                    }
+                    loadFaculty();
+                },
+                error: function () {
+                    registerMessage.text("An error occurred. Please try again.")
+                        .removeClass("hidden text-green-500")
+                        .addClass("text-red-500");
+                }
+            });
+        }
+
+        $("#edit-profile_pic").on("change", function () {
+            const file = this.files[0];
+            if (!file) return;
+
+            $("#editProfilePreview").attr("src", URL.createObjectURL(file));
+        });
+
+        $("#updateForm").on("submit", function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            $.ajax({
+                url: `${base_url}auth/action.php?action=updateUser`,
+                type: "POST",
+                data: formData,
+                contentType: false,
+                processData: false,
+                dataType: "json",
+                success: function (res) {
+                    if (res.status === 1) {
+                        alert("Updated successfully.");
+                        loadFaculty(); // refresh table
+                    } else {
+                        alert(res.message || "Update failed.");
+                    }
+                },
+                error: function (xhr) {
+                    console.error(xhr.responseText);
+                    alert("Server error while updating.");
+                }
+            });
+        });
+
+
 
     });
 </script>

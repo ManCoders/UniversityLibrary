@@ -255,64 +255,89 @@
             </div>
 
             <!-- Grid Layout -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
                 <!-- Left Column: Profile -->
-                <div class="flex flex-col items-center bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-md">
+                <div
+                    class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
+
+                    <span id="viewStatus"
+                        class="mb-2 text-xs font-semibold bg-yellow-100 dark:bg-yellow-600 text-yellow-700 dark:text-yellow-200 px-2 py-0.5 rounded">
+                        Pending
+                    </span>
+
                     <img id="viewProfilePic" src="" alt="Profile Picture"
-                        class="w-36 h-36 rounded-full object-cover border-4 border-indigo-500 shadow-lg" />
-                    <h2 id="viewFullname" class="text-2xl font-semibold mt-4 text-gray-800 dark:text-gray-100">
-                        Manuel Daligdig
+                        class="w-32 h-32 rounded-full object-cover border-4 border-indigo-500 shadow-md" />
+
+                    <h2 id="viewFullname" class="text-2xl font-bold mt-4 text-gray-900 dark:text-white">
+                        Loading...
                     </h2>
+
                     <p id="viewRole"
-                        class="text-sm font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">
-                        Student
+                        class="text-xs uppercase tracking-wide text-indigo-600 dark:text-indigo-400 font-medium">
+                        Role
                     </p>
 
-                    <div class="w-full mt-6 space-y-3 text-gray-700 dark:text-gray-200 text-left">
+                    <div class="w-full mt-6 space-y-4 text-gray-700 dark:text-gray-300 text-left">
+
                         <div>
-                            <label class="font-semibold block text-sm text-gray-500 dark:text-gray-400">Email</label>
-                            <p id="viewEmail" class="text-base break-all">
-                                daligdig.manuel19@gmail.com
-                            </p>
+                            <label class="block text-xs uppercase font-semibold opacity-60">Email</label>
+                            <p id="viewEmail" class="text-sm break-words">Loading...</p>
                         </div>
+
                         <div>
-                            <label class="font-semibold block text-sm text-gray-500 dark:text-gray-400">Username</label>
-                            <p id="viewUsername" class="text-base">manuel</p>
+                            <label class="block text-xs uppercase font-semibold opacity-60">Username</label>
+                            <p id="viewUsername" class="text-sm">Loading...</p>
                         </div>
+
                         <div>
-                            <label class="font-semibold block text-sm text-gray-500 dark:text-gray-400">Course</label>
-                            <p id="viewCourse" class="text-base uppercase">BSC Physics</p>
+                            <label class="block text-xs uppercase font-semibold opacity-60">Course</label>
+                            <p id="viewCourse" class="text-sm uppercase">N/A</p>
                         </div>
+
                         <div>
-                            <label
-                                class="font-semibold block text-sm text-gray-500 dark:text-gray-400">Department</label>
-                            <p id="viewDepartment" class="text-base uppercase">CICS</p>
+                            <label class="block text-xs uppercase font-semibold opacity-60">Department</label>
+                            <p id="viewDepartment" class="text-sm uppercase">N/A</p>
                         </div>
+
                     </div>
                 </div>
 
-                <!-- Right Column: Activities -->
-                <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-md">
+                <!-- Right Column: Recent Activity -->
+                <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
 
-                    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 text-center mb-2">
+                    <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white mb-4">
                         Recent Activity
                     </h2>
 
-                    <!-- Read Logs Section -->
-                    <div class="mb-2">
+                    <div class="flex justify-between items-center mb-3">
                         <h3
-                            class="text-md text-end font-semibold text-gray-700 dark:text-gray-200 mb-3 border-b dark:border-gray-600 pb-1">
+                            class="text-sm font-semibold text-gray-600 dark:text-gray-300 border-b dark:border-gray-600 pb-1">
                             Read Logs
                         </h3>
+                    </div>
 
-                        <div id="book_logs" class="space-y-3  h-64 overflow-y-auto">
-                            <!-- Logs will be injected here via JS -->
-                        </div>
+                    <div id="book_logs"
+                        class="space-y-3 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
+
+                        <!-- Example Structure -->
+                        <!-- Dynamically inserted -->
+                        <!--
+            <div class="bg-indigo-50 dark:bg-gray-900 p-3 rounded-lg shadow flex items-center gap-3">
+                <img src="cover.jpg" class="w-10 h-14 rounded object-cover">
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">Book Title</p>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">Read: 12 mins</span>
+                </div>
+            </div>
+            -->
+
                     </div>
 
                 </div>
 
             </div>
+
         </div>
     </div>
 
@@ -535,6 +560,7 @@
                             $("#viewDepartment").text(res.data.department);
                             $("#viewCourse").text(res.data.course);
                             $("#viewRole").text(res.data.user_role);
+                            $("#viewStatus").text(res.data.account_status);
 
                             if (res.data.profile_pic) {
                                 $("#viewProfilePic").attr("src", base_url + "auth/" + res.data.profile_pic);

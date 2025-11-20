@@ -106,15 +106,25 @@ switch ($action) {
     case 'retrieveLogs':
         echo $crud->usercrude();
         break;
+    case 'account_status':
+        echo $crud->usercrude();
+        break;
+    case 'getDashboardStats':
+        echo $crud->getDashboardStats();
+        break;
     case 'recently_viewed':
         echo $crud->usercrude();
         break;
+    /* case 'updateProfile':
+        echo $crud->usercrude();
+        break; */
     case 'updateUser':
         echo $crud->updatedetails();
         break;
     case 'get_activity_log':
         echo $crud->get_activity_log();
         break;
+    
     default:
         echo json_encode(['status' => 0, 'message' => 'Invalid or missing action.']);
         break;

@@ -124,36 +124,6 @@ $(document).ready(function () {
     }
   });
 
-  // --- GLOBAL STATE ---
-  let userState = {
-    isLoggedIn: false,
-    username: "guest",
-    lastname: "Guest",
-    firstname: "Guest",
-    middlename: "Guest",
-    suffix: "Guest",
-    user_id: "N/A",
-    student_id: "N/A",
-    employee_id: "N/A",
-    email: "N/A",
-    department: "N/A",
-    role: "N/A",
-    profilePic: null,
-    library_id: "N/A",
-  };
-  const savedState = localStorage.getItem("userState");
-  if (savedState) {
-    try {
-      const parsedState = JSON.parse(savedState);
-      if (parsedState.isLoggedIn) {
-        userState = parsedState;
-      }
-    } catch (e) {
-      console.error("Failed to parse saved user state:", e);
-      localStorage.removeItem("userState");
-    }
-  }
-
   if (typeof lucide !== "undefined" && lucide.createIcons) {
     lucide.createIcons();
   }
@@ -208,7 +178,27 @@ $(document).ready(function () {
       .addClass("bg-indigo-100 dark:bg-indigo-900 border-indigo-500")
       .removeClass("border-gray-300 dark:border-gray-600");
   });
+  // ==========================
+  // Global Variables & Setup
+  // ==========================
+  const loginModal = $("#login-modal");
+  const profileBtn = $("#profile-btn");
+  const signInBtn = $("#auth-sign-in-btn");
+  const profileDropdown = $("#profile-dropdown");
+  const allNavLinks = $(".nav-link");
+  const allViewSections = $(".view-section");
+  const $spinner = $("#upload-spinner");
+  const $loginMessage = $("#login-message");
 
+  // Global userState
+  const userState = JSON.parse(
+    sessionStorage.getItem("loggedIn") || JSON.stringify({ isLoggedIn: false })
+  );
+  sessionStorage.setItem("loggedIn", JSON.stringify(userState));
+
+  // ==========================
+  // Helper Functions
+  // ==========================
   function toggleModal(modal, show) {
     if (show) {
       modal.removeClass("hidden").addClass("flex");
@@ -221,62 +211,24 @@ $(document).ready(function () {
     }
   }
 
-  // 4. User Authentication & Profile Logic
-  const loginModal = $("#login-modal");
-  const profileBtn = $("#profile-btn");
-  const signInBtn = $("#auth-sign-in-btn");
-  const profileDropdown = $("#profile-dropdown");
-  const allNavLinks = $(".nav-link");
-  const allViewSections = $(".view-section");
+  function showMessage(message, type = "gray") {
+    $loginMessage
+      .removeClass("text-gray-500 text-green-500 text-red-500")
+      .addClass(`text-${type}-500`)
+      .text(message)
+      .show();
+  }
 
-  /**
-   * Updates the header UI based on the login state.
-   */
   function updateHeaderUI() {
     if (userState.isLoggedIn) {
       signInBtn.addClass("hidden");
       profileBtn.removeClass("hidden");
-      const usernameText = `User: ${userState.username}`;
-      $("#profile-username").text(usernameText);
-      $("#profile-picture")
-        .attr("src", `${base_url}auth/${userState.profilePic}`)
-        .on("error", function () {
-          $(this).attr(
-            "src",
-            "https://ui-avatars.com/api/?name=Guest&background=4F46E5&color=fff"
-          );
-        });
-
-      $("#profile-view-username").val(userState.username); // Update profile view name
-      $("#edit-firstname").val(userState.firstname || "");
-      $("#edit-lastname").val(userState.lastname || "");
-      $("#edit-middlename").val(userState.middlename || "");
-      $("#edit-suffix").val(userState.suffix || "");
-
-      $("#profile-department").val(userState.department);
-      $("#profile-role").text(userState.role);
-      $("#profile-status").val(userState.isLoggedIn ? "Active" : "Inactive");
-      $("#profile-library_id").val(
-        userState.library_id || userState.library_id || "N/A"
-      );
-      $("#profile-email").val(userState.email);
-      // Use a mock ID or a real one if the backend provided it
-      $("#profile-view-id").text(
-        userState.user_id ||
-          (userState.username === "admin" ? "U142-993-A" : "T200-111-B")
-      );
-      $("#profile-role").text(userState.role || "Student"); // Update role from state
-
-      // Re-render user icon (in case it wasn't rendered on load)
-      if (typeof lucide !== "undefined" && lucide.createIcons) {
-        lucide.createIcons();
-      }
+      lucide?.createIcons?.();
     } else {
       signInBtn.removeClass("hidden");
       profileBtn.addClass("hidden");
-      profileDropdown.addClass("hidden"); // Ensure dropdown is closed on logout
+      profileDropdown.addClass("hidden");
       profileBtn.attr("aria-expanded", "false");
-      // Ensure we are back on the home view on logout
       showView("home");
     }
   }
@@ -299,24 +251,22 @@ $(document).ready(function () {
         );
     });
 
-    // Close profile dropdown if view was changed from there
     toggleProfileDropdown(false);
   }
 
   function toggleProfileDropdown(show) {
     const isVisible = profileDropdown.hasClass("hidden");
-    show = show === undefined ? isVisible : show; // Toggle if no argument provided
+    show = show === undefined ? isVisible : show;
 
-    if (show) {
-      profileDropdown.removeClass("hidden");
-      profileBtn.attr("aria-expanded", "true");
-    } else {
-      profileDropdown.addClass("hidden");
-      profileBtn.attr("aria-expanded", "false");
-    }
+    profileDropdown.toggleClass("hidden", !show);
+    profileBtn.attr("aria-expanded", show);
   }
 
+  // ==========================
+  // Event Handlers
+  // ==========================
   profileBtn.on("click", () => toggleProfileDropdown());
+
   $(document).on("click", function (e) {
     if (
       userState.isLoggedIn &&
@@ -327,8 +277,7 @@ $(document).ready(function () {
   });
 
   allNavLinks.on("click", function () {
-    const viewId = $(this).data("view");
-    showView(viewId);
+    showView($(this).data("view"));
   });
 
   $("[data-view-target]").on("click", (e) => {
@@ -348,189 +297,102 @@ $(document).ready(function () {
     }
   });
 
+  // ==========================
+  // Login Form
+  // ==========================
   $("#login").on("submit", function (e) {
     e.preventDefault();
-    const $form = $(this);
-    const $submitButton = $form.find("button[type=submit]");
-    const $message = $("#login-message");
 
-    // ✅ FIXED SELECTORS
-    const username = $("#username-input").val();
-    const password = $("#password-input").val();
+    const username = $("#username-input").val().trim();
+    const password = $("#password-input").val().trim();
 
-    if (!username || !password) {
-      $message
-        .removeClass("hidden text-green-500 text-gray-500")
-        .addClass("text-red-500")
-        .text("Please enter both username and password.")
-        .show();
-      return;
-    }
+    if (!username || !password)
+      return showMessage("Please enter both username and password.", "red");
+
+    const $btn = $(this).find("button[type=submit]");
+    $("#upload-spinner").removeClass("hidden").show();
+    $btn.prop("disabled", true).text("Logging in...");
+    showMessage("Authenticating...", "gray");
 
     $.ajax({
-      url: `${base_url}auth/action.php?action=login`, // Using base_url
-      type: "POST",
-      data: { username: username, password: password },
+      url: `${base_url}auth/action.php?action=login`,
+      method: "POST",
+      data: { username, password },
       dataType: "json",
+    })
+      .done((res) => {
+        if (res.status === 1) {
+          userState.isLoggedIn = true;
+          userState.user = res.user_data || {};
+          sessionStorage.setItem("loggedIn", JSON.stringify(userState));
 
-      beforeSend: function () {
-        // ✅ FIXED SELECTOR
-        $("#login-form button[type=submit]")
-          .prop("disabled", true)
-          .text("Logging in...");
-        $message
-          .removeClass("hidden text-red-500 text-green-500")
-          .addClass("text-gray-500")
-          .text("Authenticating...")
-          .show();
-      },
+          showMessage(res.message || "Login successful!", "green");
 
-      success: function (res) {
-        try {
-          if (typeof res === "string") res = JSON.parse(res);
-
-          if (res.status === 1) {
-            const userData = res.user_data || {};
-
-            userState.isLoggedIn = true;
-            userState.library_id = userData.library_id || null;
-            userState.username = res.user_name || userData.username || username;
-            userState.email = userData.email || "student";
-            userState.student_id = userData.student_id || "N/A";
-            userState.employee_id = userData.employee_id || "N/A";
-            userState.lastname = userData.lastname || "N/A";
-            userState.firstname = userData.firstname || "N/A";
-            userState.middlename = userData.middlename || "N/A";
-            userState.suffix = userData.suffix || "N/A";
-            userState.department = userData.department || "N/A";
-            userState.role = userData.user_role || "student";
-            userState.profilePic = userData.profile_pic || null;
-            userState.user_id = res.user_id || null;
-            console.log("Login successful:", res.user_data.user_id);
-            $message
-              .removeClass("text-gray-500 text-red-500")
-              .addClass("text-green-500")
-              .text(res.message || "Login successful!")
-              .show();
-            console.log(userState);
-            // ✅ Save user data locally
-            localStorage.setItem("userState", JSON.stringify(userState));
-
-            // ✅ Determine role-based redirection
-            const role = userState.role.toLowerCase();
-            if (role === "admin" && res.redirect_url) {
-              setTimeout(() => {
-                window.location.href = res.redirect_url; // e.g. src/admin/
-              }, 1000);
-              return;
-            }
-
-            if (role === "faculty" && res.redirect_url) {
-              setTimeout(() => {
-                window.location.href = res.redirect_url; // e.g. src/faculty/
-              }, 1000);
-              return;
-            }
-
-            // 👨‍🎓 Student stays on SPA
-            updateHeaderUI();
-            showView("home");
-
-            // ✅ Close login modal after delay
+          if (res.redirect_url) {
             setTimeout(() => {
-              toggleModal(loginModal, false);
-              $message.hide().text("");
-            }, 1500);
-          } else {
-            userState.isLoggedIn = false;
-            $message
-              .removeClass("text-gray-500 text-green-500")
-              .addClass("text-red-500")
-              .text(res.message || "Login failed. Invalid credentials.")
-              .show();
-            localStorage.removeItem("userState");
+              window.location.href = res.redirect_url;
+            }, 600);
+            return;
           }
-        } catch (err) {
-          console.error("JSON parse error:", err, res);
-          $message
-            .removeClass("text-gray-500 text-green-500")
-            .addClass("text-red-500")
-            .text("Unexpected server response. Please try again.")
-            .show();
+
+          updateHeaderUI();
+          showView("home");
+          toggleModal(loginModal, false);
+        } else {
+          showMessage(res.message || "Invalid credentials.", "red");
         }
-      },
-
-      error: function (xhr, status, error) {
-        console.error("Login AJAX error:", error);
-        $message
-          .removeClass("text-gray-500 text-green-500")
-          .addClass("text-red-500")
-          .text("Network error. Please try again later.")
-          .show();
-      },
-
-      complete: function () {
-        // ✅ FIXED SELECTOR
-        $("#login-form button[type=submit]")
-          .prop("disabled", false)
-          .text("Sign In");
-      },
-    });
+      })
+      .fail(() => {
+        showMessage("Server error. Try again later.", "red");
+      })
+      .always(() => {
+        $("#upload-spinner").hide();
+        $btn.prop("disabled", false).text("Sign In");
+      });
   });
 
+  // ==========================
+  // Logout
+  // ==========================
   $("body").on("click", "#logout", function (e) {
     e.preventDefault();
+    const $btn = $(this);
+    $("#upload-spinner").removeClass("hidden").hide();
+    $btn.text("Logging out...");
 
-    const $this = $(this);
+    $.post(
+      `${base_url}auth/action.php?action=logout`,
+      function (res) {
+        userState.isLoggedIn = false;
+        userState.user = {};
+        sessionStorage.setItem("loggedIn", JSON.stringify(userState));
 
-    $.ajax({
-      url: base_url + "auth/action.php?action=logout",
-      method: "POST",
-      dataType: "json",
-      beforeSend: function () {
-        $this.text("Logging out...");
-      },
-      success: function (response) {
-        // Always clear frontend session
-        localStorage.removeItem("userState");
-        userState = {
-          isLoggedIn: false,
-          username: null,
-          role: null,
-          profilePic: null,
-          user_id: null,
-        };
-
-        const role = (response.user_role || "").toLowerCase();
-
-        if (response.status == 1) {
-          // 🧠 Redirect admin/faculty to index.php
-          if (role === "admin" || role === "faculty") {
-            console.log(`${role} logged out — returning to index...`);
-            setTimeout(() => {
-              window.location.href = base_url + "./index.php";
-            }, 400);
+        if (res.status == 1) {
+          if (
+            ["admin", "faculty"].includes((res.user_role || "").toLowerCase())
+          ) {
+            window.location.href = res.redirect_url; // direct redirect
           } else {
             updateHeaderUI();
             showView("home");
-            setTimeout(() => location.reload(), 500);
+            window.location.href = res.redirect_url;
           }
         } else {
-          console.warn("Logout failed:", response.message);
+          console.warn("Logout failed:", res.message);
         }
       },
-      error: function (xhr, status, err) {
-        console.error("AJAX logout error:", err);
-      },
-      complete: function () {
-        $this.text("Loging out...");
-        setTimeout(() => {
-          window.location.href = base_url + "./index.php";
-        }, 400);
-      },
-    });
+      "json"
+    )
+      .fail((err) => console.error("AJAX logout error:", err))
+      .always(() => {
+        $("#upload-spinner").removeClass("hidden").hide();
+        $btn.text("Log Out");
+      });
   });
 
+  // ==========================
+  // Initial UI Setup
+  // ==========================
   updateHeaderUI();
   showView("home");
 
@@ -781,4 +643,5 @@ $(document).ready(function () {
       },
     });
   });
+  
 });

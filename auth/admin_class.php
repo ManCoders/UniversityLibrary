@@ -55,22 +55,63 @@ class Action
         ]);
     } */
 
+
+    function base_url()
+    {
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+        $host = $_SERVER['HTTP_HOST']; // Detects local or live automatically
+
+        return "$protocol://$host/UniversityLibrary/";
+    }
+
     function logout()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
-        // ✅ Capture user role before destroying the session
-        $role = isset($_SESSION['user_role']) ? strtolower($_SESSION['user_role']) : 'student';
+        $base = $this->base_url();
+        $role = null;
+        $library_id = null;
+        $table = null;
+        $log_message = null;
 
-        $this->users_logs('User logged out successfully.');
-        // ✅ Clear all session data
+        // Determine user role + IDs
+        if (!empty($_SESSION['admin'])) {
+            $role = 'admin';
+            $table = 'admin';
+            $library_id = $_SESSION['admin']['admin_id'] ?? null;
+            $log_message = "Admin logged out successfully.";
+        } elseif (!empty($_SESSION['faculty'])) {
+            $role = 'faculty';
+            $table = 'user';
+            $library_id = $_SESSION['faculty']['user_id'] ?? null;
+            $log_message = "Faculty logged out successfully.";
+        } elseif (!empty($_SESSION['student'])) {
+            $role = 'student';
+            $table = 'user';
+            $library_id = $_SESSION['student']['user_id'] ?? null;
+            $log_message = "Student logged out successfully.";
+        } else {
+            return json_encode([
+                'status' => 0,
+                'message' => 'User not logged in',
+                'redirect_url' => $base . 'index.php'
+            ]);
+        }
+
+        // Mark user offline
+        $stmt = $this->db->prepare("UPDATE {$table} SET is_logged_in = 0 WHERE {$table}_id = ?");
+        $stmt->execute([$library_id]);
+
+        // Log activity
+        $this->users_logs($log_message);
+
+        // Destroy session + cookies
         $_SESSION = [];
         session_unset();
         session_destroy();
 
-        // ✅ Remove session cookie safely
         if (ini_get("session.use_cookies")) {
             $params = session_get_cookie_params();
             setcookie(
@@ -84,14 +125,17 @@ class Action
             );
         }
 
-        // ✅ Return structured JSON for frontend handling
         return json_encode([
             'status' => 1,
             'user_role' => $role,
             'message' => 'Logged out successfully.',
-            'redirect_url' => '../../'
+            'redirect_url' => $base . 'index.php'
         ]);
     }
+
+
+
+
 
     function check_login()
     {
@@ -124,6 +168,9 @@ class Action
             $stmt = $this->db->prepare("INSERT INTO user_logs (user_id, activity) VALUES (?, ?)");
             $stmt->execute([$user_id, $logs]);
 
+            $stmt = $this->db->prepare("UPDATE user SET is_logged_in = 1, WHERE user_id =");
+            $stmt->execute([$user_id]);
+
             return json_encode([
                 'status' => 1,
                 'message' => 'User activity logged successfully',
@@ -141,6 +188,7 @@ class Action
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
+            session_regenerate_id();
         }
 
         $username = trim($_POST['username'] ?? '');
@@ -165,6 +213,8 @@ class Action
                 $auth = json_decode($admin['authentication_data'], true);
                 $per = json_decode($admin['personal_details'], true);
                 if (password_verify($password, $auth['password'] ?? '')) {
+
+
                     $_SESSION['admin'] = [
                         'firstname' => $per['firstname'] ?? '',
                         'middlename' => $per['middlename'] ?? '',
@@ -177,7 +227,10 @@ class Action
                         'created_date' => $admin['created_date'] ?? '',
                         'profile_pic' => $per['admin_profile_pic'] ?? null  // <-- added profile pic
                     ];
-                    $this->users_logs('Admin logged in successfully.');
+                    $stmt = $this->db->prepare("UPDATE admin SET is_logged_in = 1 WHERE admin_id = ?");
+                    if ($stmt->execute([$admin['admin_id']])) {
+                        $this->users_logs("Admin logged in successfully.");
+                    }
                     return json_encode([
                         'status' => 1,
                         'message' => 'Admin login successful',
@@ -187,6 +240,9 @@ class Action
                 }
                 return json_encode(['status' => 0, 'message' => 'Incorrect password.']);
             }
+
+
+
 
             $stmt = $this->db->prepare("
             SELECT * FROM user 
@@ -203,22 +259,47 @@ class Action
                 return json_encode(['status' => 0, 'message' => 'Incorrect username or password.']);
             }
 
+
             $auth = json_decode($user['authentication_data'], true);
             $person = json_decode($user['personal_details'], true);
+            $accountStatus = strtolower($auth['account_status'] ?? '');
+
+            if ($accountStatus !== 'approved') {
+                switch ($accountStatus) {
+                    case 'declined':
+                        return json_encode([
+                            'status' => 0,
+                            'message' => 'Account has been declined.'
+                        ]);
+                    case 'pending':
+                    default:
+                        return json_encode([
+                            'status' => 0,
+                            'message' => 'Account is pending approval.'
+                        ]);
+                }
+            }
+
 
             if (!password_verify($password, $auth['password'] ?? '')) {
                 return json_encode(['status' => 0, 'message' => 'Incorrect username or password.']);
             }
 
+
+
             $role = strtolower($auth['user_role'] ?? '');
-            $validRoles = ['faculty', 'student'];
+            $validRoles = ['faculty', 'student', 'admin'];
 
             if (!in_array($role, $validRoles)) {
+
                 return json_encode(['status' => 4, 'message' => 'User role not permitted.']);
             }
+            $completename = trim(($person['firstname'] ?? '') . (' ' . $person['middlename'][1] ?? '') . ' ' . ($person['lastname'] ?? ''));
+
 
             // ✅ Common session data
             $sessionData = [
+                'completename' => $completename,
                 'firstname' => $person['firstname'] ?? '',
                 'middlename' => $person['middlename'] ?? '',
                 'lastname' => $person['lastname'] ?? '',
@@ -241,15 +322,16 @@ class Action
             $_SESSION[$role] = $sessionData;
 
             // Determine redirect path
-            $redirect = ($role === 'faculty') ? './' : './';
+            $redirect = ($role === 'faculty') ? 'src/faculty/index.php' : './';
 
-            $_SESSION['user'] = [
+            /* $_SESSION['user'] = [
                 'role' => $role,
                 'user_id' => $user['user_id'] ?? null
-            ];
-            $completename = trim(($person['firstname'] ?? '') . ' ' . ($person['lastname'] ?? ''));
-
-            $this->users_logs("{$completename} logged in successfully.");
+            ]; */
+            $stmt = $this->db->prepare("UPDATE user SET is_logged_in = 1 WHERE user_id = ?");
+            if ($stmt->execute([$user['user_id']])) {
+                $this->users_logs("User logged in successfully.");
+            }
 
             return json_encode([
                 'status' => 1,
@@ -260,6 +342,7 @@ class Action
                 'student_id' => $person['student_id'] ?? null,
                 'section' => $person['section'] ?? null,
                 'employee_id' => $person['employee_id'] ?? null,
+                'account_status' => $auth['account_status'] ?? null,
                 'course' => $person['course'] ?? null,
                 'department' => $person['department'] ?? null,
                 'user_id' => $user['user_id'] ?? null,
@@ -459,6 +542,7 @@ class Action
             'username' => $data['username'],
             'password' => $hashed_password,
             'user_role' => $role,
+            'account_status' => 'Pending',
             'email' => $data['email']
         ]);
 
@@ -479,21 +563,21 @@ class Action
             // Fetch all faculty users
             $stmt = $this->db->prepare("
             SELECT 
-                user_id,
+                *,
                 JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.firstname')) AS firstname,
                 JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.lastname')) AS lastname,
                 JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.profile_pic')) AS profile_pic,
                 JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.department')) AS department,
                 JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) AS email,
                 JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.user_role')) AS user_role,
-                JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) AS username
+                JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) AS username,
+                JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.account_status')) AS account_status
             FROM user
             ORDER BY user_id DESC
         ");
             $stmt->execute();
             $faculties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $this->users_logs('Fetched user details successfully.');
             return json_encode([
                 'status' => 1,
                 'data' => $faculties
@@ -1844,7 +1928,7 @@ class Action
 
         try {
 
-            $userId = $_POST['user_id'] ?? $_SESSION['admin']['user_id'] ?? $_SESSION['student']['user_id'] ?? $_SESSION['faculty']['user_id'] ?? 0;
+            $userId = $_POST['user_id'] ?? $_SESSION['student']['user_id'] ?? $_SESSION['faculty']['user_id'] ?? 0;
             if ($userId <= 0) {
                 return json_encode(['status' => 0, 'message' => 'Invalid user ID.']);
             }
@@ -1912,7 +1996,7 @@ class Action
 
             // Update auth fields
             $auth['email'] = $_POST['email'] ?? ($auth['email'] ?? '');
-            $auth['role'] = $role;
+            $auth['account_status'] = $_POST['account_status'] ?? ($auth['account_status'] ?? '');
             $auth['username'] = $_POST['username'] ?? ($auth['username'] ?? '');
 
             // Save JSON back to DB
@@ -1928,6 +2012,7 @@ class Action
                 $userId
             ]);
 
+            $this->users_logs('User updated their details');
             return json_encode([
                 'status' => 1,
                 'message' => 'User updated successfully.',
@@ -1983,16 +2068,85 @@ class Action
                     $userId = $_POST['user_id'] ?? 0;
                     $stmt = $this->db->prepare("SELECT * FROM user WHERE user_id = ?");
                     $stmt->execute([$userId]);
-                    $data = $stmt->fetch(PDO::FETCH_ASSOC);
+                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                    if ($data) {
-                        return json_encode(['status' => 1, 'data' => $data]);
+                    if (!$row) {
+                        return json_encode(['status' => 0, 'message' => 'User not found.']);
+                    }
+
+                    $personal = json_decode($row['personal_details'], true) ?? [];
+                    $auth = json_decode($row['authentication_data'], true) ?? [];
+
+                    $data = array_merge($personal, $auth);
+
+                    return json_encode([
+                        'status' => 1,
+                        'data' => [
+                            'personal' => $personal,
+                            'auth' => $auth
+                        ]
+                    ]);
+                } catch (PDOException $e) {
+                    return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
+                }
+            case 'updateProfile':
+                try {
+                    $userId = $_POST['user_id'] ?? 0;
+
+                    $stmt = $this->db->prepare(
+                        "UPDATE user 
+                            SET authentication_data = JSON_SET(authentication_data, '$.account_status', 'Approved') 
+                            WHERE user_id = ?"
+                    );
+                    $stmt->execute([$userId]);
+
+                    if ($stmt->rowCount() > 0) {
+                        return json_encode(['status' => 1, 'message' => 'User approved successfully']);
                     } else {
-                        return json_encode(['status' => 0, 'message' => 'User not found']);
+                        return json_encode(['status' => 0, 'message' => 'User not found or already approved']);
                     }
                 } catch (PDOException $e) {
                     return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
                 }
+            case 'Approved':
+                try {
+                    $userId = $_POST['user_id'] ?? 0;
+
+                    $stmt = $this->db->prepare(
+                        "UPDATE user 
+                            SET authentication_data = JSON_SET(authentication_data, '$.account_status', 'Approved') 
+                            WHERE user_id = ?"
+                    );
+                    $stmt->execute([$userId]);
+
+                    if ($stmt->rowCount() > 0) {
+                        return json_encode(['status' => 1, 'message' => 'User approved successfully']);
+                    } else {
+                        return json_encode(['status' => 0, 'message' => 'User not found or already approved']);
+                    }
+                } catch (PDOException $e) {
+                    return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
+                }
+            case 'Declined':
+                try {
+                    $userId = $_POST['user_id'] ?? 0;
+
+                    $stmt = $this->db->prepare(
+                        "UPDATE user 
+                            SET authentication_data = JSON_SET(authentication_data, '$.account_status', 'Declined') 
+                            WHERE user_id = ?"
+                    );
+                    $stmt->execute([$userId]);
+
+                    if ($stmt->rowCount() > 0) {
+                        return json_encode(['status' => 1, 'message' => 'User Declined successfully']);
+                    } else {
+                        return json_encode(['status' => 0, 'message' => 'User not found or already Declined']);
+                    }
+                } catch (PDOException $e) {
+                    return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
+                }
+
             case 'retrieveLogs':
                 try {
                     $userId = $_POST['user_id'] ?? 0;
@@ -2033,7 +2187,6 @@ class Action
                         'message' => 'Error retrieving logs: ' . $e->getMessage()
                     ]);
                 }
-
             case 'DeleteUser':
                 try {
                     $userId = $_POST['user_id'] ?? 0;
@@ -2074,6 +2227,92 @@ class Action
             default:
                 return json_encode(['status' => 0, 'message' => 'Invalid action.']);
 
+        }
+    }
+
+    function getDashboardStats()
+    {
+        try {
+            // -------------------- Requests by Status --------------------
+            $totals = [];
+            $totals['pending'] = (int) $this->db
+                ->query("SELECT COUNT(*) FROM user WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.account_status')) = 'Pending'")
+                ->fetchColumn();
+
+            $totals['approved'] = (int) $this->db
+                ->query("SELECT COUNT(*) FROM user WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.account_status')) = 'Approved'")
+                ->fetchColumn();
+
+            $totals['declined'] = (int) $this->db
+                ->query("SELECT COUNT(*) FROM user WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.account_status')) = 'Declined'")
+                ->fetchColumn();
+
+            // -------------------- Active Users --------------------
+
+            // Admin ID / user ID of current session (for validation)
+            $user_id = $_SESSION['student']['user_id']
+                ?? $_SESSION['faculty']['user_id']
+                ?? $_SESSION['admin']['admin_id']
+                ?? null;
+
+            if (!isset($_SESSION['admin']) && !$user_id) {
+                return json_encode(['status' => 0, 'message' => 'User not logged in']);
+            }
+
+            // Count online users (students + faculty)
+            $stmtActiveUsers = $this->db->query("
+                SELECT COUNT(*) FROM user WHERE is_logged_in = 1
+            ");
+            $activeUsers = (int) $stmtActiveUsers->fetchColumn();
+
+            // Count online admins
+            $stmtActiveAdmins = $this->db->query("
+                SELECT COUNT(*) FROM admin WHERE is_logged_in = 1
+            ");
+            $activeAdmins = (int) $stmtActiveAdmins->fetchColumn();
+
+            // Total active users including admins
+            $totalActiveUsers = $activeUsers + $activeAdmins;
+
+            // Count offline users (students + faculty)
+            $stmtOfflineUsers = $this->db->query("
+                SELECT COUNT(*) FROM user WHERE is_logged_in = 0
+            ");
+            $offlineUsers = (int) $stmtOfflineUsers->fetchColumn();
+
+            // Count offline admins
+            $stmtOfflineAdmins = $this->db->query("
+                SELECT COUNT(*) FROM admin WHERE is_logged_in = 0
+            ");
+            $offlineAdmins = (int) $stmtOfflineAdmins->fetchColumn();
+
+            // Total offline users including admins
+            $totalOfflineUsers = $offlineUsers + $offlineAdmins;
+
+            // -------------------- Recent Activity --------------------
+            $stmt = $this->db->query("
+            SELECT activity AS message, DATE_FORMAT(log_time, '%Y-%m-%d %H:%i') AS time 
+            FROM user_logs 
+            ORDER BY log_time DESC 
+            LIMIT 10
+        ");
+            $recentActivity = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            return json_encode([
+                'status' => 1,
+                'stats' => [
+                    'requests' => $totals,
+                    'online' => $totalActiveUsers,
+                    'offline' => $totalOfflineUsers
+                ],
+                'recent' => $recentActivity
+            ]);
+
+        } catch (PDOException $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Database error: ' . $e->getMessage()
+            ]);
         }
     }
 

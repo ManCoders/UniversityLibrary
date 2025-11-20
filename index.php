@@ -98,7 +98,7 @@
 
                         <div
                             class="px-3 py-2 text-sm font-semibold border-b border-[#b03060] dark:border-[#990033] truncate">
-                            <span id="profile-username">User ID: guest</span>
+                            <span >User ID: <i id="profile-username">test</i></span>
                         </div>
 
                         <a href="#" id="dropdown-my-profile" data-view-target="profile"
@@ -227,7 +227,11 @@
 
                     <!-- Profile Picture -->
                     <div class="relative">
+                        <?php
+                        $profilePic = $_SESSION['student']['profile_pic'] ?? 'default.png';
+                        ?>
                         <img id="profile-picture" alt="Profile Picture"
+                            src="<?php echo base_url() . "auth/" . $profilePic; ?>"
                             class="w-32 h-32 rounded-full border-4 border-[#b03060] shadow-md object-cover">
 
                         <label for="profile-picture-input"
@@ -235,7 +239,7 @@
                             <i data-lucide="camera" class="w-4 h-4"></i>
                         </label>
 
-                        <input type="file" id="profile-picture-input" name="profile_pic" accept="image/*" class="hidden"
+                        <input type="file" id="profile-picture-input" name="profile_pic" class="hidden"
                             accept="image/*">
                     </div>
 
@@ -260,45 +264,43 @@
 
                         <p class="text-sm text-[#800000] dark:text-[#ffcccc] font-medium mt-2">
                             Role:
-                            <span id="profile-role" class="ml-1">Student</span>
+                            <span id="profile-role" class="ml-1"></span>
                         </p>
                     </div>
-
                 </div>
 
                 <!-- Profile Info Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[#660000] dark:text-[#ffd1d1]">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-[#660000] dark:text-[#ffd1d1] mt-4">
 
                     <div>
                         <label class="block mb-1 font-medium">Status</label>
                         <input type="text" name="status" id="profile-status"
-                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]"
-                            placeholder="Student / Faculty">
+                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]" readonly>
                     </div>
 
                     <div>
                         <label class="block mb-1 font-medium">Department</label>
                         <input type="text" name="department" id="profile-department"
                             class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]"
-                            placeholder="Your department">
+                            value="<?php echo $_SESSION['student']['department'] ?? ''; ?>">
                     </div>
 
                     <div>
                         <label class="block mb-1 font-medium">Library ID</label>
                         <input type="text" name="library_id" id="profile-library_id"
-                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]" readonly>
+                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]"
+                            value="<?php echo $_SESSION['student']['library_id'] ?? ''; ?>" readonly>
                     </div>
 
                     <div>
                         <label class="block mb-1 font-medium">Email</label>
                         <input type="email" name="email" id="profile-email"
                             class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]"
-                            placeholder="Enter your email">
+                            value="<?php echo $_SESSION['student']['email'] ?? ''; ?>">
                     </div>
-
                 </div>
 
-                <!-- Save Buttons -->
+                <!-- Save Button -->
                 <div class="flex justify-end gap-3 pt-4">
                     <button type="submit"
                         class="px-6 py-2 rounded-full bg-[#b03060] text-white hover:bg-[#800000] transition">
@@ -868,7 +870,7 @@
                 success: function (res) {
                     if (res && res.status === 1 && res.data) {
                         alert("Book removed from favorites.");
-                        
+
                     } else {
                         alert(res?.message || "Failed to open the book.");
                     }
@@ -913,66 +915,93 @@
             });
         }
 
-        // Handle Profile Update
-        // Profile form submission
+        loadProfile();
+
+        function loadProfile() {
+            $.ajax({
+                url: `${base_url}auth/action.php?action=GetUser`,
+                type: "POST",
+                data: {
+                    action: "GetUser",
+                    user_id: <?php echo $_SESSION['student']['user_id'] ?? '' ?>,
+                },
+                dataType: "json",
+                success: function (res) {
+                    if (res.status === 1 && res.data) {
+                        const completename = res.data.personal.firstname + " " + res.data.personal.middlename + " " + res.data.personal.lastname;
+
+                        $('#profile-username').text(res.data.personal.library_id);
+                        $("#edit-firstname").val(res.data.personal.firstname || '');
+                        $("#edit-middlename").val(res.data.personal.middlename || '');
+                        $("#edit-lastname").val(res.data.personal.lastname || '');
+                        $("#edit-suffix").val(res.data.personal.suffix || '');
+                        $("#profile-status").val(res.data.auth.account_status || '');
+                        $("#profile-department").val(res.data.personal.department || '');
+                        $("#profile-library_id").val(res.data.personal.library_id || '');
+                        $("#profile-email").val(res.data.auth.email || '');
+                        $("#profile-role").text(res.data.auth.user_role ? capitalize(res.data.auth.user_role) : 'Student');
+
+                        if (res.data.personal.profile_pic) {
+                            $("#profile-picture").attr("src", base_url + "auth/" + res.data.personal.profile_pic);
+                        }
+                    } else {
+                        alert(res.message || "Could not load profile.");
+                    }
+                    loadActivityLog();
+                },
+                error: function () {
+                    alert("Server error while fetching profile.");
+                }
+            });
+        }
+
+        // Submit profile edit via AJAX
         $("#profile-edit-form").on("submit", function (e) {
             e.preventDefault();
-
             const formData = new FormData(this);
+            formData.append("user_id", <?php echo $_SESSION['student']['user_id']; ?>);
 
-            console.log("Submitting profile update with data:", Array.from(formData.entries()));
             $.ajax({
-                url: base_url + "auth/action.php?action=updateUser",
+                url: `${base_url}auth/action.php?action=updateUser`,
                 type: "POST",
                 data: formData,
-                processData: false,
-                contentType: false,
                 dataType: "json",
-
-                success: function (res) {
-                    if (!res.status) {
-                        alert(res.message || "Update failed.");
-                        return;
-                    }
-
-                    // Fill form fields from returned data
-                    $("#edit-firstname").val(res.data.firstname || '');
-                    $("#edit-middlename").val(res.data.middlename || '');
-                    $("#edit-lastname").val(res.data.lastname || '');
-                    $("#edit-suffix").val(res.data.suffix || '');
-                    $("#profile-status").val(res.data.status || '');
-                    $("#profile-department").val(res.data.department || '');
-                    $("#profile-library_id").val(res.data.library_id || '');
-                    $("#profile-email").val(res.data.email || '');
-                    $("#profile-role").text(res.data.role || 'Student');
-
-                    // Update profile picture preview if uploaded
-                    if (res.data.personal['profile_pic']) {
-                        $("#profile-picture").attr("src", base_url + res.data.personal['profile_pic']);
-                    }
-
-                    alert("Profile updated successfully.");
-                    window.location.reload();
+                contentType: false,
+                processData: false,
+                beforeSend: function () {
+                    $("button[type=submit]").prop("disabled", true).text("Updating...");
                 },
-
+                success: function (res) {
+                    if (res.status === 1) {
+                        alert(res.message || "Profile updated successfully.");
+                        loadProfile(); // refresh fields
+                    } else {
+                        alert(res.message || "Failed to update profile.");
+                    }
+                    loadActivityLog();
+                },
                 error: function () {
-                    alert("Server error. Try again.");
+                    alert("Server error while updating profile.");
+                },
+                complete: function () {
+                    $("button[type=submit]").prop("disabled", false).text("Update Profile");
                 }
             });
         });
 
-        // Live preview for profile picture
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Profile picture preview on file select
         $("#profile-picture-input").on("change", function () {
             const file = this.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = e => $("#profile-picture").attr("src", e.target.result);
-            reader.readAsDataURL(file);
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = e => $("#profile-picture").attr("src", e.target.result);
+                reader.readAsDataURL(file);
+            }
         });
-
-
-
 
     });
 </script>

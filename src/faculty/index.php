@@ -6,10 +6,14 @@ $page = 'dashboard'; // default page
 
 if (isset($_GET['page']) && in_array($_GET['page'], $allowed_pages)) {
   $page = $_GET['page'];
+  
 }
 if (!isset($_SESSION['faculty'])) {
+  http_response_code(404);
+  include '../../404.php';
   exit();
 }
+
 
 ?>
 
