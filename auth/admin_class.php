@@ -2295,18 +2295,61 @@ class Action
             FROM user_logs 
             ORDER BY log_time DESC 
             LIMIT 10
-        ");
+            ");
             $recentActivity = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+            // -------------------- Folder Department Activity --------------------
+
+            $stmt = $this->db->query("
+                SELECT folder_id, folder_name, folder_data, created_date
+                FROM folder_structure
+                ORDER BY created_date DESC
+            ");
+
+            $departments = [];
+            $books = [];
+            $filesInFolders = []; 
+            $totalBooks = 0;
+
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $departments[] = $row;
+
+                // Decode folder_data JSON
+                $folderJson = isset($row['folder_data']) ? json_decode($row['folder_data'], true) : [];
+
+                // Count books
+                $bookCount = isset($folderJson['foldername']) ? count($folderJson['foldername']) : 0;
+                $books[$row['folder_name']] = $folderJson;
+                
+                $totalBooks += $bookCount;
+
+                // Extract filenames
+                $files = isset($folderJson['filename']) ? $folderJson['filename'] : [];
+                $filesInFolders[$row['folder_data']] = $files;
+            }
+
+            $totalFolders = count($departments);
+            $folderNames = array_map(fn($d) => $d['folder_name'], $departments);
 
             return json_encode([
                 'status' => 1,
                 'stats' => [
+                    'booksperfolder' => $books,
+                    'filesperfolder' => $filesInFolders,
+                    'totalBooks' => $totalBooks,
+                    'totalDepartment' => $totalFolders,
+                    'department' => $departments,
+                    'folder_names' => $folderNames,
                     'requests' => $totals,
                     'online' => $totalActiveUsers,
-                    'offline' => $totalOfflineUsers
+                    'offline' => $totalOfflineUsers,
+                    'totalusers' => $totalActiveUsers + $totalOfflineUsers
                 ],
                 'recent' => $recentActivity
             ]);
+
+
 
         } catch (PDOException $e) {
             return json_encode([

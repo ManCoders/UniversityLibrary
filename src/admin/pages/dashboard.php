@@ -13,27 +13,27 @@
             <p id="statBooks" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
             <p class="text-xs text-green-500 mt-2">↑ 0% this month</p>
         </div>
-
+        <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-red-500 cursor-pointer 
+                hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
+            data-panel="panelDepartment">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Department Folder</p>
+            <p id="statDepartment" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
+            <!-- <p class="text-xs text-red-500 mt-2">Action required</p> -->
+        </div>
         <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-emerald-500 cursor-pointer 
                 hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
             data-panel="OnlinePanel">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Online Users</p>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active Users</p>
             <p id="OnlineUsers" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <p class="text-xs text-red-500 mt-2">↓ 0% this month</p>
+            <!-- <p class="text-xs text-red-500 mt-2">↓ 0% this month</p> -->
         </div>
-        <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-red-500 cursor-pointer 
-                hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
-            data-panel="OfflinePanel">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Offline Users</p>
-            <p id="OfflineUsers" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <p class="text-xs text-red-500 mt-2">Action required</p>
-        </div>
+
         <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-yellow-500 cursor-pointer 
                 hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
             data-panel="requestsPanel">
             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Registered Account </p>
             <p id="statRequests" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <p class="text-xs text-yellow-500 mt-2">Last updated just now</p>
+            <!-- <p class="text-xs text-yellow-500 mt-2">Last updated just now</p> -->
         </div>
 
 
@@ -50,18 +50,18 @@
 
 <div id="OnlinePanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
     <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Users</h2>
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Users Logged Monitoring</h2>
     <canvas id="usersChart" class="mt-4"></canvas>
 </div>
-<div id="OfflinePanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
+<div id="panelDepartment" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
     <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Tasks</h2>
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Department Books Monitoring</h2>
     <canvas id="offlineChart" class="mt-4"></canvas>
 </div>
 <div id="requestsPanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
     <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
 
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Requests</h2>
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Registration Requests Approval</h2>
 
     <canvas id="requestsChart" class="mt-4"></canvas>
 
@@ -154,17 +154,41 @@
                     }
 
                     // Only keep request-related stats
-                    dashboardData.requests = res.stats.requests || { pending: 0, approved: 0, declined: 0 };
+                    dashboardData.requests = res.stats.requests || {
+                        pending: 0,
+                        approved: 0,
+                        declined: 0
+                    };
                     // Online/offline users
                     dashboardData.users = res.stats || {
                         online: 0,
                         offline: 0
                     };
+
+
+                    dashboardData.stats = {
+                        totalDepartment: res.stats.totalDepartment || 0, //locked this
+                        folder_names: res.stats.folder_names || [], //locked this
+                        booksperfolder: res.stats.booksperfolder || {}
+                    };
+
+
+                    const allBooks = Object.values(dashboardData.stats.booksperfolder)
+                        .flat();
+
+                    console.log(allBooks);
+                    console.log('Total books:', allBooks.length);
+
+                    $('#statBooks').text(allBooks.length || null);
+
                     // Update dashboard counter
                     const totalRequests = dashboardData.requests.pending + dashboardData.requests.approved + dashboardData.requests.declined;
+
+
+                    $('#statDepartment').text(dashboardData.stats.totalDepartment);
                     $('#statRequests').text(totalRequests);
-                    $('#OnlineUsers').text(dashboardData.users.online || 0);
-                    $('#OfflineUsers').text(dashboardData.users.offline || 0);
+                    $('#OnlineUsers').text(dashboardData.users.totalusers || 0);
+
 
 
 
@@ -190,7 +214,7 @@
                     // Refresh requests chart
                     loadChart('requestsPanel');
                     loadChart('OnlinePanel');
-                    loadChart('OfflinePanel');
+                    loadChart('panelDepartment');
                 },
                 error: function () {
                     alert("Server error while fetching dashboard stats.");
@@ -216,16 +240,38 @@
 
                 case 'OnlinePanel':
                     ctx = $('#usersChart');
-                    chartData = [dashboardData.users.online || 0];
-                    chartLabel = ['Online Users'];
-                    chartColors = ['#10b981'];
+                    chartData = [
+                        dashboardData.users.online || 0,
+                        dashboardData.users.offline || 0
+                    ];
+                    chartLabel = ['Online Users', 'Offline Users'];
+                    chartColors = ['#10b981', '#ef4444'];
                     break;
 
-                case 'OfflinePanel':
+                case 'panelDepartment':
                     ctx = $('#offlineChart');
-                    chartData = [dashboardData.users.offline || 0];
-                    chartLabel = ['Offline Users'];
-                    chartColors = ['#ef4444'];
+                    const folderNames = dashboardData.stats.folder_names || [];
+
+                    // Get the book counts (length of each array) in the same order as folderNames
+                    chartData = folderNames.map(name => {
+                        const files = dashboardData.stats.booksperfolder[name] || [];
+                        return Array.isArray(files) ? files.length : 0;
+                    });
+
+                    chartLabel = folderNames;
+
+                    // console.log({ chartLabel, chartData });
+
+                    const colorPalette = [
+                        '#ef4444', // red
+                        '#f59e0b', // amber
+                        '#10b981', // green
+                        '#3b82f6', // blue
+                        '#8b5cf6', // purple
+                        '#ec4899', // pink
+                        '#f43f5e'  // rose
+                    ];
+                    chartColors = folderNames.map((_, i) => colorPalette[i % colorPalette.length]);
                     break;
 
                 default:
