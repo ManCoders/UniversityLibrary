@@ -51,7 +51,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-0 flex justify-between items-center">
             <h1 class="flex items-center gap-2 text-white">
                 <img src="./assets/image/<?php echo htmlspecialchars(get_option('system_logo')); ?>"
-                    alt="University Logo" class="w-14 sm:w-20 h-auto rounded-full border-1 border-white shadow-md" />
+                    alt="University Logo" class="sm:w-20 w-20 h-20 m-1 rounded-full border-1 border-white shadow-md" />
                 <div class="flex flex-col leading-tight">
                     <span class="text-lg sm:text-2xl font-extrabold">
                         <?php echo htmlspecialchars(get_option('system_title')); ?>
@@ -228,7 +228,7 @@
                     <!-- Profile Picture -->
                     <div class="relative">
                         <?php
-                        $profilePic = $_SESSION['student']['profile_pic'] ?? 'default.png';
+                        $profilePic = $_SESSION['student']['profile_pic'] ?? '';
                         ?>
                         <img id="profile-picture" alt="Profile Picture"
                             src="<?php echo base_url() . "auth/" . $profilePic; ?>"
@@ -923,7 +923,7 @@
                 type: "POST",
                 data: {
                     action: "GetUser",
-                    user_id: <?php echo $_SESSION['student']['user_id'] ?? '' ?>,
+                    user_id: '<?php echo $_SESSION['student']['user_id'] ?? '' ?>'
                 },
                 dataType: "json",
                 success: function (res) {
@@ -945,7 +945,7 @@
                             $("#profile-picture").attr("src", base_url + "auth/" + res.data.personal.profile_pic);
                         }
                     } else {
-                        alert(res.message || "Could not load profile.");
+                        //alert(res.message  "Could not load profile.");
                     }
                     loadActivityLog();
                 },
@@ -959,7 +959,7 @@
         $("#profile-edit-form").on("submit", function (e) {
             e.preventDefault();
             const formData = new FormData(this);
-            formData.append("user_id", <?php echo $_SESSION['student']['user_id']; ?>);
+            formData.append("user_id", <?php echo $_SESSION['student']['user_id'] ??'' ?>);
 
             $.ajax({
                 url: `${base_url}auth/action.php?action=updateUser`,

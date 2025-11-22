@@ -395,67 +395,145 @@ $(document).ready(function () {
   // ==========================
   updateHeaderUI();
   showView("home");
-
-  // 5. Chatbot Logic
+  // --- Chatbot Elements ---
   const chatbox = $("#chatbox");
   const chatInput = $("#chat-input");
   const chatMessages = $("#chat-messages");
+  const sendBtn = $("#send-btn");
 
   $("#chatbot-toggle").on("click", () => chatbox.toggleClass("hidden"));
   $("#close-chat").on("click", () => chatbox.addClass("hidden"));
 
+  // --- Send Message Function ---
   function sendMessage() {
-    const msg = chatInput.val().trim();
+    const msg = chatInput.val()?.trim();
     if (!msg) return;
 
-    // User message (right-aligned, maroon)
-    chatMessages.append(`
-    <div class="text-right">
-      <span class="inline-block bg-[#b03060] text-white p-2 rounded-lg max-w-[80%]">
-        ${msg}
-      </span>
-    </div>
-  `);
-    chatInput.val("");
-    chatMessages.scrollTop(chatMessages[0].scrollHeight); // Scroll to bottom
+    // Lock input
+    chatInput.prop("disabled", true);
+    sendBtn.prop("disabled", true).addClass("opacity-50 cursor-not-allowed");
 
-    // Assistant reply
-    setTimeout(() => {
-      let reply =
-        "I’ll look that up for you! Please log in for detailed assistance.";
+    // Render user message
+    const userContainer = $('<div class="text-right mb-4"></div>');
+    const userBubble = $(
+      '<div class="inline-block bg-[#b03060] text-white px-4 py-2 rounded-2xl rounded-tr-none max-w-[85%] text-left shadow-sm break-words"></div>'
+    );
+    userBubble.text(msg);
+    userContainer.append(userBubble);
+    chatMessages.append(userContainer);
+    scrollToBottom();
 
-      if (msg.toLowerCase().includes("hours")) {
-        reply = "The main library is open 8:00 AM – 9:00 PM (Mon–Fri).";
-      } else if (msg.toLowerCase().includes("metadata")) {
-        reply =
-          "Our Smart Metadata Management automatically tags and organizes research papers for easy citation.";
-      }
-
-      chatMessages.append(`
-      <div class="text-left">
-        <span class="inline-block bg-[#ffe6e6] dark:bg-gray-700 text-gray-900 dark:text-gray-100 p-2 rounded-lg max-w-[80%]">
-          ${reply}
-        </span>
+    // Render AI bubble + typing indicator
+    const aiContainer = $('<div class="text-left mb-4"></div>');
+    const aiBubble = $(
+      '<div class="inline-block bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-2 rounded-2xl rounded-tl-none max-w-[90%] shadow-sm break-words leading-relaxed"></div>'
+    );
+    const typingIndicator = $(`
+      <div id="typing-indicator" class="flex space-x-1 mt-1">
+          <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+          <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>
+          <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
       </div>
-    `);
-      chatMessages.scrollTop(chatMessages[0].scrollHeight);
-    }, 700);
+  `);
+    aiBubble.append(typingIndicator);
+    aiContainer.append(aiBubble);
+    chatMessages.append(aiContainer);
+    scrollToBottom();
+
+    // --- AJAX Call to PHP Proxy ---
+    $.ajax({
+      url: `${base_url}auth/action.php?action=chatSupportAI`,
+      type: "POST",
+      data: { message: msg },
+      dataType: "json",
+      success: function (res) {
+        $("#typing-indicator").remove();
+
+        const reply = res.status === 1 ? res.reply : `[ERROR] ${res.reply}`;
+
+        // Word-by-word typing
+        const words = reply.split(/\s+/);
+        let idx = 0;
+        const wordDelay = 150; // ms per word
+
+        function typeWord() {
+          if (idx < words.length) {
+            aiBubble.html(formatAIResponse(words.slice(0, idx + 1).join(" ")));
+            scrollToBottom();
+            idx++;
+            setTimeout(typeWord, wordDelay);
+          }
+        }
+
+        typeWord();
+      },
+      error: function () {
+        $("#typing-indicator").remove();
+        aiBubble.html(
+          '<span class="text-red-600 text-xs">Service unavailable.</span>'
+        );
+        scrollToBottom();
+      },
+      complete: function () {
+        chatInput.val("").prop("disabled", false).focus();
+        sendBtn
+          .prop("disabled", false)
+          .removeClass("opacity-50 cursor-not-allowed");
+      },
+    });
   }
 
-  $("#send-btn").on("click", sendMessage);
+  // --- Helpers ---
+  function scrollToBottom() {
+    chatMessages
+      .stop()
+      .animate({ scrollTop: chatMessages[0].scrollHeight }, 100);
+  }
+
+  function formatAIResponse(text) {
+    if (!text) return "";
+    let safe = text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+
+    // Code block formatting
+    safe = safe.replace(
+      /```([\s\S]*?)```/g,
+      '<pre class="bg-gray-800 text-white p-2 rounded my-2 overflow-x-auto text-sm font-mono">$1</pre>'
+    );
+
+    // Inline code formatting
+    safe = safe.replace(
+      /`(.*?)`/g,
+      '<code class="bg-gray-200 dark:bg-gray-600 px-1 rounded text-sm font-mono text-red-500">$1</code>'
+    );
+
+    // Bold
+    safe = safe.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>");
+    // Italic
+    safe = safe.replace(/\*(.*?)\*/g, "<i>$1</i>");
+    safe = safe.replace(/\n/g, "<br>");
+
+    return safe;
+  }
+
+  // --- Event Listeners ---
+  sendBtn.on("click", sendMessage);
   chatInput.on("keypress", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
       sendMessage();
     }
   });
+
   // --- Elements ---
   const searchModal = $("#search-modal");
   const searchInput = $("#search-input");
   const searchResults = $("#search-results");
 
   function performSearch() {
-    const query = searchInput.val().trim();
+    const query = searchInput.val();
     if (!query) return;
 
     toggleModal(searchModal, true);
@@ -643,5 +721,4 @@ $(document).ready(function () {
       },
     });
   });
-  
 });

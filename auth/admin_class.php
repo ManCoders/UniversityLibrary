@@ -2309,19 +2309,20 @@ class Action
 
             $departments = [];
             $books = [];
-            $filesInFolders = []; 
+            $filesInFolders = [];
             $totalBooks = 0;
 
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 $departments[] = $row;
 
                 // Decode folder_data JSON
+
                 $folderJson = isset($row['folder_data']) ? json_decode($row['folder_data'], true) : [];
 
                 // Count books
                 $bookCount = isset($folderJson['foldername']) ? count($folderJson['foldername']) : 0;
                 $books[$row['folder_name']] = $folderJson;
-                
+
                 $totalBooks += $bookCount;
 
                 // Extract filenames
@@ -2568,14 +2569,165 @@ class Action
     }
 
 
+    function chatSupportAI()
+    {
+        try {
+            ini_set('max_execution_time', 15); // Enough time for API
+
+            // --- Input Validation ---
+            $userMsg = trim($_POST['message'] ?? '');
+            if (empty($userMsg)) {
+                return json_encode([
+                    'status' => 0,
+                    'reply' => 'Please enter a message.'
+                ]);
+
+            }
+
+            // --- API Setup ---
+            $apiKey = 'AIzaSyBK0_P942KBxFGv1yOc4ZYFFfgOpNmcPaY';
+            $model = 'gemini-2.5-flash';
+            $url = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey";
+
+            // --- Librarian assistant system prompt ---
+            $booksMetadata = [];
+
+            $stmt = $this->db->query("SELECT folder_id, folder_name, folder_data, created_date FROM folder_structure ORDER BY created_date DESC");
+
+            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $folderData = json_decode($row['folder_data'], true);
+
+                if (is_array($folderData)) {
+                    foreach ($folderData as $book) {
+                        $booksMetadata[] = $book;
+                    }
+                }
+            }
+
+            // Prepare JSON for AI system prompt
+            $booksJSON = json_encode($booksMetadata, JSON_UNESCAPED_UNICODE);
+
+            // Define AI system prompt with metadata access
+            $systemPrompt = "
+                You are a professional and polite Zamboanga Peninsula Polytechnic State University digital librarian assistant. 
+                Your goal is to help users explore the library and the research journey, recommend books, authors, or topics, and guide users in finding reliable information online.
+                You have secure access to the following books metadata:
+
+                $booksJSON
+                Rules:
+                - Only use the provided library metadata for direct book references (Title, Author, ISBN).
+                - Suggest online resources, journals, or reading guidance when relevant.
+                - Never reveal user credentials, personal information, or internal system data.
+                - Keep responses concise, clear, and appropriate for professors, teachers, students, or academic researchers.
+                - If a book or resource is not found, respond politely: 'No matching book found in the library database.'
+                - Encourage exploration, learning, and research while keeping guidance professional and short.
+
+                User Types You Will Assist:
+                - Professors
+                - Teachers
+                - Students
+                - Academic researchers
+                - Other educational or research professionals
+
+                Guidelines for interaction:
+
+                1. If a user asks if there are available books, respond with a concise list in the format: 'Title - Author' and 5-10 items only.
+                2. If a user provides an ISBN, search the metadata and return only the matching book's Title and Author.
+                3. Tailor your responses politely based on the user type, keeping them appropriate for an academic or research context.
+                4. Never expose folder IDs, internal metadata, timestamps, or any sensitive system information to users.
+                5. Keep all responses concise, clear, and professional.
+                6. Handle user queries politely, including requests for book recommendations, authors, or research topics.
+                7. Do not guess or fabricate book data; only use the metadata you have access to.
+                8. If a book is not found, respond politely with: 'No matching book found in the library database.'
+                9. If user credentials or any personal not related in the books responce 
+                
+
+                Important Security Rules:
+                - Do not access or disclose any user credentials, emails, session info, or any personal data.
+                - Only answer based on the provided books metadata.
+                - Responses should include only 'Title - Author' or 'Title - Author - ISBN' if specifically requested.
+                - 
+                Your goal is to provide quick, accurate, context-aware, and secure assistance to users regarding the library's collection.
+                ";
 
 
+            // --- Payload ---
+            $data = [
+                "contents" => [
+                    [
+                        "parts" => [
+                            ["text" => $systemPrompt],
+                            ["text" => $userMsg]
+                        ]
+                    ]
+                ],
+                "generationConfig" => [
+                    "temperature" => 2.0,        // Slightly conservative for factual answers
+                    "maxOutputTokens" => 7000,
+                    "topP" => 0.95,              // Limit randomness
+                    "topK" => 40
+                ]
+            ];
 
+            // --- cURL Request ---
+            $ch = curl_init($url);
+            curl_setopt_array($ch, [
+                CURLOPT_POST => true,
+                CURLOPT_POSTFIELDS => json_encode($data, JSON_UNESCAPED_UNICODE),
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                CURLOPT_TIMEOUT => 60         
+            ]);
 
+            $response = curl_exec($ch);
+            if (curl_errno($ch)) {
+                $error_msg = curl_error($ch);
+                unset($ch);
+                return json_encode([
+                    'status' => 0,
+                    'reply' => 'Connection Error: ' . $error_msg
+                ]);
 
+            }
+            unset($ch);
 
+            // --- Parse Response ---
+            $res = json_decode($response, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return json_encode([
+                    'status' => 0,
+                    'reply' => 'Invalid JSON response from AI.'
+                ]);
 
+            }
 
+            if (isset($res['error'])) {
+                return json_encode([
+                    'status' => 0,
+                    'reply' => 'API Error: ' . ($res['error']['message'] ?? 'Unknown error')
+                ]);
+
+            }
+
+            // --- Extract AI Reply ---
+            $replyText = $res['candidates'][0]['content']['parts'][0]['text'] ?? 'No response generated.';
+
+            // --- Post-processing ---
+            $replyText = trim($replyText);                  // Remove extra whitespace
+            $replyText = preg_replace('/\s+/', ' ', $replyText); // Single spaces
+
+            return json_encode([
+                'status' => 1,
+                'reply' => $replyText
+            ]);
+
+        } catch (Exception $e) {
+            return json_encode([
+                'status' => 0,
+                'reply' => 'Server Exception: ' . $e->getMessage()
+            ]);
+        }
+    }
 
 
 

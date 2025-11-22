@@ -124,6 +124,9 @@ switch ($action) {
     case 'get_activity_log':
         echo $crud->get_activity_log();
         break;
+    case 'chatSupportAI':
+        echo $crud->chatSupportAI();
+        break;
     
     default:
         echo json_encode(['status' => 0, 'message' => 'Invalid or missing action.']);

@@ -44,7 +44,7 @@
 <!-- Panels -->
 <div id="booksPanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
     <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Books</h2>
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Under Maintenance</h2>
     <canvas id="booksChart" class="mt-4"></canvas>
 </div>
 
