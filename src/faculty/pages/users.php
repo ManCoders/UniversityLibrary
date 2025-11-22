@@ -319,19 +319,6 @@
 
                     <div id="book_logs"
                         class="space-y-3 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
-
-                        <!-- Example Structure -->
-                        <!-- Dynamically inserted -->
-                        <!--
-            <div class="bg-indigo-50 dark:bg-gray-900 p-3 rounded-lg shadow flex items-center gap-3">
-                <img src="cover.jpg" class="w-10 h-14 rounded object-cover">
-                <div class="flex-1">
-                    <p class="text-sm font-semibold text-gray-800 dark:text-gray-100">Book Title</p>
-                    <span class="text-xs text-gray-500 dark:text-gray-400">Read: 12 mins</span>
-                </div>
-            </div>
-            -->
-
                     </div>
 
                 </div>
@@ -513,7 +500,7 @@
                                         <td class="px-4 py-2">${user.firstname} ${user.lastname}</td>
                                         <td class="px-4 py-2">${user.email}</td>
                                         <td class="px-4 py-2">${user.department}</td>
-                                        <td class="px-2 py-2 text-center space-x-1">
+                                        <td class="px-2 py-2 text-center flex justify-center gap-1">
                                             <button id="view-btn-${user.user_id}" class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
                                             <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
                                             <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>

@@ -72,7 +72,7 @@
             </button> -->
             <button type="button" id="new-folder-btn"
                 class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-sm">
-                📁 New Folder
+                📁 Create Department
             </button>
         </div>
 
@@ -230,10 +230,10 @@
     <!-- 🆕 NEW FOLDER MODAL -->
     <div id="new-folder-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-80 p-5">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">📁 Create New Folder</h3>
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">📁 Department Name</h3>
             <input type="text" id="folder-name-input"
                 class="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 mb-4"
-                placeholder="Enter folder name">
+                placeholder="Enter Department Name">
             <div class="flex justify-end gap-2">
                 <button id="cancel-folder-btn"
                     class="px-3 py-1 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md text-sm">Cancel</button>
@@ -303,8 +303,8 @@
                                     </div>
                                     <div class="flex gap-1">
                                         <button class="delete-folder-btn text-sm px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded">🗑️ Delete</button>
-                                        <button class="upload-file-btn text-sm px-2 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded">⬆️ File</button>
-                                        <button class="upload-folder-btn text-sm px-2 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded">⬆️ Folder</button>
+                                        <button class="upload-file-btn text-sm px-2 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded">⬆️ Upload File</button>
+                                        <button class="upload-folder-btn text-sm px-2 py-1 bg-indigo-500 hover:bg-indigo-600 text-white rounded">⬆️ Upload Folder</button>
                                     </div>
                                 </div>
                                 <ul class="ml-6 mt-2 hidden space-y-1">
@@ -689,7 +689,7 @@
                                             <td class="px-4 py-2 truncate max-w-xs" title="${title}">${title}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${author}">${author}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${folder}">${folder}</td>
-                                            <td class="px-4 py-2 text-center space-x-1">
+                                            <td class="px-4 py-2 text-center flex justify-center gap-1">
                                                 <button class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs view-btn" data-id="${bookId}">View</button>
                                                 <button class="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs edit-btn" data-id="${bookId}">Edit</button>
                                                 <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs delete-btn" data-id="${bookId}">Delete</button>

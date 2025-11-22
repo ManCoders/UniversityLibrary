@@ -13,30 +13,30 @@
             <p id="statBooks" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
             <p class="text-xs text-green-500 mt-2">↑ 0% this month</p>
         </div>
-
+        <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-red-500 cursor-pointer 
+                hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
+            data-panel="panelDepartment">
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Department Folder</p>
+            <p id="statDepartment" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
+            <!-- <p class="text-xs text-red-500 mt-2">Action required</p> -->
+        </div>
         <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-emerald-500 cursor-pointer 
                 hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
-            data-panel="usersPanel">
+            data-panel="OnlinePanel">
             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active Users</p>
-            <p id="statUsers" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <p class="text-xs text-red-500 mt-2">↓ 0% this month</p>
+            <p id="OnlineUsers" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
+            <!-- <p class="text-xs text-red-500 mt-2">↓ 0% this month</p> -->
         </div>
 
         <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-yellow-500 cursor-pointer 
                 hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
             data-panel="requestsPanel">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Account Requests</p>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Registered Account </p>
             <p id="statRequests" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <p class="text-xs text-yellow-500 mt-2">Last updated just now</p>
+            <!-- <p class="text-xs text-yellow-500 mt-2">Last updated just now</p> -->
         </div>
 
-        <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-red-500 cursor-pointer 
-                hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
-            data-panel="tasksPanel">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Tasks</p>
-            <p id="statTasks" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <p class="text-xs text-red-500 mt-2">Action required</p>
-        </div>
+
     </div>
 
 </div>
@@ -44,20 +44,24 @@
 <!-- Panels -->
 <div id="booksPanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
     <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Books</h2>
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Under Maintenance</h2>
     <canvas id="booksChart" class="mt-4"></canvas>
 </div>
 
-<div id="usersPanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
+<div id="OnlinePanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
     <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Users</h2>
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Users Logged Monitoring</h2>
     <canvas id="usersChart" class="mt-4"></canvas>
 </div>
-
+<div id="panelDepartment" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
+    <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Department Books Monitoring</h2>
+    <canvas id="offlineChart" class="mt-4"></canvas>
+</div>
 <div id="requestsPanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
     <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
 
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Requests</h2>
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Registration Requests Approval</h2>
 
     <canvas id="requestsChart" class="mt-4"></canvas>
 
@@ -100,13 +104,9 @@
 </div>
 
 
-<div id="tasksPanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
-    <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Tasks</h2>
-    <canvas id="tasksChart" class="mt-4"></canvas>
-</div>
+
 <!-- Monitoring Panel -->
-<div id="monitorPanel" class="mt-8 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+<!-- <div id="monitorPanel" class="mt-8 p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
     <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Live User Monitoring</h2>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -132,13 +132,183 @@
             <li>Database connections: 0</li>
         </ul>
     </div>
-</div>
+</div> -->
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     $(document).ready(function () {
 
+        let dashboardData = { requests: { pending: 0, approved: 0, declined: 0 } };
+
+        // ---------------- Load Dashboard Stats ----------------
+        function loadDashboardStats() {
+            $.ajax({
+                url: `${base_url}auth/action.php?action=getDashboardStats`,
+                type: 'GET',
+                dataType: 'json',
+                success: function (res) {
+                    if (!res || res.status !== 1) {
+                        alert(res?.message || "Failed to load dashboard.");
+                        return;
+                    }
+
+                    // Only keep request-related stats
+                    dashboardData.requests = res.stats.requests || {
+                        pending: 0,
+                        approved: 0,
+                        declined: 0
+                    };
+                    // Online/offline users
+                    dashboardData.users = res.stats || {
+                        online: 0,
+                        offline: 0
+                    };
+
+
+                    dashboardData.stats = {
+                        totalDepartment: res.stats.totalDepartment || 0, //locked this
+                        folder_names: res.stats.folder_names || [], //locked this
+                        booksperfolder: res.stats.booksperfolder || {}
+                    };
+
+
+                    const allBooks = Object.values(dashboardData.stats.booksperfolder)
+                        .flat();
+
+                    console.log(allBooks);
+                    console.log('Total books:', allBooks.length);
+
+                    $('#statBooks').text(allBooks.length || null);
+
+                    // Update dashboard counter
+                    const totalRequests = dashboardData.requests.pending + dashboardData.requests.approved + dashboardData.requests.declined;
+
+
+                    $('#statDepartment').text(dashboardData.stats.totalDepartment);
+                    $('#statRequests').text(totalRequests);
+                    $('#OnlineUsers').text(dashboardData.users.totalusers || 0);
+
+
+
+
+
+
+                    // Populate recent activity
+                    const $recent = $('#recentActivity').empty();
+                    if (res.recent?.length) {
+                        res.recent.forEach(item => {
+                            $recent.append(`
+                            <p class="text-sm text-gray-600 dark:text-gray-300 border-b dark:border-gray-700 pb-1">
+                                ${item.message || ''} 
+                                <span class="float-right text-xs text-gray-400 dark:text-gray-500">
+                                    ${item.time || ''}
+                                </span>
+                            </p>
+                        `);
+                        });
+                    } else {
+                        $recent.append('<p class="text-center text-gray-500 dark:text-gray-400 py-2">No recent activity</p>');
+                    }
+
+                    // Refresh requests chart
+                    loadChart('requestsPanel');
+                    loadChart('OnlinePanel');
+                    loadChart('panelDepartment');
+                },
+                error: function () {
+                    alert("Server error while fetching dashboard stats.");
+                }
+            });
+        }
+
+        // ---------------- Requests Chart ----------------
+        function loadChart(panelId) {
+            let ctx, chartData, chartLabel, chartColors;
+
+            switch (panelId) {
+                case 'requestsPanel':
+                    ctx = $('#requestsChart');
+                    chartData = [
+                        dashboardData.requests.pending || 0,
+                        dashboardData.requests.approved || 0,
+                        dashboardData.requests.declined || 0
+                    ];
+                    chartLabel = ['Pending', 'Approved', 'Declined'];
+                    chartColors = ['#facc15', '#34d399', '#ef4444'];
+                    break;
+
+                case 'OnlinePanel':
+                    ctx = $('#usersChart');
+                    chartData = [
+                        dashboardData.users.online || 0,
+                        dashboardData.users.offline || 0
+                    ];
+                    chartLabel = ['Online Users', 'Offline Users'];
+                    chartColors = ['#10b981', '#ef4444'];
+                    break;
+
+                case 'panelDepartment':
+                    ctx = $('#offlineChart');
+                    const folderNames = dashboardData.stats.folder_names || [];
+
+                    // Get the book counts (length of each array) in the same order as folderNames
+                    chartData = folderNames.map(name => {
+                        const files = dashboardData.stats.booksperfolder[name] || [];
+                        return Array.isArray(files) ? files.length : 0;
+                    });
+
+                    chartLabel = folderNames;
+
+                    // console.log({ chartLabel, chartData });
+
+                    const colorPalette = [
+                        '#ef4444', // red
+                        '#f59e0b', // amber
+                        '#10b981', // green
+                        '#3b82f6', // blue
+                        '#8b5cf6', // purple
+                        '#ec4899', // pink
+                        '#f43f5e'  // rose
+                    ];
+                    chartColors = folderNames.map((_, i) => colorPalette[i % colorPalette.length]);
+                    break;
+
+                default:
+                    return;
+            }
+
+            if (!ctx.length) return;
+
+            // Destroy previous chart instance if exists
+            if (ctx.data('chartInstance')) {
+                ctx.data('chartInstance').destroy();
+            }
+
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartLabel,
+                    datasets: [{
+                        label: panelId.includes('Online') ? 'Online' : panelId.includes('Offline') ? 'Offline' : 'Requests',
+                        data: chartData,
+                        backgroundColor: chartColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+
+            ctx.data('chartInstance', chart);
+        }
+
+        // ---------------- Panel click / back ----------------
         // Show panel on card click
         $('.stat-card').on('click', function () {
             const panelId = $(this).data('panel');
@@ -153,97 +323,13 @@
             $('#mainDashboard').show();
         });
 
-        // Load dashboard stats & recent activity
-        function loadDashboardStats() {
-            $.getJSON(base_url + "auth/action.php?action=getDashboardStats", function (data) {
-                if (data.status === 1) {
-                    $('#statBooks').text(data.stats.books);
-                    $('#statUsers').text(data.stats.users);
-                    $('#statRequests').text(data.stats.requests);
-                    $('#statTasks').text(data.stats.tasks);
-
-                    $('#recentActivity').empty();
-                    data.recent.forEach(item => {
-                        $('#recentActivity').append(
-                            `<p class="text-sm text-gray-600 dark:text-gray-300 border-b dark:border-gray-700 pb-1">
-                            ${item.message} <span class="float-right text-xs text-gray-400 dark:text-gray-500">${item.time}</span>
-                        </p>`
-                        );
-                    });
-                }
-            });
-        }
-
-        loadDashboardStats();
-
-        // Function to load charts dynamically
-        function loadChart(panelId) {
-            let ctx, chartData, chartLabel, chartColors;
-
-            switch (panelId) {
-                case 'booksPanel':
-                    ctx = $('#booksChart');
-                    chartData = [120, 80, 600, 50, 200]; // example data
-                    chartLabel = ['Fiction', 'Science', 'programming', 'History', 'Others'];
-                    chartColors = ['#4338ca', '#4f46e5', '#818cf8', '#c7d2fe'];
-                    break;
-                case 'usersPanel':
-                    ctx = $('#usersChart');
-                    chartData = [50, 30, 20]; // example: students/faculty/admin
-                    chartLabel = ['Students', 'Faculty', 'Admin'];
-                    chartColors = ['#10b981', '#34d399', '#6ee7b7'];
-                    break;
-                case 'requestsPanel':
-                    ctx = $('#requestsChart');
-                    chartData = [5, 8, 1]; // example: pending/approved/rejected
-                    chartLabel = ['Pending', 'Approved', 'Rejected'];
-                    chartColors = ['#facc15', '#fde68a', '#fbbf24'];
-                    break;
-                case 'tasksPanel':
-                    ctx = $('#tasksChart');
-                    chartData = [3, 2, 4, 1]; // example tasks by type
-                    chartLabel = ['Database', 'Reports', 'Maintenance', 'Other'];
-                    chartColors = ['#ef4444', '#f87171', '#fca5a5', '#fecaca'];
-                    break;
-            }
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: chartLabel,
-                    datasets: [{
-                        label: 'Count',
-                        data: chartData,
-                        backgroundColor: chartColors
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { mode: 'index', intersect: false }
-                    },
-                    scales: {
-                        y: { beginAtZero: true }
-                    }
-                }
-            });
-        }
-
-
-        loadApprovalRequests();
+        // ---------------- Approval Requests Table ----------------
         function loadApprovalRequests() {
-            $('#approvalTable').html(`
-                <tr><td colspan="5" class="text-center py-4">Loading...</td></tr>
-            `);
+            $('#approvalTable').html(`<tr><td colspan="5" class="text-center py-4">Loading...</td></tr>`);
 
-            $.post(base_url + "auth/action.php?action=GetFaculty", {
-                action: 'GetFaculty'
-            }, res => {
-                if (!res.status || !res.data || res.data.length === 0) {
-                    return $('#approvalTable').html(`
-                <tr><td colspan="5" class="text-center py-4 text-gray-500">No pending requests</td></tr>
-            `);
+            $.post(`${base_url}auth/action.php?action=GetFaculty`, { action: 'GetFaculty' }, res => {
+                if (!res.status || !res.data?.length) {
+                    return $('#approvalTable').html(`<tr><td colspan="5" class="text-center py-4 text-gray-500">No pending requests</td></tr>`);
                 }
 
                 const statusClasses = {
@@ -269,49 +355,34 @@
                 </tr>
             `).join('');
 
-
                 $("#approvalTable").html(rows);
-
-            }, 'json')
-                .fail(() => {
-                    $('#approvalTable').html(`<tr><td colspan="5" class="text-center text-red-500 py-4">Failed to load requests</td></tr>`);
-                });
+            }, 'json').fail(() => {
+                $('#approvalTable').html(`<tr><td colspan="5" class="text-center text-red-500 py-4">Failed to load requests</td></tr>`);
+            });
         }
 
-        // Handle approve
-        $(document).on('click', '.approveBtn', function () {
+        // Approve / Decline handlers
+        $(document).on('click', '.approveBtn, .declineBtn', function () {
             const user_id = $(this).data('id');
-            // alert(id);
-            if (!confirm("Approve this request?")) return;
+            const action = $(this).hasClass('approveBtn') ? 'Approved' : 'Declined';
+
+            if (!confirm(`${action} this request?`)) return;
+
             $('#upload-spinner').removeClass('hidden').show();
 
-            $.post(base_url + "auth/action.php?action=account_status", { user_id: user_id, action: 'Approved'}, res => {
-                $('#upload-spinner').removeClass('hidden').hide();
-
+            $.post(`${base_url}auth/action.php?action=account_status`, { user_id, action }, res => {
+                $('#upload-spinner').hide();
                 if (res.status) {
-                    alert('Request approved');
+                    alert(`Request ${action.toLowerCase()}`);
                     loadApprovalRequests();
+                    loadDashboardStats(); // refresh chart
                 } else alert(res.message || 'Operation failed');
             }, 'json').fail(() => alert('Server error'));
         });
 
-        // Handle decline
-        $(document).on('click', '.declineBtn', function () {
-            const user_id = $(this).data('id');
-
-            if (!confirm("Decline this request?")) return;
-
-            $('#upload-spinner').removeClass('hidden').show();
-
-            $.post(base_url + "auth/action.php?action=account_status", { user_id: user_id, action: 'Declined'}, res => {
-                $('#upload-spinner').removeClass('hidden').hide();
-
-                if (res.status) {
-                    alert('Request declined');
-                    loadApprovalRequests();
-                } else alert(res.message || 'Operation failed');
-            }, 'json').fail(() => alert('Server error'));
-        });
+        // ---------------- Initial Load ----------------
+        loadDashboardStats();
+        loadApprovalRequests();
 
     });
 </script>

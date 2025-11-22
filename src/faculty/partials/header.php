@@ -1,7 +1,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Faculty Dashboard</title>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f7f9fc; }
         .content-area::-webkit-scrollbar { width: 8px; }
