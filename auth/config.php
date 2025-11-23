@@ -20,7 +20,7 @@ function db_connect()
             // Librarian (Admin) Table
             "CREATE TABLE IF NOT EXISTS admin (
                 admin_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                isLogined TINYINT(1) DEFAULT 0,
+                is_logged_in TINYINT(1) DEFAULT 0,
                 personal_details JSON,
                 authentication_data JSON,
                 admin_book_data JSON,
@@ -35,7 +35,7 @@ function db_connect()
 
             "CREATE TABLE IF NOT EXISTS user (
                 user_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                isLogined TINYINT(1) DEFAULT 0,
+                is_logged_in TINYINT(1) DEFAULT 0,
                 personal_details JSON,
                 authentication_data JSON,
                 user_book_data JSON,

@@ -349,8 +349,6 @@ class Action
                 'user_name' => $completename,
                 'user_data' => $sessionData
             ]);
-
-
         } catch (Exception $e) {
             return json_encode(['status' => 500, 'message' => 'Server error: ' . $e->getMessage()]);
         }
@@ -582,7 +580,6 @@ class Action
                 'status' => 1,
                 'data' => $faculties
             ]);
-
         } catch (PDOException $e) {
             return json_encode([
                 'status' => 0,
@@ -655,8 +652,6 @@ class Action
                     'message' => 'Folder created successfully'
                 ]);
             }
-
-
         } catch (PDOException $e) {
             if (file_exists($folderPath)) {
                 rmdir($folderPath);
@@ -725,7 +720,6 @@ class Action
         // Recursive delete function - safely remove directory and its contents
         $removeDir = function ($dir) use (&$removeDir) {
             if (!is_dir($dir)) {
-
             }
             $items = scandir($dir);
             foreach ($items as $item) {
@@ -763,19 +757,21 @@ class Action
     function uploadFile()
     {
         $baseDir = __DIR__ . '/files/';
-        $folderName = $_POST['folder'] ?? null;
 
+        if (!is_dir($baseDir)) {
+            mkdir($baseDir, 0777, true);
+        }
+
+        $folderName = $_POST['folder'] ?? null;
         if (!$folderName) {
             ob_clean();
             return json_encode(['status' => 0, 'message' => 'Folder name is required.']);
-
         }
 
         $safeFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $folderName);
         if (empty($safeFolderName)) {
             ob_clean();
             return json_encode(['status' => 0, 'message' => 'Invalid folder name.']);
-
         }
 
         $targetDir = $baseDir . $safeFolderName . '/';
@@ -911,17 +907,19 @@ class Action
             'covers' => $uploadedCovers,
             'metadata_count' => count($existingMetadata)
         ]);
-
     }
 
-    function uploadFolder()
+    /* function uploadFolder()
     {
         header('Content-Type: application/json'); // force JSON output
         ini_set('display_errors', 0); // suppress PHP warnings/notices
 
         $baseDir = __DIR__ . '/files/';
-        $rootFolderName = $_POST['folder'] ?? null;
+        if (!is_dir($baseDir)) {
+            mkdir($baseDir, 0777, true);
+        }
 
+        $rootFolderName = $_POST['folder'] ?? $_POST['foldername'] ?? null;
         if (!$rootFolderName) {
             ob_clean();
             return json_encode(['status' => 0, 'message' => 'Target folder name not provided.']);
@@ -1077,7 +1075,196 @@ class Action
             'total_books' => count($existingMetadata)
         ]);
 
+    } */
+
+    function uploadFolder()
+    {
+        header('Content-Type: application/json');
+
+        $baseDir = __DIR__ . '/files/';
+        if (!is_dir($baseDir)) {
+            mkdir($baseDir, 0777, true);
+        }
+
+        // --- Folder name ---
+        $rootFolderName = $_POST['folder'] ?? $_POST['foldername'] ?? null;
+        if (!$rootFolderName) {
+            return json_encode(['status' => 0, 'message' => 'Target folder name not provided.']);
+            return;
+        }
+
+        // Sanitize folder name
+        $safeRootFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $rootFolderName);
+        if (empty($safeRootFolderName)) {
+            return json_encode(['status' => 0, 'message' => 'Invalid folder name after sanitization.']);
+            return;
+        }
+
+        $targetDir = $baseDir . $safeRootFolderName . '/';
+        $coverDir = $targetDir . 'covers/';
+
+        // Create directories if not exist
+        if (!is_dir($targetDir)) {
+            if (!mkdir($targetDir, 0777, true)) {
+                return json_encode(['status' => 0, 'message' => 'Failed to create target folder.']);
+                return;
+            }
+        }
+
+        if (!is_dir($coverDir)) {
+            mkdir($coverDir, 0777, true);
+        }
+
+        $uploadedFiles = [];
+        $uploadedCovers = [];
+
+        // ID generator
+        $generateId = function ($length = 12): string {
+            $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            $id = '';
+            for ($i = 0; $i < $length; $i++) {
+                $id .= $chars[random_int(0, strlen($chars) - 1)];
+            }
+            return $id;
+        };
+
+        // ==========================
+        // Fetch folder info or create new
+        // ==========================
+
+        $stmt = $this->db->prepare("SELECT folder_id, folder_data FROM folder_structure WHERE folder_name = ?");
+        $stmt->execute([$safeRootFolderName]);
+        $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($folderData) {
+            $folderId = $folderData['folder_id'];
+            $existingMetadata = json_decode($folderData['folder_data'], true) ?: [];
+        } else {
+            $this->db->prepare("INSERT INTO folder_structure (folder_name, folder_data) VALUES (?, ?)")
+                ->execute([$safeRootFolderName, json_encode([])]);
+            $folderId = $this->db->lastInsertId();
+            $existingMetadata = [];
+        }
+
+        // ==========================
+        // Upload main files
+        // ==========================
+
+        if (!empty($_FILES['files']['name'][0])) {
+            foreach ($_FILES['files']['name'] as $i => $name) {
+
+                if ($_FILES['files']['error'][$i] !== UPLOAD_ERR_OK) continue;
+
+                $tmp = $_FILES['files']['tmp_name'][$i];
+                $ext = pathinfo($name, PATHINFO_EXTENSION) ?: 'pdf';
+
+                $newName = $generateId() . '.' . $ext;
+                $destination = $targetDir . $newName;
+
+                if (move_uploaded_file($tmp, $destination)) {
+                    $uploadedFiles[$name] = $newName;
+                }
+            }
+        }
+
+        // ==========================
+        // Upload cover images
+        // ==========================
+
+        if (!empty($_FILES['covers']['name'])) {
+            foreach ($_FILES['covers']['name'] as $i => $name) {
+
+                if ($_FILES['covers']['error'][$i] !== UPLOAD_ERR_OK) continue;
+
+                $tmp = $_FILES['covers']['tmp_name'][$i];
+                $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+
+                if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) continue;
+
+                $newCoverName = $generateId(8) . '.' . $ext;
+                $destination = $coverDir . $newCoverName;
+
+                if (move_uploaded_file($tmp, $destination)) {
+                    $uploadedCovers[$name] = $newCoverName;
+                }
+            }
+        }
+
+        // ==========================
+        // Handle metadata processing
+        // ==========================
+
+        $newMetadata = [];
+
+        if (!empty($_POST['metadata'])) {
+            $metadata = json_decode($_POST['metadata'], true);
+
+            if (is_array($metadata)) {
+                foreach ($metadata as $meta) {
+
+                    $id = $generateId();
+                    $originalFile = $meta['filename'] ?? '';
+
+                    $meta['id'] = $id;
+                    $meta['folder_id'] = $folderId;
+                    $meta['foldername'] = $safeRootFolderName;
+
+                    // Assign file
+                    if (!empty($originalFile) && isset($uploadedFiles[$originalFile])) {
+                        $meta['filename'] = $uploadedFiles[$originalFile];
+                        $meta['file_path'] = "files/$safeRootFolderName/" . $uploadedFiles[$originalFile];
+                    } else {
+                        $meta['filename'] = null;
+                        $meta['file_path'] = null;
+                    }
+
+                    // Assign cover
+                    $originalCover = $meta['cover'] ?? '';
+
+                    if (!empty($originalCover) && isset($uploadedCovers[$originalCover])) {
+                        $meta['cover'] = $uploadedCovers[$originalCover];
+                        $meta['cover_path'] = "files/$safeRootFolderName/covers/" . $uploadedCovers[$originalCover];
+                    } else {
+                        $meta['cover'] = null;
+                        $meta['cover_path'] = null;
+                    }
+
+                    $newMetadata[] = $meta;
+                }
+            }
+        }
+
+        // Prevent duplicate metadata entries
+        $existingFiles = array_column($existingMetadata, 'filename');
+
+        foreach ($newMetadata as $meta) {
+            if (!empty($meta['filename']) && !in_array($meta['filename'], $existingFiles)) {
+                $existingMetadata[] = $meta;
+            }
+        }
+
+        // Save to database
+        $this->db->prepare("UPDATE folder_structure SET folder_data = ? WHERE folder_id = ?")
+            ->execute([json_encode($existingMetadata, JSON_UNESCAPED_UNICODE), $folderId]);
+
+        // Save metadata JSON file
+        file_put_contents(
+            $targetDir . 'metadata.json',
+            json_encode($existingMetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+        );
+
+        // Final response
+        return json_encode([
+            'status' => 1,
+            'message' => 'Folder uploaded successfully.',
+            'folder_id' => $folderId,
+            'folder_name' => $safeRootFolderName,
+            'files_uploaded' => $uploadedFiles,
+            'covers_uploaded' => $uploadedCovers,
+            'total_books' => count($existingMetadata)
+        ]);
     }
+
     function getMetadata()
     {
         $sql = "SELECT folder_name, folder_data FROM folder_structure";
@@ -1215,7 +1402,6 @@ class Action
                     // Update metadata
                     $file['metadata'] = array_merge($file['metadata'] ?? [], $newMetadata);
                     $updated = true;
-
                 }
             }
 
@@ -1297,7 +1483,6 @@ class Action
                     'message' => 'Search query not provided',
                     'data' => []
                 ], JSON_UNESCAPED_UNICODE);
-
             }
 
             $results = [];
@@ -1519,7 +1704,6 @@ class Action
                 'duration' => $duration,
                 'total_read_time' => $new_total
             ]);
-
         } catch (Exception $e) {
             return json_encode([
                 'status' => 0,
@@ -1574,7 +1758,6 @@ class Action
                 'status' => 1,
                 'message' => $favorite ? 'Added to favorites.' : 'Removed from favorites.'
             ]);
-
         } catch (Exception $e) {
             return json_encode([
                 'status' => 0,
@@ -1599,7 +1782,6 @@ class Action
                 'status' => 0,
                 'message' => 'User not logged in.'
             ]);
-
         }
 
         try {
@@ -1712,14 +1894,12 @@ class Action
                 'message' => 'Favorite books retrieved successfully.',
                 'data' => $result
             ]);
-
         } catch (Exception $e) {
             return json_encode([
                 'status' => 0,
                 'message' => 'Error: ' . $e->getMessage()
             ]);
         }
-
     }
 
 
@@ -1742,7 +1922,6 @@ class Action
                 'status' => 0,
                 'message' => 'User not logged in.'
             ]);
-
         }
 
         $user_id = $user['user_id'];
@@ -1758,7 +1937,6 @@ class Action
                     'status' => 0,
                     'message' => 'User not found.'
                 ]);
-
             }
 
             $auth = json_decode($row['authentication_data'], true);
@@ -1769,7 +1947,6 @@ class Action
                     'status' => 0,
                     'message' => 'Current password is incorrect.'
                 ]);
-
             }
 
             // ✅ Hash and update password in JSON
@@ -1802,7 +1979,6 @@ class Action
         $user = $_SESSION['student'] ?? $_SESSION['faculty'] ?? null;
         if (!$user || empty($user['user_id'])) {
             return json_encode(['status' => 0, 'message' => 'User not logged in.']);
-
         }
 
         $user_id = $user['user_id'];
@@ -1826,7 +2002,6 @@ class Action
 
             if (!$row) {
                 return json_encode(['status' => 0, 'message' => 'User not found.']);
-
             }
 
             $personal = json_decode($row['personal_details'], true) ?? [];
@@ -1836,15 +2011,12 @@ class Action
             if (!empty($current_password) || !empty($new_password) || !empty($confirm_password)) {
                 if (empty($auth['password']) || !password_verify($current_password, $auth['password'])) {
                     return json_encode(['status' => 0, 'message' => 'Current password is incorrect.']);
-
                 }
                 if ($new_password !== $confirm_password) {
                     return json_encode(['status' => 0, 'message' => 'New passwords do not match.']);
-
                 }
                 if (strlen($new_password) < 6) {
                     return json_encode(['status' => 0, 'message' => 'Password must be at least 6 characters long.']);
-
                 }
                 $auth['password'] = password_hash($new_password, PASSWORD_DEFAULT);
             }
@@ -1857,7 +2029,6 @@ class Action
 
                 if (!in_array($ext, $allowed)) {
                     return json_encode(['status' => 0, 'message' => 'Invalid image type.']);
-
                 }
 
                 $uploadDir = __DIR__ . '/uploads/' . ($role === 'faculty' ? 'faculty_profiles/' : 'student_profiles/');
@@ -1869,7 +2040,6 @@ class Action
 
                 if (!move_uploaded_file($file['tmp_name'], $destPath)) {
                     return json_encode(['status' => 0, 'message' => 'Failed to upload profile picture.']);
-
                 }
 
                 // Delete old image if exists
@@ -1917,7 +2087,6 @@ class Action
                 'message' => 'Account updated successfully.',
                 'new_image' => $updatedSession['profile_pic'] ?? null
             ]);
-
         } catch (PDOException $e) {
             return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
         }
@@ -2021,12 +2190,9 @@ class Action
                     'auth' => $auth
                 ]
             ]);
-
         } catch (PDOException $e) {
             return json_encode(['status' => 0, 'message' => 'Update failed: ' . $e->getMessage()]);
         }
-
-
     }
 
     function usercrude()
@@ -2057,7 +2223,6 @@ class Action
                     $data = array_merge($personal, $auth);
 
                     return json_encode(['status' => 1, 'data' => $data]);
-
                 } catch (PDOException $e) {
                     return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
                 }
@@ -2226,7 +2391,6 @@ class Action
 
             default:
                 return json_encode(['status' => 0, 'message' => 'Invalid action.']);
-
         }
     }
 
@@ -2349,9 +2513,6 @@ class Action
                 ],
                 'recent' => $recentActivity
             ]);
-
-
-
         } catch (PDOException $e) {
             return json_encode([
                 'status' => 0,
@@ -2401,7 +2562,6 @@ class Action
                 'status' => 1,
                 'message' => 'Removed from favorites.'
             ]);
-
         } catch (Exception $e) {
             return json_encode([
                 'status' => 0,
@@ -2424,7 +2584,6 @@ class Action
                 'status' => 0,
                 'message' => 'User not logged in.'
             ]);
-
         }
 
         try {
@@ -2442,7 +2601,6 @@ class Action
                     'message' => 'Activity log retrieved successfully.',
                     'data' => $readingLogs
                 ]);
-
             } else {
                 return json_encode([
                     'status' => 1,
@@ -2450,7 +2608,6 @@ class Action
                     'data' => []
                 ]);
             }
-
         } catch (Exception $e) {
             return json_encode([
                 'status' => 0,
@@ -2562,7 +2719,6 @@ class Action
                     'profile_pic' => $profile_pic
                 ]
             ]);
-
         } catch (PDOException $e) {
             return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
         }
@@ -2581,11 +2737,10 @@ class Action
                     'status' => 0,
                     'reply' => 'Please enter a message.'
                 ]);
-
             }
 
             // --- API Setup ---
-            $apiKey = 'AIzaSyBK0_P942KBxFGv1yOc4ZYFFfgOpNmcPaY';
+            $apiKey = 'AIzaSyCG1Nph8zT4B8tzx3jlvg8n261oDuMcusQ';
             $model = 'gemini-2.5-flash';
             $url = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey";
 
@@ -2640,6 +2795,7 @@ class Action
                 7. Do not guess or fabricate book data; only use the metadata you have access to.
                 8. If a book is not found, respond politely with: 'No matching book found in the library database.'
                 9. If user credentials or any personal not related in the books responce 
+                10. if user give a details don't give directly details or information if they are not ask for help.
                 
 
                 Important Security Rules:
@@ -2676,7 +2832,7 @@ class Action
                 CURLOPT_POSTFIELDS => json_encode($data, JSON_UNESCAPED_UNICODE),
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-                CURLOPT_TIMEOUT => 60         
+                CURLOPT_TIMEOUT => 60
             ]);
 
             $response = curl_exec($ch);
@@ -2687,7 +2843,6 @@ class Action
                     'status' => 0,
                     'reply' => 'Connection Error: ' . $error_msg
                 ]);
-
             }
             unset($ch);
 
@@ -2698,7 +2853,6 @@ class Action
                     'status' => 0,
                     'reply' => 'Invalid JSON response from AI.'
                 ]);
-
             }
 
             if (isset($res['error'])) {
@@ -2706,7 +2860,6 @@ class Action
                     'status' => 0,
                     'reply' => 'API Error: ' . ($res['error']['message'] ?? 'Unknown error')
                 ]);
-
             }
 
             // --- Extract AI Reply ---
@@ -2720,7 +2873,6 @@ class Action
                 'status' => 1,
                 'reply' => $replyText
             ]);
-
         } catch (Exception $e) {
             return json_encode([
                 'status' => 0,
@@ -2728,8 +2880,4 @@ class Action
             ]);
         }
     }
-
-
-
-
 }
