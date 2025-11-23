@@ -764,15 +764,17 @@ class Action
 
         $folderName = $_POST['folder'] ?? null;
         if (!$folderName) {
-            ob_clean();
+
             return json_encode(['status' => 0, 'message' => 'Folder name is required.']);
         }
 
         $safeFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $folderName);
         if (empty($safeFolderName)) {
-            ob_clean();
+
             return json_encode(['status' => 0, 'message' => 'Invalid folder name.']);
         }
+
+
 
         $targetDir = $baseDir . $safeFolderName . '/';
         $coverDir = $targetDir . 'covers/';
@@ -794,6 +796,8 @@ class Action
             if (!is_array($existingMetadata))
                 $existingMetadata = [];
         }
+
+
 
         $uploadedFiles = [];
         $uploadedCovers = [];
@@ -878,13 +882,52 @@ class Action
             }
         }
 
+
+
         // Merge with existing metadata avoiding duplicates
-        $existingFilenames = array_column($existingMetadata, 'filename');
+        /* $existingFilenames = array_column($existingMetadata, 'filename');
         foreach ($newMetadata as $meta) {
             if (!empty($meta['filename']) && !in_array($meta['filename'], $existingFilenames)) {
                 $existingMetadata[] = $meta;
             }
+        } */
+
+        // === Improved Duplicate Protection ===
+
+        // Build quick-lookup arrays
+        $existingFilenames = array_column($existingMetadata, 'filename');
+        $existingTitles = array_map('strtolower', array_column($existingMetadata, 'title'));
+        $existingCovers = array_column($existingMetadata, 'cover');
+
+        foreach ($newMetadata as $meta) {
+            $filename = $meta['filename'] ?? '';
+            $title = strtolower($meta['title'] ?? '');
+            $cover = $meta['cover'] ?? '';
+
+            // Skip if filename already exists
+            if (!empty($filename) && in_array($filename, $existingFilenames)) {
+                continue;
+            }
+
+            // Skip if title already exists
+            if (!empty($title) && in_array($title, $existingTitles)) {
+                continue;
+            }
+
+            // Skip if cover already exists
+            if (!empty($cover) && in_array($cover, $existingCovers)) {
+                continue;
+            }
+
+            // If unique, add metadata
+            $existingMetadata[] = $meta;
+
+            // Update lookup arrays
+            if (!empty($filename)) $existingFilenames[] = $filename;
+            if (!empty($title)) $existingTitles[] = $title;
+            if (!empty($cover)) $existingCovers[] = $cover;
         }
+
 
         // Update database
         $stmtUpdate = $this->db->prepare("UPDATE folder_structure SET folder_data = ? WHERE folder_name = ?");
@@ -897,7 +940,7 @@ class Action
         );
 
         // Clean any stray output and return JSON
-        ob_clean();
+
         return json_encode([
             'status' => 1,
             'message' => 'Uploaded successfully',
@@ -921,14 +964,14 @@ class Action
 
         $rootFolderName = $_POST['folder'] ?? $_POST['foldername'] ?? null;
         if (!$rootFolderName) {
-            ob_clean();
+            
             return json_encode(['status' => 0, 'message' => 'Target folder name not provided.']);
 
         }
 
         $safeRootFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $rootFolderName);
         if (empty($safeRootFolderName)) {
-            ob_clean();
+            
             return json_encode(['status' => 0, 'message' => 'Invalid folder name after sanitization.']);
 
         }
@@ -937,7 +980,7 @@ class Action
         $coverDir = $targetDir . 'covers/';
 
         if (!is_dir($targetDir) && !mkdir($targetDir, 0777, true)) {
-            ob_clean();
+            
             return json_encode(['status' => 0, 'message' => 'Failed to create target folder.']);
 
         }
@@ -955,7 +998,7 @@ class Action
             for ($i = 0; $i < $length; $i++) {
                 $id .= $chars[random_int(0, strlen($chars) - 1)];
             }
-            ob_clean();
+            
             return $id;
         };
 
@@ -1064,7 +1107,7 @@ class Action
             $targetDir . 'metadata.json',
             json_encode($existingMetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
-        ob_clean();
+        
         return json_encode([
             'status' => 1,
             'message' => 'Folder Uploaded successfully',
@@ -1090,14 +1133,12 @@ class Action
         $rootFolderName = $_POST['folder'] ?? $_POST['foldername'] ?? null;
         if (!$rootFolderName) {
             return json_encode(['status' => 0, 'message' => 'Target folder name not provided.']);
-            return;
         }
 
         // Sanitize folder name
         $safeRootFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $rootFolderName);
         if (empty($safeRootFolderName)) {
             return json_encode(['status' => 0, 'message' => 'Invalid folder name after sanitization.']);
-            return;
         }
 
         $targetDir = $baseDir . $safeRootFolderName . '/';
@@ -1107,7 +1148,6 @@ class Action
         if (!is_dir($targetDir)) {
             if (!mkdir($targetDir, 0777, true)) {
                 return json_encode(['status' => 0, 'message' => 'Failed to create target folder.']);
-                return;
             }
         }
 
@@ -1235,13 +1275,66 @@ class Action
         }
 
         // Prevent duplicate metadata entries
+        // ============================================
+        // Strong Duplicate Protection for Metadata
+        // ============================================
+
+        // Build quick-lookup indexes
         $existingFiles = array_column($existingMetadata, 'filename');
+        $existingTitles = array_map('strtolower', array_column($existingMetadata, 'title'));
+        $existingAuthors = array_map('strtolower', array_column($existingMetadata, 'author'));
+        $existingCovers = array_column($existingMetadata, 'cover');
+
+        // Avoid duplicates based on:
+        // - filename
+        // - title
+        // - title + author combination
+        // - cover image
 
         foreach ($newMetadata as $meta) {
-            if (!empty($meta['filename']) && !in_array($meta['filename'], $existingFiles)) {
-                $existingMetadata[] = $meta;
+
+            $filename = $meta['filename'] ?? '';
+            $title = strtolower($meta['title'] ?? '');
+            $author = strtolower($meta['author'] ?? '');
+            $cover = $meta['cover'] ?? '';
+
+            // Check duplicate by filename
+            if (!empty($filename) && in_array($filename, $existingFiles)) {
+                continue;
             }
+
+            // Check duplicate by title
+            if (!empty($title) && in_array($title, $existingTitles)) {
+                continue;
+            }
+
+            // Check duplicate by title + author
+            if (!empty($title) && !empty($author)) {
+                foreach ($existingMetadata as $e) {
+                    if (
+                        strtolower($e['title'] ?? '') === $title &&
+                        strtolower($e['author'] ?? '') === $author
+                    ) {
+                        continue 2; // skip this metadata
+                    }
+                }
+            }
+
+            // Check duplicate by cover filename
+            if (!empty($cover) && in_array($cover, $existingCovers)) {
+                continue;
+            }
+
+            // If we reach here → metadata is unique
+            $existingMetadata[] = $meta;
+
+            // Update lookup arrays dynamically
+            if (!empty($filename)) $existingFiles[] = $filename;
+            if (!empty($title)) $existingTitles[] = $title;
+            if (!empty($author)) $existingAuthors[] = $author;
+            if (!empty($cover)) $existingCovers[] = $cover;
         }
+
 
         // Save to database
         $this->db->prepare("UPDATE folder_structure SET folder_data = ? WHERE folder_id = ?")
@@ -1469,7 +1562,7 @@ class Action
         return json_encode(['status' => 0, 'message' => 'Book not found']);
     }
 
-    public function searching()
+    /* public function searching()
     {
         header('Content-Type: application/json; charset=utf-8');
 
@@ -1562,7 +1655,112 @@ class Action
                 'data' => []
             ], JSON_UNESCAPED_UNICODE);
         }
+    } */
+
+    public function searching()
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        try {
+            $query = $_POST['q'] ?? '';
+            $query = trim($query);
+
+            if (!$query) {
+                return json_encode([
+                    'status' => 0,
+                    'message' => 'Search query not provided',
+                    'data' => []
+                ], JSON_UNESCAPED_UNICODE);
+            }
+
+            $results = [];
+            $unique = []; // To track duplicates by ISBN + title + author
+
+            // Fetch all folders
+            $sql = "SELECT folder_id, folder_name, folder_data FROM folder_structure";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute();
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($rows as $row) {
+                $folderId = $row['folder_id'];
+                $folderName = $row['folder_name'];
+                $data = json_decode($row['folder_data'], true) ?? [];
+
+                foreach ($data as $file) {
+                    $metadata = $file['metadata'] ?? [];
+
+                    // Flatten searchable fields
+                    $title = $metadata['dc:title'] ?? $metadata['Title'] ?? '';
+                    if (is_array($title)) $title = implode(' ', $title);
+
+                    $author = $metadata['dc:creator'] ?? $metadata['Author'] ?? '';
+                    if (is_array($author)) $author = implode(', ', $author);
+
+                    $isbn = $metadata['prism:isbn'] ?? $metadata['isbn'] ?? $metadata['dc:identifier'] ?? '';
+                    if (is_array($isbn)) $isbn = implode(' ', $isbn);
+
+                    $doi = $metadata['xmp:identifier'] ?? $metadata['dc:identifier'] ?? '';
+                    if (is_array($doi)) $doi = implode(' ', $doi);
+
+                    $subject = $metadata['dc:subject'] ?? '';
+                    if (is_array($subject)) $subject = implode(' ', $subject);
+
+                    $category = $metadata['Custom']['EBX_PUBLISHER'] ?? '';
+                    if (is_array($category)) $category = implode(' ', $category);
+
+                    // Case-insensitive search
+                    if (
+                        stripos($title, $query) !== false ||
+                        stripos($author, $query) !== false ||
+                        stripos($isbn, $query) !== false ||
+                        stripos($doi, $query) !== false ||
+                        stripos($subject, $query) !== false ||
+                        stripos($category, $query) !== false
+                    ) {
+                        // Unique key based only on ISBN + Title + Author
+                        $uniqueKey = strtolower(
+                            trim($isbn) . '|' . trim($title) . '|' . trim($author)
+                        );
+
+                        // Skip if already added
+                        if (isset($unique[$uniqueKey])) {
+                            continue;
+                        }
+
+                        // Mark as added
+                        $unique[$uniqueKey] = true;
+
+                        // Add result
+                        $file['foldername'] = $folderName;
+                        $file['folder_id'] = $folderId;
+                        $results[] = $file;
+                    }
+                }
+            }
+
+            if (count($results) > 0) {
+                return json_encode([
+                    'status' => 1,
+                    'message' => 'Results found',
+                    'data' => $results
+                ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+            } else {
+                return json_encode([
+                    'status' => 0,
+                    'message' => 'No results found',
+                    'data' => []
+                ], JSON_UNESCAPED_UNICODE);
+            }
+        } catch (Exception $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Server error: ' . $e->getMessage(),
+                'data' => []
+            ], JSON_UNESCAPED_UNICODE);
+        }
     }
+
 
     function readingbooks()
     {
@@ -2776,6 +2974,47 @@ class Action
                 - Keep responses concise, clear, and appropriate for professors, teachers, students, or academic researchers.
                 - If a book or resource is not found, respond politely: 'No matching book found in the library database.'
                 - Encourage exploration, learning, and research while keeping guidance professional and short.
+                - 
+                Library Assistant Guidelines:
+
+                    Only reference books using the library’s metadata: Title, Author, ISBN.
+
+                    Suggest credible online resources, journals, or reading guidance when appropriate.
+
+                    Never reveal user credentials, personal information, or internal system data.
+
+                    Never reveal list of books if not ask.
+
+                    Keep all responses concise, clear, and professional, suitable for professors, students, and academic researchers.
+
+                    If a book or resource is not found, respond politely:
+                    `No matching book found in the library database.`
+
+                    Encourage exploration, learning, and research, maintaining a professional tone.
+
+                    Maintain neutrality; do not express personal opinions about authors or publications.
+
+                    Ensure recommendations are relevant to the query or topic.
+                                        
+                    Do not link to unofficial, non-academic, or unsafe sources.
+
+                    Use formal academic language, accessible to all users.
+
+                    Avoid repeating information in the same response.
+
+                    Suggest alternative resources if the exact book is unavailable.
+
+                    Prioritize clarity, correctness, and accessibility over exhaustive detail.
+
+                    Support academic integrity and responsible research practices.
+
+                    Responses must be suitable for all knowledge levels, from beginners to advanced users.
+
+                    Always stay within the scope of academic guidance; never speculate or provide unverified information.
+
+                    Encourage critical thinking and responsible use of resources.
+
+                    Responses should be safe, professional, and appropriate for a university or research environment.       
 
                 User Types You Will Assist:
                 - Professors
