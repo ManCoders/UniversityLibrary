@@ -276,7 +276,7 @@
                         });
 
                         html += `
-                        <div class="border rounded-lg bg-gray-50 dark:bg-gray-700">
+                                <div class="border rounded-lg bg-gray-50 dark:bg-gray-700">
                             <button class="w-full flex justify-between items-center p-3 categoryBtn">
                                 <span class="font-semibold text-gray-900 dark:text-gray-100">${folderName}</span>
                                 <span class="bg-indigo-500 text-white text-xs px-3 text-2xl font-bold py-2 rounded">
@@ -288,16 +288,25 @@
 
                             <div class="categoryList hidden px-4 pb-3">
                                 <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-1">
-                                    ${titles.map(t => `<li>${t}</li>`).join("")}
+                                    ${files
+                                .map(file => `
+                                            <li>
+                                                <a 
+                                                    href="javascript:void(0)" 
+                                                    onclick="openBook('${folderName}', '${file.metadata?.Title ?? file.filename}', '${file.filename}')"
+                                                    class="text-indigo-600 dark:text-indigo-400 hover:underline"
+                                                >
+                                                    ${file.metadata?.Title ?? file.filename}
+                                                </a>
+                                            </li>
+                                        `)
+                                .join("")}
                                 </ol>
                             </div>
                         </div>
-                        `;
+                    `;
+                        $("#booksContainer").html(html);
                     });
-                    $("#booksContainer").html(html);
-
-
-
 
 
 

@@ -829,6 +829,7 @@
         });
         $container.on("click", ".read-btn", function () {
             const filePath = $(this).data("file");
+            console.log("Requesting reading session for file:", filePath);
             if (!filePath) return;
 
             console.log("Requesting reading session for file:", filePath);
