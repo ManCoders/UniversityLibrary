@@ -5,35 +5,42 @@
     </h1>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-indigo-500 cursor-pointer 
-                hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
-            data-panel="booksPanel">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Available Books</p>
-            <p id="statBooks" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
 
-        </div>
-        <!-- <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-red-500 cursor-pointer 
-                hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
-            data-panel="panelDepartment">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400"></p>
-            <p id="statDepartment" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <p class="text-xs text-red-500 mt-2">Action required</p>
-        </div> -->
-        <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-emerald-500 cursor-pointer 
-                hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
-            data-panel="OnlinePanel">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active Users</p>
-            <p id="OnlineUsers" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <!-- <p class="text-xs text-red-500 mt-2">↓ 0% this month</p> -->
+        <div data-panel="booksPanel" class="stat-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl border-l-8 border-indigo-500 cursor-pointer 
+                transform transition duration-300 ease-in-out flex flex-col items-center text-center w-full max-w-xs">
+            <div class="flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-indigo-50 dark:bg-indigo-900">
+                <svg class="w-8 h-8 text-indigo-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 2H9a2 2 0 00-2 2v16l7-3 7 3V4a2 2 0 00-2-2z" />
+                </svg>
+            </div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Available Books</p>
+            <p id="statBooks" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">0</p>
         </div>
 
-        <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-yellow-500 cursor-pointer 
-                hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
-            data-panel="requestsPanel">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Registered Account </p>
-            <p id="statRequests" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <!-- <p class="text-xs text-yellow-500 mt-2">Last updated just now</p> -->
+        <div data-panel="OnlinePanel" class="stat-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl border-l-8 border-emerald-500 cursor-pointer 
+                transform transition duration-300 ease-in-out flex flex-col items-center text-center w-full max-w-xs">
+            <div class="flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-emerald-50 dark:bg-emerald-900">
+                <svg class="w-8 h-8 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Active Users</p>
+            <p id="OnlineUsers" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">0</p>
+        </div>
+
+        <div data-panel="requestsPanel" class="stat-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl border-l-8 border-yellow-500 cursor-pointer 
+                transform transition duration-300 ease-in-out flex flex-col items-center text-center w-full max-w-xs">
+            <div class="flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-yellow-50 dark:bg-yellow-900">
+                <svg class="w-8 h-8 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Registered Accounts
+            </p>
+            <p id="statRequests" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">0</p>
         </div>
 
 
@@ -110,7 +117,7 @@
         <div>
             <h3 class="text-lg font-bold mb-2 text-green-600">Online</h3>
             <ul id="onlineList" class="space-y-2 text-sm">
-                
+
             </ul>
         </div>
 
@@ -118,7 +125,7 @@
         <div>
             <h3 class="text-lg font-bold mb-2 text-red-600">Offline</h3>
             <ul id="offlineList" class="space-y-2 text-sm">
-                
+
             </ul>
         </div>
 
@@ -233,7 +240,7 @@
                     let offlineHtml = '';
                     (users.offline_users || []).forEach((user, index) => {
                         let details = JSON.parse(user.personal_details);
-                        
+
                         let fullName = [details.firstname, details.middlename, details.lastname].filter(Boolean).join(' ');
                         let userId = user.admin_id || user.user_id || 'N/A';
                         offlineHtml += `
