@@ -462,18 +462,30 @@ class Action
         if (!isset($input['role'])) {
             return json_encode(['status' => 0, 'message' => 'User role is required']);
         }
+
+        if (!isset($input['role'])) {
+            return json_encode(['status' => 0, 'message' => 'User role is required']);
+        }
+
+        if (!isset($input['role'])) {
+            return json_encode(['status' => 0, 'message' => 'User role is required']);
+        }
+
         $role = strtolower($input['role']);
         if (!in_array($role, ['student', 'faculty'])) {
             return json_encode(['status' => 0, 'message' => 'Invalid role']);
         }
 
         // Common required fields
-        $requiredFields = ['firstname', 'lastname', 'username', 'password', 'email', 'department', 'role'];
+        $requiredFields = ['firstname', 'lastname', 'username', 'password', 'confirm_password', 'email', 'department', 'role'];
         foreach ($requiredFields as $field) {
             if (empty($input[$field])) {
                 return json_encode(['status' => 0, 'message' => "Missing required field: $field"]);
             }
         }
+
+        
+
 
         // Role-specific fields
         if ($role === 'student') {
@@ -492,6 +504,12 @@ class Action
         $data = array_map('trim', $input);
 
         // Hash password
+        if ($data['confirm_password'] !== $data['password']) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Confirm password not match!'
+            ]);
+        }
         $hashed_password = password_hash($data['password'], PASSWORD_BCRYPT);
 
         // Handle profile pic (Base64)
@@ -564,6 +582,7 @@ class Action
                 *,
                 JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.firstname')) AS firstname,
                 JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.lastname')) AS lastname,
+                JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.middlename')) AS middlename,
                 JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.profile_pic')) AS profile_pic,
                 JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.department')) AS department,
                 JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) AS email,
@@ -923,9 +942,12 @@ class Action
             $existingMetadata[] = $meta;
 
             // Update lookup arrays
-            if (!empty($filename)) $existingFilenames[] = $filename;
-            if (!empty($title)) $existingTitles[] = $title;
-            if (!empty($cover)) $existingCovers[] = $cover;
+            if (!empty($filename))
+                $existingFilenames[] = $filename;
+            if (!empty($title))
+                $existingTitles[] = $title;
+            if (!empty($cover))
+                $existingCovers[] = $cover;
         }
 
 
@@ -964,14 +986,14 @@ class Action
 
         $rootFolderName = $_POST['folder'] ?? $_POST['foldername'] ?? null;
         if (!$rootFolderName) {
-            
+
             return json_encode(['status' => 0, 'message' => 'Target folder name not provided.']);
 
         }
 
         $safeRootFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $rootFolderName);
         if (empty($safeRootFolderName)) {
-            
+
             return json_encode(['status' => 0, 'message' => 'Invalid folder name after sanitization.']);
 
         }
@@ -980,7 +1002,7 @@ class Action
         $coverDir = $targetDir . 'covers/';
 
         if (!is_dir($targetDir) && !mkdir($targetDir, 0777, true)) {
-            
+
             return json_encode(['status' => 0, 'message' => 'Failed to create target folder.']);
 
         }
@@ -998,7 +1020,7 @@ class Action
             for ($i = 0; $i < $length; $i++) {
                 $id .= $chars[random_int(0, strlen($chars) - 1)];
             }
-            
+
             return $id;
         };
 
@@ -1107,7 +1129,7 @@ class Action
             $targetDir . 'metadata.json',
             json_encode($existingMetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
         );
-        
+
         return json_encode([
             'status' => 1,
             'message' => 'Folder Uploaded successfully',
@@ -1193,7 +1215,8 @@ class Action
         if (!empty($_FILES['files']['name'][0])) {
             foreach ($_FILES['files']['name'] as $i => $name) {
 
-                if ($_FILES['files']['error'][$i] !== UPLOAD_ERR_OK) continue;
+                if ($_FILES['files']['error'][$i] !== UPLOAD_ERR_OK)
+                    continue;
 
                 $tmp = $_FILES['files']['tmp_name'][$i];
                 $ext = pathinfo($name, PATHINFO_EXTENSION) ?: 'pdf';
@@ -1214,12 +1237,14 @@ class Action
         if (!empty($_FILES['covers']['name'])) {
             foreach ($_FILES['covers']['name'] as $i => $name) {
 
-                if ($_FILES['covers']['error'][$i] !== UPLOAD_ERR_OK) continue;
+                if ($_FILES['covers']['error'][$i] !== UPLOAD_ERR_OK)
+                    continue;
 
                 $tmp = $_FILES['covers']['tmp_name'][$i];
                 $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
 
-                if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp'])) continue;
+                if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp']))
+                    continue;
 
                 $newCoverName = $generateId(8) . '.' . $ext;
                 $destination = $coverDir . $newCoverName;
@@ -1329,10 +1354,14 @@ class Action
             $existingMetadata[] = $meta;
 
             // Update lookup arrays dynamically
-            if (!empty($filename)) $existingFiles[] = $filename;
-            if (!empty($title)) $existingTitles[] = $title;
-            if (!empty($author)) $existingAuthors[] = $author;
-            if (!empty($cover)) $existingCovers[] = $cover;
+            if (!empty($filename))
+                $existingFiles[] = $filename;
+            if (!empty($title))
+                $existingTitles[] = $title;
+            if (!empty($author))
+                $existingAuthors[] = $author;
+            if (!empty($cover))
+                $existingCovers[] = $cover;
         }
 
 
@@ -1692,22 +1721,28 @@ class Action
 
                     // Flatten searchable fields
                     $title = $metadata['dc:title'] ?? $metadata['Title'] ?? '';
-                    if (is_array($title)) $title = implode(' ', $title);
+                    if (is_array($title))
+                        $title = implode(' ', $title);
 
                     $author = $metadata['dc:creator'] ?? $metadata['Author'] ?? '';
-                    if (is_array($author)) $author = implode(', ', $author);
+                    if (is_array($author))
+                        $author = implode(', ', $author);
 
                     $isbn = $metadata['prism:isbn'] ?? $metadata['isbn'] ?? $metadata['dc:identifier'] ?? '';
-                    if (is_array($isbn)) $isbn = implode(' ', $isbn);
+                    if (is_array($isbn))
+                        $isbn = implode(' ', $isbn);
 
                     $doi = $metadata['xmp:identifier'] ?? $metadata['dc:identifier'] ?? '';
-                    if (is_array($doi)) $doi = implode(' ', $doi);
+                    if (is_array($doi))
+                        $doi = implode(' ', $doi);
 
                     $subject = $metadata['dc:subject'] ?? '';
-                    if (is_array($subject)) $subject = implode(' ', $subject);
+                    if (is_array($subject))
+                        $subject = implode(' ', $subject);
 
                     $category = $metadata['Custom']['EBX_PUBLISHER'] ?? '';
-                    if (is_array($category)) $category = implode(' ', $category);
+                    if (is_array($category))
+                        $category = implode(' ', $category);
 
                     // Case-insensitive search
                     if (
@@ -2211,7 +2246,7 @@ class Action
                     return json_encode(['status' => 0, 'message' => 'Current password is incorrect.']);
                 }
                 if ($new_password !== $confirm_password) {
-                    return json_encode(['status' => 0, 'message' => 'New passwords do not match.']);
+                    return json_encode(['status' => 0, 'message' => 'New password not match!']);
                 }
                 if (strlen($new_password) < 6) {
                     return json_encode(['status' => 0, 'message' => 'Password must be at least 6 characters long.']);
@@ -2407,7 +2442,7 @@ class Action
         switch ($action) {
             case 'GetFaculty':
                 try {
-                    $stmt = $this->db->prepare("SELECT personal_details, authentication_data FROM user WHERE user_id = ?");
+                    $stmt = $this->db->prepare("SELECT * FROM user WHERE user_id = ?");
                     $stmt->execute([$user_id]);
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 

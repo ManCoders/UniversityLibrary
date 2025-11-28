@@ -692,6 +692,7 @@
             });
 
             function sendRegisterRequest(data) {
+                console.log(data);
                 $.ajax({
                     url: `${base_url}auth/action.php?action=register_user`,
                     type: 'POST',

@@ -20,7 +20,11 @@
             </button>
             <button id="tab-teacher-table"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Teacher Table
+                Faculty Table
+            </button>
+            <button id="tab-request-table"
+                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Acccount Approval
             </button>
         </nav>
 
@@ -239,6 +243,33 @@
             </tbody>
         </table>
     </div>
+    <!-- Approval request -->
+    <div id="approval-table-content" class="tab-panel hidden">
+        <table
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        ID</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Name</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Email</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Department</th>
+                    <th
+                        class="px-1 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="teacherTableBody">
+            </tbody>
+        </table>
+    </div>
 
     <!-- View info tab -->
     <div id="view-content" class="tab-panel hidden">
@@ -253,78 +284,71 @@
                     Back
                 </button>
             </div>
-
-            <!-- Grid Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-                <!-- Left Column: Profile -->
+            <div class="flex flex-col sm:flex-row gap-6 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                <!-- LEFT: Profile Upload -->
                 <div
-                    class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
-
-                    <span id="viewStatus"
-                        class="mb-2 text-xs font-semibold bg-yellow-100 dark:bg-yellow-600 text-yellow-700 dark:text-yellow-200 px-2 py-0.5 rounded">
-                        Pending
-                    </span>
-
-                    <img id="viewProfilePic" src="" alt="Profile Picture"
-                        class="w-32 h-32 rounded-full object-cover border-4 border-indigo-500 shadow-md" />
-
-                    <h2 id="viewFullname" class="text-2xl font-bold mt-4 text-gray-900 dark:text-white">
-                        Loading...
-                    </h2>
-
-                    <p id="viewRole"
-                        class="text-xs uppercase tracking-wide text-indigo-600 dark:text-indigo-400 font-medium">
-                        Role
-                    </p>
-
-                    <div class="w-full mt-6 space-y-4 text-gray-700 dark:text-gray-300 text-left">
-
-                        <div>
-                            <label class="block text-xs uppercase font-semibold opacity-60">Email</label>
-                            <p id="viewEmail" class="text-sm break-words">Loading...</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs uppercase font-semibold opacity-60">Username</label>
-                            <p id="viewUsername" class="text-sm">Loading...</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs uppercase font-semibold opacity-60">Course</label>
-                            <p id="viewCourse" class="text-sm uppercase">N/A</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs uppercase font-semibold opacity-60">Department</label>
-                            <p id="viewDepartment" class="text-sm uppercase">N/A</p>
-                        </div>
-
+                    class="flex flex-col items-center justify-center w-full sm:w-[35%] border-r border-[#b03060]/40 dark:border-[#800000]/40 pr-4">
+                    <div
+                        class="relative w-32 h-32 rounded-full overflow-hidden border border-[#b03060] dark:border-[#ff4d6d]">
+                        <img id="viewProfilePic" src="../../assets/default-profile.png" alt="Profile Preview"
+                            class="w-full h-full object-cover">
+                    </div>
+                    <label for="profile" id="viewStatus"
+                        class="mt-3 cursor-pointer text-sm font-semibold text-[#b03060] dark:text-[#ff4d6d] hover:underline">
+                        Status
+                    </label>
+                    <div class="px-4 py-2 gap-2">
+                        <button id="approveBtn"
+                            class="approveBtn px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 mr-1">Approve</button>
+                        <button id="declineBtn"
+                            class="declineBtn px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600">Decline</button>
                     </div>
                 </div>
 
-                <!-- Right Column: Recent Activity -->
-                <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+                <!-- RIGHT: Registration Form -->
+                <div class="flex-1">
+                    <form id="maintenance" class="space-y-4" enctype="multipart/form-data">
 
-                    <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white mb-4">
-                        Recent Activity
-                    </h2>
 
-                    <div class="flex justify-between items-center mb-3">
-                        <h3
-                            class="text-sm font-semibold text-gray-600 dark:text-gray-300 border-b dark:border-gray-600 pb-1">
-                            Read Logs
-                        </h3>
-                    </div>
+                        <!-- Name Fields -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="text" id="firstname" name="firstname" placeholder="First Name" required
+                                class="input-field border  rounded-lg py-3 p-2">
+                            <input type="text" id="lastname" name="lastname" placeholder="Last Name" required
+                                class="input-field border rounded-lg py-3 p-2">
+                            <input type="text" id="middlename" name="middlename" placeholder="Middle Name"
+                                class="input-field border rounded-lg py-3 p-2">
+                            <input type="text" id="suffix" name="suffix" placeholder="Suffix (e.g. Jr., III)"
+                                class="input-field border rounded-lg py-3 p-2">
+                        </div>
 
-                    <div id="book_logs"
-                        class="space-y-3 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
-                    </div>
+                        <!-- Student Section -->
+                        <div id="student-fields" class=" grid grid-cols-2 gap-3">
+                            <!-- Department -->
+                            <input type="text" id="department" name="department" placeholder="Department"
+                                class="input-field border rounded-lg py-3 p-2 w-full">
+                            <input type="text" id="student_id" name="student_id" placeholder="Student ID"
+                                class="input-field border rounded-lg py-3 p-2 w-full">
+                            <input type="text" id="course" name="course" placeholder="Course"
+                                class="input-field border rounded-lg py-3 p-2 w-full">
+                            <input type="text" id="section" name="section" placeholder="Section"
+                                class="input-field border rounded-lg py-3 p-2 w-full">
+                        </div>
 
+                        <!-- Email & Username -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="email" id="viewEmail" name="email" placeholder="Email" required
+                                class="input-field border rounded-lg py-3 p-2">
+                            <input type="text" id="viewUsername" name="username" placeholder="Username" required
+                                class="input-field border rounded-lg py-3 p-2">
+                        </div>
+
+                        <!-- Message -->
+                        <p id="register-message" class="text-sm text-red-500 hidden"></p>
+
+                    </form>
                 </div>
-
             </div>
-
         </div>
     </div>
 
@@ -464,6 +488,8 @@
         $('#tab-faculty').click(function () { activateTab('#tab-faculty', '#user-content'); });
         $('#tab-student-table').click(function () { activateTab('#tab-student-table', '#student-table-content'); });
         $('#tab-teacher-table').click(function () { activateTab('#tab-teacher-table', '#teacher-table-content'); });
+        $('#tab-request-table').click(function () { activateTab('#tab-request-table', '#teacher-table-content'); });
+
 
         $("#searchFaculty").on("keyup", function () {
             loadFaculty($(this).val());
@@ -497,7 +523,7 @@
                             const row = `
                                     <tr class="text-indigo" data-id="${user.user_id}">
                                         <td class="px-4 py-2">${index + 1}</td>
-                                        <td class="px-4 py-2">${user.firstname} ${user.lastname}</td>
+                                        <td class="px-4 py-2">${user.firstname} ${user.middlename}, ${user.lastname}</td>
                                         <td class="px-4 py-2">${user.email}</td>
                                         <td class="px-4 py-2">${user.department}</td>
                                         <td class="px-2 py-2 text-center flex justify-center gap-1">
@@ -523,7 +549,7 @@
             });
         }
 
-        $(document).on("click", ".view-btn, .edit-btn, .delete-btn", function () {
+        $(document).on("click", ".view-btn, .edit-btn, .delete-btn, .approveBtn, .declineBtn", function () {
             const tr = $(this).closest("tr");
             const userId = tr.data("id");
 
@@ -541,12 +567,18 @@
 
                     success: function (res) {
                         if (res.status === 1) {
-                            $("#viewFullname").text(res.data.firstname + " " + res.data.lastname);
-                            $("#viewEmail").text(res.data.email);
-                            $("#viewUsername").text(res.data.username);
-                            $("#viewDepartment").text(res.data.department);
-                            $("#viewCourse").text(res.data.course);
-                            $("#viewRole").text(res.data.user_role);
+                            $('#student_id').val(res.data.student_id);
+                            $("#firstname").val(res.data.firstname);
+                            $("#lastname").val(res.data.lastname);
+                            $("#middlename").val(res.data.middlename);
+                            $("#suffix").val(res.data.suffix);
+                            $('#course').val(res.data.course);
+                            $('#section').val(res.data.section);
+                            $("#viewEmail").val(res.data.email);
+                            $("#viewUsername").val(res.data.username);
+                            $("#department").val(res.data.department);
+                            $("#viewCourse").val(res.data.course);
+                            $("#viewRole").val(res.data.user_role);
                             $("#viewStatus").text(res.data.account_status);
 
                             if (res.data.profile_pic) {
@@ -554,6 +586,7 @@
                             } else {
                                 $("#viewProfilePic").attr("src", base_url + "../../assets/default-profile.png");
                             }
+
                         } else {
                             alert(res.message);
                         }
@@ -565,7 +598,9 @@
                 });
 
             }
+            
             else if ($(this).hasClass("edit-btn")) {
+
                 activateTab(`.tab-panel`, `#edit-content`);
 
                 $.ajax({
@@ -725,13 +760,7 @@
                 formData.employee_id = $("input[name='employee_id']").val();
             }
 
-            // Password confirmation check
-            if (formData.password !== formData.confirm_password) {
-                registerMessage.text("Passwords do not match")
-                    .removeClass("hidden text-green-500")
-                    .addClass("text-red-500");
-                return;
-            }
+
 
             // Convert profile image to Base64 if selected
             const fileInput = $('#profile')[0].files[0];
@@ -810,7 +839,25 @@
             });
         });
 
+        $(document).on('click', '.approveBtn, .declineBtn', function () {
+            
 
+            const user_id = $(this).data('id');
+            const action = $(this).hasClass('approveBtn') ? 'Approved' : 'Declined';
+
+            if (!confirm(`${action} this request?`)) return;
+
+            $('#upload-spinner').removeClass('hidden').show();
+
+            $.post(`${base_url}auth/action.php?action=account_status`, { user_id, action }, res => {
+                $('#upload-spinner').hide();
+                if (res.status) {
+                    alert(`Request ${action.toLowerCase()}`);
+                    loadApprovalRequests();
+                    loadDashboardStats(); // refresh chart
+                } else alert(res.message || 'Operation failed');
+            }, 'json').fail(() => alert('Server error'));
+        });
 
     });
 </script>

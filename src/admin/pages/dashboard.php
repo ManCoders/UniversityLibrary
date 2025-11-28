@@ -11,15 +11,15 @@
             data-panel="booksPanel">
             <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Available Books</p>
             <p id="statBooks" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <p class="text-xs text-green-500 mt-2">↑ 0% this month</p>
+
         </div>
-        <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-red-500 cursor-pointer 
+        <!-- <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-red-500 cursor-pointer 
                 hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
             data-panel="panelDepartment">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Department Folder</p>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400"></p>
             <p id="statDepartment" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <!-- <p class="text-xs text-red-500 mt-2">Action required</p> -->
-        </div>
+            <p class="text-xs text-red-500 mt-2">Action required</p>
+        </div> -->
         <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-emerald-500 cursor-pointer 
                 hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
             data-panel="OnlinePanel">
@@ -41,12 +41,63 @@
 
 </div>
 
-<!-- Panels -->
-<div id="booksPanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
-    <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Under Maintenance</h2>
-    <canvas id="booksChart" class="mt-4"></canvas>
+<div id="booksPanel" class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6 hidden">
+    <button class="backBtn mb-4 px-5 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+        Back
+    </button>
+
+    <h2 class="text-xl text-gray-900 dark:text-gray-100 mb-2">
+        Books by Category
+    </h2>
+
+    <div class="space-y-2">
+        <div id="booksContainer" class="space-y-4"></div>
+        <!-- <div class="border rounded-lg bg-gray-50 dark:bg-gray-700">
+            <button class="w-full flex justify-between items-center p-3 categoryBtn">
+                <span class="font-semibold text-gray-900 dark:text-gray-100">Science</span>
+                <span class="bg-indigo-500 text-white text-xs px-3 text-2xl font-bold py-2 rounded font-bold">Total book: <span class="">12</span></span>
+            </button>
+
+            <hr class="border-gray-300 dark:border-gray-600">
+
+            <div class="categoryList hidden px-4 pb-3">
+                <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-1">
+                    <li>Physics Handbook</li>
+                    <li>Chemistry Essentials</li>
+                    <li>Biology Intro</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="border rounded-lg bg-gray-50 dark:bg-gray-700">
+            <button class="w-full flex justify-between items-center p-3 categoryBtn">
+                <span class="font-semibold text-gray-900 dark:text-gray-100">Science</span>
+                <span class="bg-indigo-500 text-white text-xs px-3 text-2xl font-bold py-2 rounded font-bold">Total book: <span class="">12</span></span>
+            </button>
+
+            <hr class="border-gray-300 dark:border-gray-600">
+
+            <div class="categoryList hidden px-4 pb-3">
+                <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-1">
+                    <li>Physics Handbook</li>
+                    <li>Chemistry Essentials</li>
+                    <li>Biology Intro</li>
+                </ol>
+            </div>
+        </div>
+ -->
+    </div>
 </div>
+
+<script>
+    $(document).on('click', '.categoryBtn', function () {
+        $(this).closest('div').find('.categoryList').toggleClass('hidden');
+    });
+</script>
+
+
+
+
 
 <div id="OnlinePanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
     <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
@@ -82,21 +133,7 @@
                 </thead>
 
                 <tbody id="approvalTable" class="text-gray-800 dark:text-gray-100">
-                    <!-- Dynamic rows go here -->
-                    <!-- Example row:
-                    <tr class="border-b dark:border-gray-700">
-                        <td class="px-4 py-2">John Doe</td>
-                        <td class="px-4 py-2">Account Activation</td>
-                        <td class="px-4 py-2">2025-11-20</td>
-                        <td class="px-4 py-2 text-center">
-                            <span class="px-3 py-1 text-xs font-semibold rounded bg-yellow-100 text-yellow-700">Pending</span>
-                        </td>
-                        <td class="px-4 py-2 text-center">
-                            <button class="approveBtn px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs">Approve</button>
-                            <button class="declineBtn px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs ml-2">Decline</button>
-                        </td>
-                    </tr>
-                    -->
+
                 </tbody>
             </table>
         </div>
@@ -176,8 +213,52 @@
                     const allBooks = Object.values(dashboardData.stats.booksperfolder)
                         .flat();
 
-                    console.log(allBooks);
+                    console.log('Array: ', allBooks);
                     console.log('Total books:', allBooks.length);
+
+
+                    if (res.status !== 1 || !res.stats || !res.stats.booksperfolder) {
+                        $("#booksContainer").html("<p class='text-red-500'>No data found.</p>");
+                        return;
+                    }
+                    const folders = res.stats.booksperfolder;
+                    let html = "";
+
+                    $.each(folders, function (folderName, files) {
+
+                        // Extract titles properly
+                        const titles = files.map(file => {
+                            if (file.metadata?.Title) return file.metadata.Title;
+                            if (file.metadata?.["dc:title"]) return file.metadata["dc:title"];
+                            return file.filename; // fallback
+                        });
+
+                        html += `
+                        <div class="border rounded-lg bg-gray-50 dark:bg-gray-700">
+                            <button class="w-full flex justify-between items-center p-3 categoryBtn">
+                                <span class="font-semibold text-gray-900 dark:text-gray-100">${folderName}</span>
+                                <span class="bg-indigo-500 text-white text-xs px-3 text-2xl font-bold py-2 rounded">
+                                    Total book: <span>${titles.length}</span>
+                                </span>
+                            </button>
+
+                            <hr class="border-gray-300 dark:border-gray-600">
+
+                            <div class="categoryList hidden px-4 pb-3">
+                                <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-1">
+                                    ${titles.map(t => `<li>${t}</li>`).join("")}
+                                </ol>
+                            </div>
+                        </div>
+                        `;
+                    });
+
+                    $("#booksContainer").html(html);
+
+
+
+
+
 
                     $('#statBooks').text(allBooks.length || null);
 
