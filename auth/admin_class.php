@@ -168,7 +168,7 @@ class Action
             $stmt = $this->db->prepare("INSERT INTO user_logs (user_id, activity) VALUES (?, ?)");
             $stmt->execute([$user_id, $logs]);
 
-            $stmt = $this->db->prepare("UPDATE user SET is_logged_in = 1, WHERE user_id =");
+            $stmt = $this->db->prepare("UPDATE user SET is_logged_in = 1, updated_date =NOW()  WHERE user_id =");
             $stmt->execute([$user_id]);
 
             return json_encode([
@@ -400,6 +400,7 @@ class Action
                 json_encode([
                     'firstname' => $admin['firstname'],
                     'middlename' => $admin['middlename'] ?? '',
+                    'library_id' => 'admin-' . str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT),
                     'lastname' => $admin['lastname'],
                     'admin_profile_pic' => $admin['admin_profile_pic'] ?? ''
                 ]),
@@ -484,7 +485,7 @@ class Action
             }
         }
 
-        
+
 
 
         // Role-specific fields
@@ -2135,6 +2136,61 @@ class Action
         }
     }
 
+    function GetStudentActivities()
+{
+    try {
+        $user_id = $_POST['user_id'] ?? $_GET['user_id'] ?? null; // accept POST or GET
+        if (!$user_id) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'User ID not provided.'
+            ]);
+        }
+
+        $stmt = $this->db->prepare("
+            SELECT id, book_title, start_time, end_time, duration, is_favorite
+            FROM reading_logs
+            WHERE user_id = ?
+            ORDER BY updated_at DESC
+            LIMIT 10
+        ");
+        $stmt->execute([$user_id]);
+        $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $activities = array_map(function ($log) {
+            $start = new DateTime($log['start_time']);
+            $end = $log['end_time'] ? new DateTime($log['end_time']) : new DateTime();
+            $interval = $start->diff($end);
+            $hours = $interval->h;
+            $minutes = $interval->i;
+            $consumed = ($hours ? $hours . 'h ' : '') . ($minutes ? $minutes . 'm' : '0m');
+
+            return [
+                'id' => $log['id'],
+                'book_title' => $log['book_title'],
+                'start_time' => $log['start_time'],
+                'end_time' => $log['end_time'] ?? null,
+                'consumed' => $consumed,
+                'remark' => $log['is_favorite'] ? 'Favorited' : ''
+            ];
+        }, $logs);
+
+        return json_encode([
+            'status' => 1,
+            'message' => 'Student activities retrieved successfully.',
+            'data' => $activities
+        ]);
+
+    } catch (Exception $e) {
+        return json_encode([
+            'status' => 0,
+            'message' => 'Error: ' . $e->getMessage()
+        ]);
+    }
+}
+
+
+
 
     function change_password()
     {
@@ -2658,34 +2714,35 @@ class Action
 
             // Count online users (students + faculty)
             $stmtActiveUsers = $this->db->query("
-                SELECT COUNT(*) FROM user WHERE is_logged_in = 1
+                SELECT * FROM user WHERE is_logged_in = 1
             ");
-            $activeUsers = (int) $stmtActiveUsers->fetchColumn();
+            $activeUsers = $stmtActiveUsers->fetchAll(PDO::FETCH_ASSOC);
 
             // Count online admins
             $stmtActiveAdmins = $this->db->query("
-                SELECT COUNT(*) FROM admin WHERE is_logged_in = 1
+                SELECT * FROM admin WHERE is_logged_in = 1
             ");
-            $activeAdmins = (int) $stmtActiveAdmins->fetchColumn();
+            $activeAdmins = $stmtActiveAdmins->fetchAll(PDO::FETCH_ASSOC);
 
             // Total active users including admins
-            $totalActiveUsers = $activeUsers + $activeAdmins;
+            $totalActiveUsers = array_merge($activeUsers, $activeAdmins);
+            // $totalActiveUsers = $activeUsers + $activeAdmins;
 
             // Count offline users (students + faculty)
             $stmtOfflineUsers = $this->db->query("
-                SELECT COUNT(*) FROM user WHERE is_logged_in = 0
+                SELECT * FROM user WHERE is_logged_in = 0
             ");
-            $offlineUsers = (int) $stmtOfflineUsers->fetchColumn();
+            $offlineUsers = $stmtOfflineUsers->fetchAll(PDO::FETCH_ASSOC);
 
             // Count offline admins
             $stmtOfflineAdmins = $this->db->query("
-                SELECT COUNT(*) FROM admin WHERE is_logged_in = 0
+                SELECT * FROM admin WHERE is_logged_in = 0
             ");
-            $offlineAdmins = (int) $stmtOfflineAdmins->fetchColumn();
 
+            $offlineAdmins = $stmtOfflineAdmins->fetchAll(PDO::FETCH_ASSOC);
             // Total offline users including admins
-            $totalOfflineUsers = $offlineUsers + $offlineAdmins;
-
+            // $totalOfflineUsers = $offlineUsers + $offlineAdmins;
+            $totalOfflineUsers = array_merge($offlineUsers, $offlineAdmins);
             // -------------------- Recent Activity --------------------
             $stmt = $this->db->query("
             SELECT activity AS message, DATE_FORMAT(log_time, '%Y-%m-%d %H:%i') AS time 
@@ -2740,9 +2797,11 @@ class Action
                     'department' => $departments,
                     'folder_names' => $folderNames,
                     'requests' => $totals,
-                    'online' => $totalActiveUsers,
-                    'offline' => $totalOfflineUsers,
-                    'totalusers' => $totalActiveUsers + $totalOfflineUsers
+                    'online_users' => $totalActiveUsers,
+                    'offline_users' => $totalOfflineUsers,
+                    'online' => count($totalActiveUsers),
+                    'offline' => count($totalOfflineUsers),
+                    'totalusers' => count($totalActiveUsers) + count($totalOfflineUsers)
                 ],
                 'recent' => $recentActivity
             ]);

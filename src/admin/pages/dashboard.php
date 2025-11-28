@@ -100,44 +100,44 @@
 
 
 <div id="OnlinePanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
-    <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Users Logged Monitoring</h2>
-    <canvas id="usersChart" class="mt-4"></canvas>
+    <button class="backBtn mb-4 px-4 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
+
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Users Logged Monitoring</h2>
+    <canvas id="usersChart" class="mt-6"></canvas>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- ONLINE USERS -->
+        <div>
+            <h3 class="text-lg font-bold mb-2 text-green-600">Online</h3>
+            <ul id="onlineList" class="space-y-2 text-sm">
+                
+            </ul>
+        </div>
+
+        <!-- OFFLINE USERS -->
+        <div>
+            <h3 class="text-lg font-bold mb-2 text-red-600">Offline</h3>
+            <ul id="offlineList" class="space-y-2 text-sm">
+                
+            </ul>
+        </div>
+
+    </div>
+
+
 </div>
+
 <div id="panelDepartment" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
     <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
     <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Department Books Monitoring</h2>
     <canvas id="offlineChart" class="mt-4"></canvas>
 </div>
 <div id="requestsPanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
-    <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
+    <button class="backBtn mb-4 px-4 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
 
     <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Registration Requests Approval</h2>
 
     <canvas id="requestsChart" class="mt-4"></canvas>
-
-    <!-- Approval Table -->
-    <div class="mt-8">
-        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3">Approval Requests</h3>
-
-        <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-            <table class="min-w-full text-sm text-left">
-                <thead class="bg-gray-100 dark:bg-gray-700 dark:text-gray-200">
-                    <tr>
-                        <th class="px-4 py-2">User</th>
-                        <th class="px-4 py-2">Request Type</th>
-                        <th class="px-4 py-2">Date</th>
-                        <th class="px-4 py-2 text-center">Status</th>
-                        <th class="px-4 py-2 text-center">Action</th>
-                    </tr>
-                </thead>
-
-                <tbody id="approvalTable" class="text-gray-800 dark:text-gray-100">
-
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
 
 
@@ -202,13 +202,48 @@
                         offline: 0
                     };
 
-
                     dashboardData.stats = {
                         totalDepartment: res.stats.totalDepartment || 0, //locked this
                         folder_names: res.stats.folder_names || [], //locked this
                         booksperfolder: res.stats.booksperfolder || {}
                     };
 
+                    if (res.status !== 1) {
+                        $('#onlineList, #offlineList').html('<li class="text-red-500">No data found</li>');
+                        return;
+                    }
+
+                    const users = res.stats || { online_users: [], offline_users: [] };
+                    $('#OnlineUsers').text(res.stats.totalusers || 0);
+                    let onlineHtml = '';
+                    (users.online_users || []).forEach((user, index) => {
+                        let details = JSON.parse(user.personal_details);
+                        let fullName = [details.firstname, details.middlename, details.lastname].filter(Boolean).join(' ');
+                        let userId = user.admin_id || user.user_id || 'N/A';
+                        onlineHtml += `
+                            <li class="p-2 bg-green-50 dark:bg-green-900/40 rounded flex justify-between items-center">
+                                <span class="flex-1"><span class="font-bold">${index + 1}.</span> ${fullName}</span>
+                                <span class="flex-1 text-center text-gray-600">ID: ${details.library_id}</span>
+                                <span class="flex-1 text-right text-blue-600">${user.updated_date}</span>
+                            </li>`;
+                    });
+                    $('#onlineList').html(onlineHtml);
+
+
+                    let offlineHtml = '';
+                    (users.offline_users || []).forEach((user, index) => {
+                        let details = JSON.parse(user.personal_details);
+                        
+                        let fullName = [details.firstname, details.middlename, details.lastname].filter(Boolean).join(' ');
+                        let userId = user.admin_id || user.user_id || 'N/A';
+                        offlineHtml += `
+                        <li class="p-2 bg-red-50 dark:bg-red-900/40 rounded flex justify-between items-center">
+                            <span class="flex-1"><span class="font-bold">${index + 1}.</span> ${fullName}</span>
+                            <span class="flex-1 text-center text-gray-600">ID: ${details.library_id}</span>
+                            <span class="flex-1 text-right text-blue-600">${user.updated_date}</span>
+                        </li>`;
+                    });
+                    $('#offlineList').html(offlineHtml);
 
                     const allBooks = Object.values(dashboardData.stats.booksperfolder)
                         .flat();
@@ -252,7 +287,6 @@
                         </div>
                         `;
                     });
-
                     $("#booksContainer").html(html);
 
 
@@ -268,7 +302,7 @@
 
                     $('#statDepartment').text(dashboardData.stats.totalDepartment);
                     $('#statRequests').text(totalRequests);
-                    $('#OnlineUsers').text(dashboardData.users.totalusers || 0);
+                    // $('#OnlineUsers').text(dashboardData.users.totalusers || 0);
 
 
 
@@ -463,7 +497,6 @@
 
         // ---------------- Initial Load ----------------
         loadDashboardStats();
-        loadApprovalRequests();
 
     });
 </script>

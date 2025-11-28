@@ -24,35 +24,36 @@ function db_connect()
                 personal_details JSON,
                 authentication_data JSON,
                 admin_book_data JSON,
-                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                 updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )",
-
-            "CREATE TABLE IF NOT EXISTS books (
-                books_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                books_details JSON,
-                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-            )",
-
             "CREATE TABLE IF NOT EXISTS user (
                 user_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 is_logged_in TINYINT(1) DEFAULT 0,
                 personal_details JSON,
                 authentication_data JSON,
                 user_book_data JSON,
-                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                 updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )",
-
+            "CREATE TABLE IF NOT EXISTS books (
+                books_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                books_details JSON,
+                 updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )",
             "CREATE TABLE IF NOT EXISTS system (
                 id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 system_details JSON,
-                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )",
-            
+
             "CREATE TABLE IF NOT EXISTS folder_structure (
                 folder_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 folder_name VARCHAR(50) NOT NULL,
                 folder_data JSON,
-                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                 updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
             ",
             "CREATE TABLE IF NOT EXISTS reading_logs (
@@ -87,7 +88,7 @@ function db_connect()
         foreach ($tableQueries as $sql) {
             $pdo->exec($sql);
         }
-
+        
         return $pdo;
     } catch (PDOException $e) {
         die("Database error: " . $e->getMessage());

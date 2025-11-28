@@ -80,6 +80,9 @@ switch ($action) {
         echo $crud->toggleFavorite();
         break;
 
+    case 'GetStudentActivities':
+        echo $crud->GetStudentActivities();
+        break;
     case 'get_favorite_books':
         echo $crud->get_favorite_books();
         break;
