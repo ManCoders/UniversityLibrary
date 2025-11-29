@@ -206,6 +206,7 @@
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Department</th>
+                    
                     <th
                         class="px-1 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Actions</th>
@@ -745,14 +746,10 @@
             const rows = filteredData.map(req => `
                     <tr class="border-b dark:border-gray-700">
                         <td class="px-4 py-2">${req.user_id}</td>
-                        <td class="px-4 py-2">${req.firstname} ${req.lastname}</td>
+                        <td class="px-6 py-2">${req.firstname} ${req.lastname}</td>
                         <td class="px-4 py-2">${req.email}</td>
                         <td class="px-4 py-2">${req.department}</td>
-                        <td class="px-4 py-2 text-center">
-                            <span class="px-3 py-1 text-xs font-bold rounded ${statusClasses[req.account_status] || 'bg-gray-100 text-gray-700'}">
-                                ${req.account_status || 'Pending'}
-                            </span>
-                        </td>
+                        
                         <td class="px-4 py-2 text-center">
                             <button data-id="${req.user_id}" class="approveBtn px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 mr-1">Approve</button>
                             <button data-id="${req.user_id}" class="declineBtn px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600">Decline</button>

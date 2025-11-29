@@ -6,6 +6,8 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
  */
 
+
+
 class Action
 {
     private $db;
@@ -26,36 +28,7 @@ class Action
         $this->db = null;
     }
 
-
-    /* function logout()
-    {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        $_SESSION = [];
-        session_destroy();
-        session_unset();
-
-        if (ini_get("session.use_cookies")) {
-            $params = session_get_cookie_params();
-            setcookie(
-                session_name(),
-                '',
-                time() - 42000,
-                $params["path"],
-                $params["domain"],
-                $params["secure"],
-                $params["httponly"]
-            );
-        }
-
-        return json_encode([
-            'status' => 1,
-            'redirect_url' => './index.php'
-        ]);
-    } */
-
-
+    
     function base_url()
     {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
@@ -64,7 +37,7 @@ class Action
         return "$protocol://$host/UniversityLibrary/";
     }
 
-    function logout()
+    /* function logout()
     {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
@@ -81,16 +54,22 @@ class Action
             $role = 'admin';
             $table = 'admin';
             $library_id = $_SESSION['admin']['admin_id'] ?? null;
+            $stmt = $this->db->prepare("UPDATE admin SET is_logged_in = 0, updated_date =NOW()  WHERE user_id =");
+            $stmt->execute([$library_id]);
             $log_message = "Admin logged out successfully.";
         } elseif (!empty($_SESSION['faculty'])) {
             $role = 'faculty';
             $table = 'user';
             $library_id = $_SESSION['faculty']['user_id'] ?? null;
+            $stmt = $this->db->prepare("UPDATE user SET is_logged_in = 0, updated_date =NOW()  WHERE user_id =");
+            $stmt->execute([$library_id]);
             $log_message = "Faculty logged out successfully.";
         } elseif (!empty($_SESSION['student'])) {
             $role = 'student';
             $table = 'user';
             $library_id = $_SESSION['student']['user_id'] ?? null;
+            $stmt = $this->db->prepare("UPDATE user SET is_logged_in = 0, updated_date =NOW()  WHERE user_id =");
+            $stmt->execute([$library_id]);
             $log_message = "Student logged out successfully.";
         } else {
             return json_encode([
@@ -101,7 +80,7 @@ class Action
         }
 
         // Mark user offline
-        $stmt = $this->db->prepare("UPDATE {$table} SET is_logged_in = 0 WHERE {$table}_id = ?");
+        $stmt = $this->db->prepare("UPDATE {$table} SET is_logged_in = 0, SET updated_date = NOW() WHERE {$table}_id = ?");
         $stmt->execute([$library_id]);
 
         // Log activity
@@ -131,7 +110,91 @@ class Action
             'message' => 'Logged out successfully.',
             'redirect_url' => $base . 'index.php'
         ]);
+    } */
+
+
+    
+
+    function logout($auto = false)
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $base = $this->base_url();
+        $role = null;
+        $library_id = null;
+        $table = null;
+        $log_message = null;
+        $id_column = 'user_id';
+
+        // Identify logged-in role
+        if (!empty($_SESSION['admin'])) {
+            $role = 'admin';
+            $table = 'admin';
+            $library_id = $_SESSION['admin']['admin_id'];
+            $id_column = 'admin_id';
+            $log_message = $auto ? "Admin auto-logged out due to inactivity." : "Admin logged out successfully.";
+
+        } elseif (!empty($_SESSION['faculty'])) {
+            $role = 'faculty';
+            $table = 'user';
+            $library_id = $_SESSION['faculty']['user_id'];
+            $log_message = $auto ? "Faculty auto-logged out due to inactivity." : "Faculty logged out successfully.";
+
+        } elseif (!empty($_SESSION['student'])) {
+            $role = 'student';
+            $table = 'user';
+            $library_id = $_SESSION['student']['user_id'];
+            $log_message = $auto ? "Student auto-logged out due to inactivity." : "Student logged out successfully.";
+
+        } else {
+            return json_encode([
+                'status' => 0,
+                'message' => 'User not logged in',
+                'redirect_url' => $base . 'index.php'
+            ]);
+        }
+
+        // Update login status
+        $stmt = $this->db->prepare("
+        UPDATE {$table} 
+        SET is_logged_in = 0, updated_date = NOW() 
+        WHERE {$id_column} = ?
+    ");
+        $stmt->execute([$library_id]);
+
+        // Log action
+        $this->users_logs($log_message);
+
+        // Destroy session
+        $_SESSION = [];
+        session_unset();
+        session_destroy();
+
+        // Delete session cookie
+        if (ini_get("session.use_cookies")) {
+            $params = session_get_cookie_params();
+            setcookie(
+                session_name(),
+                '',
+                time() - 42000,
+                $params["path"],
+                $params["domain"],
+                $params["secure"],
+                $params["httponly"]
+            );
+        }
+
+        return json_encode([
+            'status' => 1,
+            'auto' => $auto,
+            'user_role' => $role,
+            'message' => $auto ? 'Auto-logged out due to inactivity.' : 'Logged out successfully.',
+            'redirect_url' => $base . 'index.php'
+        ]);
     }
+
 
 
 
@@ -904,14 +967,6 @@ class Action
 
 
 
-        // Merge with existing metadata avoiding duplicates
-        /* $existingFilenames = array_column($existingMetadata, 'filename');
-        foreach ($newMetadata as $meta) {
-            if (!empty($meta['filename']) && !in_array($meta['filename'], $existingFilenames)) {
-                $existingMetadata[] = $meta;
-            }
-        } */
-
         // === Improved Duplicate Protection ===
 
         // Build quick-lookup arrays
@@ -975,173 +1030,6 @@ class Action
         ]);
     }
 
-    /* function uploadFolder()
-    {
-        header('Content-Type: application/json'); // force JSON output
-        ini_set('display_errors', 0); // suppress PHP warnings/notices
-
-        $baseDir = __DIR__ . '/files/';
-        if (!is_dir($baseDir)) {
-            mkdir($baseDir, 0777, true);
-        }
-
-        $rootFolderName = $_POST['folder'] ?? $_POST['foldername'] ?? null;
-        if (!$rootFolderName) {
-
-            return json_encode(['status' => 0, 'message' => 'Target folder name not provided.']);
-
-        }
-
-        $safeRootFolderName = preg_replace('/[^a-zA-Z0-9_\- ]/', '', $rootFolderName);
-        if (empty($safeRootFolderName)) {
-
-            return json_encode(['status' => 0, 'message' => 'Invalid folder name after sanitization.']);
-
-        }
-
-        $targetDir = $baseDir . $safeRootFolderName . '/';
-        $coverDir = $targetDir . 'covers/';
-
-        if (!is_dir($targetDir) && !mkdir($targetDir, 0777, true)) {
-
-            return json_encode(['status' => 0, 'message' => 'Failed to create target folder.']);
-
-        }
-
-        if (!is_dir($coverDir)) {
-            mkdir($coverDir, 0777, true);
-        }
-
-        $uploadedFiles = [];
-        $uploadedCovers = [];
-
-        $generateId = function ($length = 12): string {
-            $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            $id = '';
-            for ($i = 0; $i < $length; $i++) {
-                $id .= $chars[random_int(0, strlen($chars) - 1)];
-            }
-
-            return $id;
-        };
-
-        // === Fetch existing folder or create new ===
-        $stmt = $this->db->prepare("SELECT folder_id, folder_data FROM folder_structure WHERE folder_name = ?");
-        $stmt->execute([$safeRootFolderName]);
-        $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($folderData) {
-            $folderId = $folderData['folder_id'];
-            $existingMetadata = json_decode($folderData['folder_data'], true) ?: [];
-        } else {
-            $this->db->prepare("INSERT INTO folder_structure (folder_name, folder_data) VALUES (?, ?)")
-                ->execute([$safeRootFolderName, json_encode([], JSON_UNESCAPED_UNICODE)]);
-            $folderId = $this->db->lastInsertId();
-            $existingMetadata = [];
-        }
-
-        // === Upload main files ===
-        if (!empty($_FILES['files']['name'][0])) {
-            foreach ($_FILES['files']['name'] as $i => $name) {
-                if (!isset($_FILES['files']['error'][$i]) || $_FILES['files']['error'][$i] !== UPLOAD_ERR_OK)
-                    continue;
-
-                $tmpName = $_FILES['files']['tmp_name'][$i];
-                $ext = pathinfo($name, PATHINFO_EXTENSION) ?: 'pdf';
-                $newFileName = $generateId() . '.' . $ext;
-                $destination = $targetDir . $newFileName;
-
-                if (move_uploaded_file($tmpName, $destination)) {
-                    $uploadedFiles[$name] = $newFileName; // original → generated
-                }
-            }
-        }
-
-        // === Upload covers safely ===
-        if (!empty($_FILES['covers']['name'])) {
-            foreach ($_FILES['covers']['name'] as $i => $filename) {
-                if (!isset($_FILES['covers']['error'][$i]) || $_FILES['covers']['error'][$i] !== UPLOAD_ERR_OK)
-                    continue;
-
-                $tmpName = $_FILES['covers']['tmp_name'][$i];
-                $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION)) ?: 'png';
-                if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp']))
-                    continue;
-
-                $newCoverName = $generateId(8) . '.' . $ext;
-                $destination = $coverDir . $newCoverName;
-
-                if (move_uploaded_file($tmpName, $destination)) {
-                    $uploadedCovers[$filename] = $newCoverName;
-                }
-            }
-        }
-
-        // === Handle metadata safely ===
-        $newMetadata = [];
-        if (!empty($_POST['metadata'])) {
-            $decoded = json_decode($_POST['metadata'], true);
-            if (is_array($decoded)) {
-                foreach ($decoded as $meta) {
-                    $metaId = $generateId();
-                    $originalFile = $meta['filename'] ?? '';
-                    $meta['id'] = $metaId;
-                    $meta['folder_id'] = $folderId;
-                    $meta['foldername'] = $safeRootFolderName;
-
-                    // Safe file assignment
-                    if (!empty($originalFile) && isset($uploadedFiles[$originalFile])) {
-                        $meta['filename'] = $uploadedFiles[$originalFile];
-                        $meta['file_path'] = 'files/' . $safeRootFolderName . '/' . $uploadedFiles[$originalFile];
-                    } else {
-                        $meta['filename'] = null;
-                        $meta['file_path'] = null;
-                    }
-
-                    // Safe cover assignment
-                    $coverFile = $meta['cover'] ?? '';
-                    if (!empty($coverFile) && isset($uploadedCovers[$coverFile])) {
-                        $meta['cover'] = $uploadedCovers[$coverFile];
-                        $meta['cover_path'] = 'files/' . $safeRootFolderName . '/covers/' . $uploadedCovers[$coverFile];
-                    } else {
-                        $meta['cover'] = null;
-                        $meta['cover_path'] = null;
-                    }
-
-                    $newMetadata[] = $meta;
-                }
-            }
-        }
-
-        // Merge with existing metadata safely
-        $existingFilenames = array_column($existingMetadata, 'filename');
-        foreach ($newMetadata as $meta) {
-            if (!in_array($meta['filename'], $existingFilenames, true) && !empty($meta['filename'])) {
-                $existingMetadata[] = $meta;
-            }
-        }
-
-        // Update DB
-        $stmtUpdate = $this->db->prepare("UPDATE folder_structure SET folder_data = ? WHERE folder_id = ?");
-        $stmtUpdate->execute([json_encode($existingMetadata, JSON_UNESCAPED_UNICODE), $folderId]);
-
-        // Save metadata JSON file
-        file_put_contents(
-            $targetDir . 'metadata.json',
-            json_encode($existingMetadata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
-        );
-
-        return json_encode([
-            'status' => 1,
-            'message' => 'Folder Uploaded successfully',
-            'folder_id' => $folderId,
-            'folder_name' => $safeRootFolderName,
-            'files_uploaded' => $uploadedFiles,
-            'covers_uploaded' => $uploadedCovers,
-            'total_books' => count($existingMetadata)
-        ]);
-
-    } */
 
     function uploadFolder()
     {
@@ -2137,57 +2025,57 @@ class Action
     }
 
     function GetStudentActivities()
-{
-    try {
-        $user_id = $_POST['user_id'] ?? $_GET['user_id'] ?? null; // accept POST or GET
-        if (!$user_id) {
-            return json_encode([
-                'status' => 0,
-                'message' => 'User ID not provided.'
-            ]);
-        }
+    {
+        try {
+            $user_id = $_POST['user_id'] ?? $_GET['user_id'] ?? null; // accept POST or GET
+            if (!$user_id) {
+                return json_encode([
+                    'status' => 0,
+                    'message' => 'User ID not provided.'
+                ]);
+            }
 
-        $stmt = $this->db->prepare("
+            $stmt = $this->db->prepare("
             SELECT id, book_title, start_time, end_time, duration, is_favorite
             FROM reading_logs
             WHERE user_id = ?
             ORDER BY updated_at DESC
             LIMIT 10
         ");
-        $stmt->execute([$user_id]);
-        $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt->execute([$user_id]);
+            $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $activities = array_map(function ($log) {
-            $start = new DateTime($log['start_time']);
-            $end = $log['end_time'] ? new DateTime($log['end_time']) : new DateTime();
-            $interval = $start->diff($end);
-            $hours = $interval->h;
-            $minutes = $interval->i;
-            $consumed = ($hours ? $hours . 'h ' : '') . ($minutes ? $minutes . 'm' : '0m');
+            $activities = array_map(function ($log) {
+                $start = new DateTime($log['start_time']);
+                $end = $log['end_time'] ? new DateTime($log['end_time']) : new DateTime();
+                $interval = $start->diff($end);
+                $hours = $interval->h;
+                $minutes = $interval->i;
+                $consumed = ($hours ? $hours . 'h ' : '') . ($minutes ? $minutes . 'm' : '0m');
 
-            return [
-                'id' => $log['id'],
-                'book_title' => $log['book_title'],
-                'start_time' => $log['start_time'],
-                'end_time' => $log['end_time'] ?? null,
-                'consumed' => $consumed,
-                'remark' => $log['is_favorite'] ? 'Favorited' : ''
-            ];
-        }, $logs);
+                return [
+                    'id' => $log['id'],
+                    'book_title' => $log['book_title'],
+                    'start_time' => $log['start_time'],
+                    'end_time' => $log['end_time'] ?? null,
+                    'consumed' => $consumed,
+                    'remark' => $log['is_favorite'] ? 'Favorited' : ''
+                ];
+            }, $logs);
 
-        return json_encode([
-            'status' => 1,
-            'message' => 'Student activities retrieved successfully.',
-            'data' => $activities
-        ]);
+            return json_encode([
+                'status' => 1,
+                'message' => 'Student activities retrieved successfully.',
+                'data' => $activities
+            ]);
 
-    } catch (Exception $e) {
-        return json_encode([
-            'status' => 0,
-            'message' => 'Error: ' . $e->getMessage()
-        ]);
+        } catch (Exception $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
     }
-}
 
 
 

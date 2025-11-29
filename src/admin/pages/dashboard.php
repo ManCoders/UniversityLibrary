@@ -375,7 +375,7 @@
                         dashboardData.users.online || 0,
                         dashboardData.users.offline || 0
                     ];
-                    chartLabel = ['Online Users', 'Offline Users'];
+                    chartLabel = ['Online', 'Offline'];
                     chartColors = ['#10b981', '#ef4444'];
                     break;
 
@@ -421,7 +421,11 @@
                 data: {
                     labels: chartLabel,
                     datasets: [{
-                        label: panelId.includes('Online') ? 'Online' : panelId.includes('Offline') ? 'Offline' : 'Requests',
+                        label:
+                            panelId.includes('Online') && !panelId.includes('Offline') ? 'Users' :
+                                panelId.includes('Offline') && !panelId.includes('Online') ? 'Users' :
+                                    'Requests',
+
                         data: chartData,
                         backgroundColor: chartColors
                     }]

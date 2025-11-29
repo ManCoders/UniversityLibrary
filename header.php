@@ -113,6 +113,41 @@ if (session_status() === PHP_SESSION_NONE) {
             initializeSidebarToggle?.();
             initializeDarkModeToggle();
         };
+
+
+        let inactivityTime = 0;
+        const logoutTime = 30; 
+
+        // Reset inactivity timer
+        function resetTimer() {
+            inactivityTime = 0;
+        }
+
+        document.onmousemove = resetTimer;
+        document.onkeydown = resetTimer;
+        document.onclick = resetTimer;
+        document.onscroll = resetTimer;
+
+        // Check every second
+        setInterval(() => {
+            inactivityTime++;
+
+            if (inactivityTime >= logoutTime) {
+                fetch(`${base_url}auth/action.php?action=autologout`)
+                    .then(res => res.json())
+                    .then(data => {
+                        alert("Auto-logged out for security reasons.");
+                        window.location.href = data.redirect_url;
+                    })
+                    .catch(() => {
+                        alert("Session expired.");
+                        window.location.href = base_url;
+                    });
+            }
+
+        }, 1000);
+
+
     </script>
 
 </head>

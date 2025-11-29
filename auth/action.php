@@ -71,6 +71,10 @@ switch ($action) {
     case 'readingbooks':
         echo $crud->readingbooks();
         break;
+    case 'autologout':
+        echo $crud->logout(true);
+        break;
+        
 
     case 'end_reading':
         echo $crud->endReading();
