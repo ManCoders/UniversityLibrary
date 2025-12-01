@@ -2,56 +2,422 @@
     Digital E-Library Analytics & Reports
 </h1>
 
-<!-- Stats Cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-indigo-500">
-        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</p>
-        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">4,289</p>
-        <p class="text-xs text-green-500 mt-2">↑ 12.5% this month</p>
+
+
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition flex flex-col">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Top Ebook Access</h2>
+        <div class="flex-1">
+            <canvas id="utilizationChart" class="w-full h-64"></canvas>
+        </div>
     </div>
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-emerald-500">
-        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">New Digital Resources</p>
-        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">1,024</p>
-        <p class="text-xs text-red-500 mt-2">↓ 3.1% this month</p>
+
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition flex flex-col">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Reading Session</h2>
+        <div class="flex-1">
+            <canvas id="usersChart" class="w-full h-64"></canvas>
+        </div>
     </div>
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-yellow-500">
-        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Approvals</p>
-        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">14</p>
-        <p class="text-xs text-yellow-500 mt-2">Last updated 5 mins ago</p>
-    </div>
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-red-500">
-        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">System Alerts</p>
-        <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">3</p>
-        <p class="text-xs text-red-500 mt-2">Action required</p>
+
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition flex flex-col">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Total Access & References</h2>
+        <div class="flex-1">
+            <canvas id="resourcesChart" class="w-full h-64"></canvas>
+        </div>
     </div>
 </div>
 
-<!-- Recent Activity -->
-<div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mt-8">
-    <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Recent Library Activity</h2>
-    <div class="space-y-3">
-        <p class="text-sm text-gray-600 dark:text-gray-300 border-b dark:border-gray-700 pb-1">
-            User JohnDoe accessed "Digital Research Paper 2025".
-            <span class="float-right text-xs text-gray-400 dark:text-gray-500">2 min ago</span>
-        </p>
-        <p class="text-sm text-gray-600 dark:text-gray-300 border-b dark:border-gray-700 pb-1">
-            New e-book 'Modern Library Systems' added to the collection.
-            <span class="float-right text-xs text-gray-400 dark:text-gray-500">1 hour ago</span>
-        </p>
-        <p class="text-sm text-gray-600 dark:text-gray-300 border-b dark:border-gray-700 pb-1">
-            Digital resource approval completed.
-            <span class="float-right text-xs text-gray-400 dark:text-gray-500">3 hours ago</span>
-        </p>
+<!-- Detailed Table -->
+<div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Detailed Report</h2>
+        <div class="flex gap-2 mt-2 md:mt-0">
+            <button onclick="exportDetailedReportCSV()"
+                class="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition text-sm">Export
+                CSV</button>
+            <button onclick="exportDetailedReportPDF()"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm">Export
+                PDF</button>
+        </div>
+    </div>
+    <div class="overflow-x-auto max-h-[400px]">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+            <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
+                <tr>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        #</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        User</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Ebook Title</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Start Time</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Duration</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Timestamp</th>
+                </tr>
+            </thead>
+            <tbody id="HistoryReading" class="divide-y divide-gray-200 dark:divide-gray-700 hover:divide-gray-400">
+
+            </tbody>
+        </table>
     </div>
 </div>
 
-<!-- Extended Content -->
-<div class="mt-12 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-    <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">Analytics & Reports</p>
-    <p class="mt-4 text-gray-500 dark:text-gray-400">
-        Use this section to display detailed analytics, usage charts, and reports of the digital e-library. Visualize user engagement, resource downloads, and more.
-    </p>
-    <div class="h-[60vh] bg-gray-50 dark:bg-gray-700 mt-4 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm border-2 border-dashed dark:border-gray-600">
-        Placeholder for Analytics Charts & Reports
+<!-- Detailed Books -->
+<div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Books List</h2>
+        <div class="flex gap-2 mt-2 md:mt-0">
+            <button onclick="exportBooksCSV()"
+                class="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition text-sm">
+                Export CSV
+            </button>
+            <button onclick="exportBooksPDF()"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm">
+                Export PDF
+            </button>
+        </div>
+    </div>
+    <div class="overflow-x-auto max-h-[400px]">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+            <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
+                <tr>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        #</th>
+                   
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Book ID</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Book Title</th>
+                    
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Author</th>
+                </tr>
+            </thead>
+            <tbody id="AllBooks" class="divide-y divide-gray-200 dark:divide-gray-700 hover:divide-gray-400">
+                <!-- AJAX-loaded rows will go here -->
+            </tbody>
+        </table>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    let allBooksData = [];
+
+    function fetchBooks() {
+        $.post(`${base_url}auth/action.php?action=getMetadata`, {}, function (res) {
+            if (!res.status || !res.data) return console.warn("No books found.");
+
+            allBooksData = res.data; // store globally for export
+
+            const tbody = $("#AllBooks");
+            tbody.empty();
+
+            res.data.forEach((book, index) => {
+                const tr = `<tr>
+                <td class="px-4 py-2">${index + 1}</td>
+                
+                <td class="px-4 py-2">${book.book_id}</td>
+                <td class="px-4 py-2 truncate max-w-xs">${book.title}</td>
+                <td class="px-4 py-2">${book.author}</td>
+            </tr>`;
+                tbody.append(tr);
+            });
+        }, 'json').fail(() => console.error("Failed to load books."));
+    }
+
+    function exportBooksCSV() {
+        if (!allBooksData.length) return console.warn("No data to export.");
+
+        const headers = ["#", "Book ID", "Book Title", "Author"];
+        let csvContent = headers.join(",") + "\n";
+
+        allBooksData.forEach((book, index) => {
+            const row = [
+                index + 1,
+               
+                book.book_id,
+                book.title,
+                book.author
+            ].map(cell => `"${String(cell).replace(/"/g, '""')}"`);
+            csvContent += row.join(",") + "\n";
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "books_list.csv";
+        link.click();
+    }
+
+    function exportBooksPDF() {
+        if (!allBooksData.length) return console.warn("No data to export.");
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'pt', 'a4');
+
+        const columns = ["#", "Book ID", "Book Title", "Author"];
+        const rows = allBooksData.map((book, index) => [
+            index + 1,
+            book.book_id,
+            book.title,
+            book.author
+        ]);
+
+        doc.setFontSize(14);
+        doc.text("Books List", 40, 40);
+
+        doc.autoTable({
+            startY: 60,
+            head: [columns],
+            body: rows,
+            theme: 'grid',
+            headStyles: { fillColor: [99, 102, 241] },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
+            styles: { fontSize: 10, cellPadding: 4 },
+            columnStyles: { 3: { cellWidth: 150 } }
+        });
+
+        doc.save('books_list.pdf');
+    }
+
+    $(document).ready(() => {
+        fetchBooks();
+    });
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Load stats first
+        fetchDashboardStats();
+        fetchDetailedReport();
+        function fetchDashboardStats() {
+            $.post(`${base_url}auth/action.php?action=getAnalyticsStats`, {}, res => {
+                if (!res.status || !res.data) {
+                    console.warn("No dashboard data found.");
+                    return;
+                }
+
+                buildCharts(res.data);
+            }, 'json')
+                .fail(() => console.error("Dashboard stats failed to load"));
+        }
+
+        function buildCharts(data) {
+
+            const barOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            };
+
+            // === Utilization Chart ===
+            const maxLength = 15; // max characters for display
+            const shortLabels = data.utilization.labels.map(title =>
+                title.length > maxLength ? title.slice(0, maxLength) + '…' : title
+            );
+
+            new Chart(document.getElementById('utilizationChart'), {
+                type: 'bar',
+                data: {
+                    labels: shortLabels,
+                    datasets: [{
+                        label: 'Accesses',
+                        data: data.utilization.values,
+                        backgroundColor: '#6366F1',
+                        borderRadius: 5
+                    }]
+                },
+                options: barOptions
+            });
+
+            // Truncate labels helper
+            function truncateLabels(labels) {
+                return labels.map(label => label.length > maxLength ? label.slice(0, maxLength) + '…' : label);
+            }
+
+            // Users Chart
+            new Chart(document.getElementById('usersChart'), {
+                type: 'bar',
+                data: {
+                    labels: truncateLabels(data.users.labels),
+                    datasets: [{
+                        label: 'Ebooks Accessed',
+                        data: data.users.values,
+                        backgroundColor: '#10B981',
+                        borderRadius: 5
+                    }]
+                },
+                options: barOptions
+            });
+
+            // Resources Chart
+            new Chart(document.getElementById('resourcesChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: truncateLabels(data.resources.labels),
+                    datasets: [{
+                        data: data.resources.values,
+                        backgroundColor: ['#F59E0B', '#FCD34D']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                color: '#374151'
+                            }
+                        }
+                    }
+                }
+            });
+
+        }
+
+        function fetchDetailedReport() {
+            $.post(`${base_url}auth/action.php?action=getDetailedReport`, {}, res => {
+                if (!res.status || !res.data) {
+                    console.warn("No detailed report data found.");
+                    return;
+                }
+
+                const tbody = document.getElementById('HistoryReading');
+                tbody.innerHTML = '';
+
+                res.data.forEach((record, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-4 py-2">${index + 1}</td>
+                        <td class="px-4 truncate py-2">${record.fullname}</td>
+                        <td class="px-4 truncate block max-w-xs py-2">${record.book_title}</td>
+                        <td class="px-4 py-2">${record.start_time}</td>
+                        <td class="px-4 py-2">${record.total_read_time_formatted}</td>
+                        <td class="px-4 py-2">${record.end_time}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }, 'json')
+                .fail(() => console.error("Detailed report failed to load"));
+        }
+
+        let detailedReportData = [];
+
+        function fetchDetailedReport() {
+            $.post(`${base_url}auth/action.php?action=getDetailedReport`, {}, res => {
+                if (!res.status || !res.data) {
+                    console.warn("No detailed report data found.");
+                    return;
+                }
+
+                detailedReportData = res.data; // store globally for export
+
+                const tbody = document.getElementById('HistoryReading');
+                tbody.innerHTML = '';
+
+                res.data.forEach((record, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                <td class="px-4 py-2">${index + 1}</td>
+                <td class="px-4 truncate py-2">${truncate(record.fullname, 20)}</td>
+                <td class="px-4 truncate block max-w-xs py-2">${truncate(record.book_title, 25)}</td>
+                <td class="px-4 py-2">${record.start_time}</td>
+                <td class="px-4 py-2">${record.total_read_time_formatted}</td>
+                <td class="px-4 py-2">${record.end_time ?? '-'}</td>
+            `;
+                    tbody.appendChild(tr);
+                });
+            }, 'json')
+                .fail(() => console.error("Detailed report failed to load"));
+        }
+
+        function truncate(str, maxLength) {
+            if (!str) return '';
+            return str.length > maxLength ? str.slice(0, maxLength) + '…' : str;
+        }
+
+        window.exportDetailedReportPDF = function () {
+            if (!detailedReportData.length) return console.warn("No data to export.");
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'pt', 'a4');
+
+            const tableColumns = ["#", "Name", "Book Title", "Start Time", "Duration", "End Time"];
+            const tableRows = detailedReportData.map((record, index) => [
+                index + 1,
+                truncate(record.fullname, 20),
+                truncate(record.book_title, 25),
+                record.start_time ?? '-',
+                record.total_read_time_formatted ?? '-',
+                record.end_time ?? '-'
+            ]);
+
+            doc.setFontSize(14);
+            doc.text("Detailed Reading Report", 40, 40);
+
+            doc.autoTable({
+                startY: 60,
+                head: [tableColumns],
+                body: tableRows,
+                theme: 'grid',
+                headStyles: { fillColor: [99, 102, 241] },
+                alternateRowStyles: { fillColor: [245, 245, 245] },
+                styles: { fontSize: 10, cellPadding: 4 },
+                columnStyles: { 1: { cellWidth: 100 }, 2: { cellWidth: 120 } }
+            });
+
+            doc.save('detailed_reading_report.pdf');
+        };
+
+        window.exportDetailedReportCSV = function () {
+            if (!detailedReportData.length) return console.warn("No data to export.");
+
+            const headers = ["#", "Name", "Book Title", "Start Time", "Duration", "End Time"];
+            const rows = detailedReportData.map((record, index) => [
+                index + 1,
+                record.fullname,
+                record.book_title,
+                record.start_time ?? '',
+                record.total_read_time_formatted ?? '',
+                record.end_time ?? ''
+            ]);
+
+            let csvContent = headers.join(",") + "\n";
+            rows.forEach(row => {
+                const escapedRow = row.map(cell => `"${String(cell).replace(/"/g, '""')}"`);
+                csvContent += escapedRow.join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "detailed_reading_report.csv";
+            link.click();
+        };
+
+    });
+</script>

@@ -6,8 +6,8 @@ $navLinks = [
     ['id' => 'dashboard', 'text' => 'Dashboard', 'icon' => 'layout-dashboard'],
     ['id' => 'metadata', 'text' => 'Metadata Management', 'icon' => 'book-open'],
     ['id' => 'users', 'text' => 'User Management', 'icon' => 'users'],
-    /* ['id' => 'reports', 'text' => 'Analytics & Reports', 'icon' => 'bar-chart-3'],
-    ['id' => 'settings', 'text' => 'Settings', 'icon' => 'settings'], */
+    ['id' => 'reports', 'text' => 'Analytics & Reports', 'icon' => 'bar-chart-3'],
+    /* ['id' => 'settings', 'text' => 'Settings', 'icon' => 'settings'], */
 ];
 ?>
 

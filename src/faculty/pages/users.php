@@ -12,7 +12,7 @@
             </button> -->
             <button id="tab-faculty"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Add New Account
+                Account Request
             </button>
             <button id="tab-student-table"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
@@ -20,7 +20,11 @@
             </button>
             <button id="tab-teacher-table"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Teacher Table
+                Faculty Table
+            </button>
+            <button id="tab-request-table"
+                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Acccount Approval
             </button>
         </nav>
 
@@ -35,60 +39,6 @@
 
 <!-- Tab Contents -->
 <div id="tab-content">
-    <!-- Dashboard -->
-    <!-- <div id="dashboard-content" class="tab-panel">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-indigo-500">
-                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">4,289</p>
-                <p class="text-xs text-green-500 mt-2">↑ 12.5% this month</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-emerald-500">
-                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">New Registrations</p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">1,024</p>
-                <p class="text-xs text-red-500 mt-2">↓ 3.1% this month</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-yellow-500">
-                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Verifications</p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">14</p>
-                <p class="text-xs text-yellow-500 mt-2">Last updated 5 mins ago</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-red-500">
-                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Account Issues</p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">3</p>
-                <p class="text-xs text-red-500 mt-2">Action required</p>
-            </div>
-        </div>
-
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg mt-8">
-            <h2 class="text-xl font-semibold mb-4 text-gray-800 dark:text-gray-100">Recent User Activity</h2>
-            <div class="space-y-3">
-                <p class="text-sm text-gray-600 dark:text-gray-300 border-b dark:border-gray-700 pb-1">
-                    User JohnDoe logged in successfully.
-                    <span class="float-right text-xs text-gray-400 dark:text-gray-500">2 min ago</span>
-                </p>
-                <p class="text-sm text-gray-600 dark:text-gray-300 border-b dark:border-gray-700 pb-1">
-                    New user JaneSmith registered.
-                    <span class="float-right text-xs text-gray-400 dark:text-gray-500">1 hour ago</span>
-                </p>
-                <p class="text-sm text-gray-600 dark:text-gray-300 border-b dark:border-gray-700 pb-1">
-                    Account verification completed for user MikeBrown.
-                    <span class="float-right text-xs text-gray-400 dark:text-gray-500">3 hours ago</span>
-                </p>
-            </div>
-        </div>
-
-        <div class="mt-12 p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
-            <p class="text-lg font-semibold text-gray-700 dark:text-gray-200">Extended User Management Tools</p>
-            <p class="mt-4 text-gray-500 dark:text-gray-400">
-                Use this section for user reports, role management, or activity charts.
-            </p>
-            <div
-                class="h-[60vh] bg-gray-50 dark:bg-gray-700 mt-4 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 text-sm border-2 border-dashed dark:border-gray-600">
-                Placeholder for User Charts/Tables
-            </div>
-        </div>
-    </div> -->
     <div id="user-content"
         class="tab-panel flex flex-col sm:flex-row gap-6 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
         <!-- LEFT: Profile Upload -->
@@ -239,94 +189,243 @@
             </tbody>
         </table>
     </div>
+    <div id="approval-table-content" class="tab-panel hidden">
+        <table
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        ID</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Name</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Email</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Department</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Account Status</th>
+                    <th
+                        class="px-1 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="approvalTable">
+            </tbody>
+        </table>
+    </div>
 
     <!-- View info tab -->
     <div id="view-content" class="tab-panel hidden">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-6xl mx-auto">
-            <!-- Back Button -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+                Profile Overview
+            </h2>
+            <button id="closeViewBtn"
+                class="bg-indigo-600 text-white px-6 py-1 rounded-lg hover:bg-indigo-700 transition">
+                Back
+            </button>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-6 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
+
+            <!-- LEFT: Profile Picture & Status -->
+            <div
+                class="flex flex-col items-center my-auto justify-start w-full sm:w-[35%] border-r border-[#b03060]/40 dark:border-[#800000]/40 pr-4">
+                <div class="relative w-50 h-50 overflow-hidden border border-[#b03060] dark:border-[#ff4d6d]">
+                    <img id="viewProfilePic" src="../../assets/default-profile.png" alt="Profile Preview"
+                        class="w-full h-full object-cover">
+                </div>
+                <p id="viewStatus" class="mt-3 text-sm font-bold text-[#b03060] dark:text-[#ff4d6d]">Pending</p>
+
+            </div>
+
+            <!-- RIGHT: Profile Information -->
+            <div class="flex-1 flex flex-col gap-4">
+
+                <!-- Name Section -->
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                    <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200 mb-2">Name</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">First Name</p>
+                            <p id="viewfirstname" class="text-gray-800 dark:text-gray-100 font-semibold">John</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Last Name</p>
+                            <p id="viewlastname" class="text-gray-800 dark:text-gray-100 font-semibold">Doe</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Middle Name</p>
+                            <p id="viewmiddlename" class="text-gray-800 dark:text-gray-100 font-semibold">Michael</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Suffix</p>
+                            <p id="viewsuffix" class="text-gray-800 dark:text-gray-100 font-semibold">Jr.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Info Section -->
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                    <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200 mb-2">Student Information</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Department</p>
+                            <p id="viewdepartment" class="text-gray-800 dark:text-gray-100 font-semibold">Computer
+                                Science
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Student ID</p>
+                            <p id="viewstudent_id" class="text-gray-800 dark:text-gray-100 font-semibold">2025001</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Course</p>
+                            <p id="viewcourse" class="text-gray-800 dark:text-gray-100 font-semibold">BSIT</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Section</p>
+                            <p id="viewsection" class="text -gray-800 dark:text-gray-100 font-semibold">A</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Section -->
+                <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                    <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200 mb-2">Contact</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                            <p id="viewEmail" class="text-gray-800 dark:text-gray-100 font-semibold">
+                                john.doe@example.com</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-500 dark:text-gray-400">Username</p>
+                            <p id="viewUsername" class="text-gray-800 dark:text-gray-100 font-semibold">johndoe</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <!-- Student Activities Table -->
+        <div class="mt-6 bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg max-w-6xl mx-auto">
+            <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Student Activities</h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th
+                                class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                #
+                            </th>
+                            <th
+                                class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Book Title
+                            </th>
+                            <th
+                                class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Date & Time
+                            </th>
+                            <th
+                                class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                End Time / Consumed Reading
+                            </th>
+                            <th
+                                class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                Remark
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentActivitiesBody" class="divide-y divide-gray-200 dark:divide-gray-700">
+                        
+                        <!-- Dynamic rows can be appended via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL OVERLAY -->
+    <div id="reviewModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden justify-center items-center z-50">
+
+        <!-- MODAL CONTENT -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-[95%] max-w-4xl p-6 overflow-y-auto max-h-[90vh]">
+
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                    Profile Overview
-                </h2>
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Review Overview</h2>
                 <button id="closeViewBtn"
-                    class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition">
+                    class="bg-indigo-600 text-white px-6 py-1 rounded-lg hover:bg-indigo-700 transition">
                     Back
                 </button>
             </div>
 
-            <!-- Grid Layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- ORIGINAL CONTENT -->
+            <div class="flex flex-col sm:flex-row gap-6">
 
-                <!-- Left Column: Profile -->
+                <!-- LEFT: Profile Picture & Status -->
                 <div
-                    class="lg:col-span-1 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg flex flex-col items-center text-center">
-
-                    <span id="viewStatus"
-                        class="mb-2 text-xs font-semibold bg-yellow-100 dark:bg-yellow-600 text-yellow-700 dark:text-yellow-200 px-2 py-0.5 rounded">
-                        Pending
-                    </span>
-
-                    <img id="viewProfilePic" src="" alt="Profile Picture"
-                        class="w-32 h-32 rounded-full object-cover border-4 border-indigo-500 shadow-md" />
-
-                    <h2 id="viewFullname" class="text-2xl font-bold mt-4 text-gray-900 dark:text-white">
-                        Loading...
-                    </h2>
-
-                    <p id="viewRole"
-                        class="text-xs uppercase tracking-wide text-indigo-600 dark:text-indigo-400 font-medium">
-                        Role
-                    </p>
-
-                    <div class="w-full mt-6 space-y-4 text-gray-700 dark:text-gray-300 text-left">
-
-                        <div>
-                            <label class="block text-xs uppercase font-semibold opacity-60">Email</label>
-                            <p id="viewEmail" class="text-sm break-words">Loading...</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs uppercase font-semibold opacity-60">Username</label>
-                            <p id="viewUsername" class="text-sm">Loading...</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs uppercase font-semibold opacity-60">Course</label>
-                            <p id="viewCourse" class="text-sm uppercase">N/A</p>
-                        </div>
-
-                        <div>
-                            <label class="block text-xs uppercase font-semibold opacity-60">Department</label>
-                            <p id="viewDepartment" class="text-sm uppercase">N/A</p>
-                        </div>
-
+                    class="flex flex-col items-center my-auto justify-start w-full sm:w-[35%] border-r border-[#b03060]/40 dark:border-[#800000]/40 pr-4">
+                    <div class="relative w-50 h-50 overflow-hidden border border-[#b03060] dark:border-[#ff4d6d]">
+                        <img id="ReviewProfilePic" src="../../assets/default-profile.png" alt="Profile Preview"
+                            class="w-full h-full object-cover">
                     </div>
-                </div>
-
-                <!-- Right Column: Recent Activity -->
-                <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg">
-
-                    <h2 class="text-xl font-semibold text-center text-gray-900 dark:text-white mb-4">
-                        Recent Activity
-                    </h2>
-
-                    <div class="flex justify-between items-center mb-3">
-                        <h3
-                            class="text-sm font-semibold text-gray-600 dark:text-gray-300 border-b dark:border-gray-600 pb-1">
-                            Read Logs
-                        </h3>
-                    </div>
-
-                    <div id="book_logs"
-                        class="space-y-3 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600">
-                    </div>
+                    <p id="viewStatus" class="mt-3 text-sm font-bold text-[#b03060] dark:text-[#ff4d6d]">Pending</p>
 
                 </div>
 
+                <!-- RIGHT CONTENT (unchanged from yours) -->
+                <div class="flex-1 flex flex-col gap-4">
+                    <!-- Name Section -->
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                        <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200 mb-2">Complete Name</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <p><span class="text-gray-500 dark:text-gray-400">First Name</span><br><span id="firstname"
+                                    class="font-semibold"></span></p>
+                            <p><span class="text-gray-500 dark:text-gray-400">Last Name</span><br><span id="lastname"
+                                    class="font-semibold"></span></p>
+                            <p><span class="text-gray-500 dark:text-gray-400">Middle Name</span><br><span
+                                    id="middlename" class="font-semibold"></span></p>
+                            <p><span class="text-gray-500 dark:text-gray-400">Suffix</span><br><span id="suffix"
+                                    class="font-semibold"></span></p>
+                        </div>
+                    </div>
+
+                    <!-- Student Info Section -->
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                        <h3 class="text-md font-semibold mb-2">Student Information</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <p><span class="text-gray-500 dark:text-gray-400">Department</span><br><span id="department"
+                                    class="font-semibold"></span></p>
+                            <p><span class="text-gray-500 dark:text-gray-400">Student ID</span><br><span id="student_id"
+                                    class="font-semibold"></span></p>
+                            <p><span class="text-gray-500 dark:text-gray-400">Course</span><br><span id="course"
+                                    class="font-semibold"></span></p>
+                            <p><span class="text-gray-500 dark:text-gray-400">Section</span><br><span id="section"
+                                    class="font-semibold"></span></p>
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                        <h3 class="text-md font-semibold mb-2">Contact</h3>
+                        <p><span class="text-gray-500 dark:text-gray-400">Email</span><br><span id="reviewEmail"
+                                class="font-semibold"></span></p>
+                        <p><span class="text-gray-500 dark:text-gray-400">Username</span><br><span id="reviewUsername"
+                                class="font-semibold"></span></p>
+                    </div>
+                </div>
             </div>
-
         </div>
     </div>
+
 
     <!-- Edit info tab -->
     <div id="edit-content" class="tab-panel hidden">
@@ -334,94 +433,123 @@
 
             <!-- Header -->
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">
-                    Update User Information
-                </h2>
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Update User Information</h2>
                 <button id="closeEditBtn"
-                    class="bg-indigo-600 text-white px-5 py-2 rounded-lg hover:bg-indigo-700 transition">
-                    Back
-                </button>
+                    class="bg-indigo-600 text-white px-6 py-1 rounded-lg hover:bg-indigo-700 transition">Back</button>
             </div>
 
             <form id="updateForm" enctype="multipart/form-data">
 
                 <input type="hidden" name="user_id" id="edit-user_id" value="" />
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="flex flex-col sm:flex-row gap-6">
 
-                    <!-- Left: Profile -->
-                    <div class="flex flex-col items-center bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-md">
-                        <img id="editProfilePreview" src="../../assets/default-profile.png" alt="Profile Picture"
-                            class="w-36 h-36 rounded-full object-cover border-4 border-indigo-500 shadow-lg" />
-
-                        <label class="mt-4 text-sm font-medium text-gray-700 dark:text-gray-200">
-                            Update Profile Picture
-                        </label>
+                    <!-- LEFT: Profile Picture & Upload -->
+                    <div
+                        class="flex flex-col items-center my-auto sm:w-[35%] bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-md">
+                        <div class="relative w-50 h-50  overflow-hidden border-4 border-indigo-500 shadow-lg">
+                            <img id="editProfilePreview" src="../../assets/default-profile.png" alt="Profile Picture"
+                                class="w-full h-full object-cover">
+                        </div>
+                        <label for="edit-profile_pic"
+                            class="mt-4 text-sm font-medium text-gray-700 dark:text-gray-200">Update Profile
+                            Picture</label>
                         <input type="file" name="profile_pic" id="edit-profile_pic"
                             class="mt-2 text-sm text-gray-600 dark:text-gray-300">
                     </div>
 
+                    <!-- RIGHT: Editable Form Fields -->
+                    <div class="flex-1 flex flex-col gap-4">
 
-                    <!-- Right: Form Fields -->
-                    <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl shadow-md space-y-4">
-
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">First
-                                Name</label>
-                            <input type="text" name="firstname" id="edit-firstname"
-                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        <!-- Name Section -->
+                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                            <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200 mb-2">Name</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-sm text-gray-500 dark:text-gray-400">First Name</label>
+                                    <input type="text" name="firstname" id="edit-firstname"
+                                        class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-500 dark:text-gray-400">Last Name</label>
+                                    <input type="text" name="lastname" id="edit-lastname"
+                                        class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-500 dark:text-gray-400">Middle Name</label>
+                                    <input type="text" name="middlename" id="edit-middlename"
+                                        class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-500 dark:text-gray-400">Suffix</label>
+                                    <input type="text" name="suffix" id="edit-suffix"
+                                        class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                </div>
+                            </div>
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Last
-                                Name</label>
-                            <input type="text" name="lastname" id="edit-lastname"
-                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        <!-- Student Info Section -->
+                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                            <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200 mb-2">Student Information
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-sm text-gray-500 dark:text-gray-400">Department</label>
+                                    <input type="text" name="department" id="edit-department"
+                                        class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-500 dark:text-gray-400">Student ID</label>
+                                    <input type="text" name="student_id" id="edit-student_id"
+                                        class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-500 dark:text-gray-400">Course</label>
+                                    <input type="text" name="course" id="edit-course"
+                                        class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-500 dark:text-gray-400">Section</label>
+                                    <input type="text" name="section" id="edit-section"
+                                        class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                </div>
+                            </div>
                         </div>
 
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Email</label>
-                            <input type="email" name="email" id="edit-email"
-                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Username</label>
-                            <input type="text" name="username" id="edit-username"
-                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Role</label>
-                            <select name="user_role" id="edit-user_role"
-                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
-                                <option value="student">Student</option>
-                                <option value="faculty">Faculty</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label
-                                class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Department</label>
-                            <input type="text" name="department" id="edit-department"
-                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-500 dark:text-gray-300">Course</label>
-                            <input type="text" name="course" id="edit-course"
-                                class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                        <!-- Contact & Account Info Section -->
+                        <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                            <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200 mb-2">Contact & Account
+                            </h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="text-sm text-gray-500 dark:text-gray-400">Email</label>
+                                    <input type="email" name="email" id="edit-email"
+                                        class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-500 dark:text-gray-400">Username</label>
+                                    <input type="text" name="username" id="edit-username"
+                                        class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                </div>
+                                <div>
+                                    <label class="text-sm text-gray-500 dark:text-gray-400">Role</label>
+                                    <select name="user_role" id="edit-user_role"
+                                        class="w-full p-2 mt-1 rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-600">
+                                        <option value="student">Student</option>
+                                        <option value="faculty">Faculty</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
-
                 </div>
 
                 <!-- Save Button -->
                 <div class="text-end mt-6">
                     <button type="submit"
                         class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
-                        Save Changes
+                        Update Changes
                     </button>
                 </div>
 
@@ -432,249 +560,161 @@
 
 
 
+
 </div>
 
-<!-- jQuery Tab Script -->
 <script>
     $(document).ready(function () {
-        function activateTab(tabId, contentId) {
-            $('.tab-panel').addClass('hidden');
-            $('.tab-button').removeClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
-                .addClass('border-transparent  dark:text-gray-400');
-
-            $(contentId).removeClass('hidden');
-            $(tabId).addClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
-                .removeClass('border-transparent  dark:text-gray-400');
-        }
-
-        // Initial tab
-        // activateTab('#tab-dashboard', '#dashboard-content');
-        activateTab('#tab-faculty', '#user-content');
-        $('#closeViewBtn').on('click', function () {
-            $('#view-content').addClass('hidden');
-            $('.tab-panel').removeClass('hidden');
-        });
-
-        $('#closeEditBtn').on('click', function () {
-            $('#edit-content').addClass('hidden');
-            $('.tab-panel').removeClass('hidden');
-        });
-
-        $('#tab-dashboard').click(function () { activateTab('#tab-dashboard', '#dashboard-content'); });
-        $('#tab-faculty').click(function () { activateTab('#tab-faculty', '#user-content'); });
-        $('#tab-student-table').click(function () { activateTab('#tab-student-table', '#student-table-content'); });
-        $('#tab-teacher-table').click(function () { activateTab('#tab-teacher-table', '#teacher-table-content'); });
-
-        $("#searchFaculty").on("keyup", function () {
-            loadFaculty($(this).val());
-        });
-        loadFaculty();
-        function loadFaculty(query = "") {
-            $.ajax({
-                url: `${base_url}auth/action.php?action=GetFaculty`,
-                type: "GET",
-                dataType: "json",
-                success: function (response) {
-                    if (response.status === 1) {
-
-                        const facultyTbody = $("#teacherTableBody");
-                        const studentTbody = $("#studentTableBody");
-
-                        // Clear tables once before appending
-                        facultyTbody.empty();
-                        studentTbody.empty();
-                        const q = query.toLowerCase();
-
-                        response.data.filter(user => {
-                            return (
-                                user.firstname.toLowerCase().includes(q) ||
-                                user.lastname.toLowerCase().includes(q) ||
-                                user.email.toLowerCase().includes(q) ||
-                                user.department.toLowerCase().includes(q) ||
-                                user.user_role.toLowerCase().includes(q)
-                            );
-                        }).forEach((user, index) => {
-                            const row = `
-                                    <tr class="text-indigo" data-id="${user.user_id}">
-                                        <td class="px-4 py-2">${index + 1}</td>
-                                        <td class="px-4 py-2">${user.firstname} ${user.lastname}</td>
-                                        <td class="px-4 py-2">${user.email}</td>
-                                        <td class="px-4 py-2">${user.department}</td>
-                                        <td class="px-2 py-2 text-center flex justify-center gap-1">
-                                            <button id="view-btn-${user.user_id}" class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                            <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                            <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                                        </td>
-                                    </tr>
-                                `;
-
-                            if (user.user_role === 'faculty') {
-                                facultyTbody.append(row);
-                            } else if (user.user_role === 'student') {
-                                studentTbody.append(row);
-                            }
-
-                        });
-                    }
-                },
-                error: function (xhr) {
-                    console.error(xhr.responseText);
-                }
-            });
-        }
-
-        $(document).on("click", ".view-btn, .edit-btn, .delete-btn", function () {
-            const tr = $(this).closest("tr");
-            const userId = tr.data("id");
-
-            if ($(this).hasClass("view-btn")) {
-
-                activateTab(`#view-btn-${userId}`, `#view-content`);
-                $.ajax({
-                    url: `${base_url}auth/action.php?action=GetUser`,
-                    type: "POST",
-                    data: {
-                        action: 'GetFaculty',
-                        user_id: userId
-                    },
-                    dataType: "json",
-
-                    success: function (res) {
-                        if (res.status === 1) {
-                            $("#viewFullname").text(res.data.firstname + " " + res.data.lastname);
-                            $("#viewEmail").text(res.data.email);
-                            $("#viewUsername").text(res.data.username);
-                            $("#viewDepartment").text(res.data.department);
-                            $("#viewCourse").text(res.data.course);
-                            $("#viewRole").text(res.data.user_role);
-                            $("#viewStatus").text(res.data.account_status);
-
-                            if (res.data.profile_pic) {
-                                $("#viewProfilePic").attr("src", base_url + "auth/" + res.data.profile_pic);
-                            } else {
-                                $("#viewProfilePic").attr("src", base_url + "../../assets/default-profile.png");
-                            }
-                        } else {
-                            alert(res.message);
-                        }
-                        loadReadLogs(userId);
-                        loadFaculty();
-
-                    },
-                    error: function () { alert("Server error"); }
-                });
-
-            }
-            else if ($(this).hasClass("edit-btn")) {
-                activateTab(`.tab-panel`, `#edit-content`);
-
-                $.ajax({
-                    url: `${base_url}auth/action.php?action=GetUser`,
-                    type: "POST",
-                    data: {
-                        user_id: userId,
-                        action: 'GetFaculty'
-                    },
-                    dataType: "json",
-
-                    success: function (res) {
-                        if (res.status !== 1) {
-                            alert(res.message || "Failed to load user.");
-                            return;
-                        }
-                        // const form = $("#updateForm"); // new update form
-
-                        $("#edit-firstname").val(res.data.firstname);
-                        $("#edit-lastname").val(res.data.lastname);
-                        $("#edit-email").val(res.data.email);
-                        $("#edit-username").val(res.data.username);
-                        $("#edit-department").val(res.data.department);
-                        $("#edit-course").val(res.data.course);
-                        $("#edit-user_role").val(res.data.user_role);
-                        $("#edit-user_id").val(userId);
-
-                        // profile preview logic
-                        if (res.data.profile_pic) {
-                            $("#editProfilePreview").attr("src", base_url + "auth/" + res.data.profile_pic);
-                        } else {
-                            $("#editProfilePreview").attr("src", base_url + "../../assets/default-profile.png");
-                        }
-                    },
-                    error: function () {
-                        alert("Server error while loading user.");
-                    }
-                });
-
-            } else if ($(this).hasClass("delete-btn")) {
-                if (!confirm("Are you sure you want to delete this user?")) return;
-                $.ajax({
-                    url: `${base_url}auth/action.php?action=GetUser`,
-                    type: "POST",
-                    data: {
-                        action: 'DeleteUser',
-                        user_id: userId
-                    },
-                    dataType: "json",
-                    success: function (res) {
-                        if (res.status === 1) {
-                            alert(res.message);
-                            tr.remove();
-                            loadFaculty();
-
-                        } else alert(res.message);
-                        loadFaculty();
-                    },
-                    error: function () { alert("Server error"); }
-                });
-            }
-        });
-
-
-        function loadReadLogs(userId) {
-            $.ajax({
-                url: `${base_url}auth/action.php?action=recently_viewed`,
-                method: 'POST',
-                data: {
-                    action: 'recently_viewed',
-                    user_id: userId
-                },
-                dataType: 'json',
-                success: function (result) {
-                    const container = $("#book_logs");
-                    container.empty(); // Clear previous logs
-
-                    if (result.status === 1 && result.data.length > 0) {
-                        result.data.forEach(log => {
-                            const logItem = `
-                            <p class="text-sm text-gray-700 truncate w-50 dark:text-gray-300 border-b dark:border-gray-600 pb-2">
-                                ${log.book_title}
-                                <span class="float-right text-xs text-gray-500  dark:text-gray-400">
-                                    ${log.duration < 60 ? log.duration + 's ago' : log.duration < 3600 ? Math.floor(log.duration / 60) + ' min ago' : Math.floor(log.duration / 3600) + 'h ' + Math.floor((log.duration % 3600) / 60) + 'm ago'}
-                                </span>
-                            </p>
-                            `;
-                            container.append(logItem);
-                        });
-                    } else {
-                        container.append(`
-                    <p class="text-sm text-gray-700 dark:text-gray-300 italic mx-auto">No read logs found.</p>
-                `);
-                    }
-                },
-                error: function () {
-                    console.error("Failed to load read logs.");
-                }
-            });
-        }
-
-
-
         const studentFields = $("#student-fields");
         const facultyFields = $("#faculty-fields");
         const profilePreview = $("#profile-preview");
         const registerMessage = $("#register-message");
 
-        // Toggle student/faculty fields
+        // --- TAB MANAGEMENT ---
+        function activateTab(tabId, contentId) {
+            $('.tab-panel').addClass('hidden');
+            $('.tab-button')
+                .removeClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
+                .addClass('border-transparent dark:text-gray-400');
+
+            $(contentId).removeClass('hidden');
+            $(tabId).addClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
+                .removeClass('border-transparent dark:text-gray-400');
+        }
+
+        // Initial tab
+        activateTab('#tab-faculty', '#user-content');
+
+        // Close view/edit tabs
+        $('#closeViewBtn, #closeEditBtn').click(() => {
+            $('#reviewModal').addClass('hidden');
+            $('.tab-panel').addClass('hidden');
+            activateTab('#tab-faculty', '#user-content');
+        });
+
+        // Tab click handlers
+        $('#tab-dashboard').click(() => activateTab('#tab-dashboard', '#dashboard-content'));
+        $('#tab-faculty').click(() => activateTab('#tab-faculty', '#user-content'));
+        $('#tab-student-table').click(() => activateTab('#tab-student-table', '#student-table-content'));
+        $('#tab-teacher-table').click(() => activateTab('#tab-teacher-table', '#teacher-table-content'));
+        $('#tab-request-table').click(() => activateTab('#tab-request-table', '#approval-table-content'));
+
+        // --- SEARCH & LOAD FACULTY/STUDENT TABLE ---
+        $("#searchFaculty").on("keyup", function () { loadUsers($(this).val()); });
+        loadUsers();
+
+        function loadUsers(query = "") {
+            $.ajax({
+                url: `${base_url}auth/action.php?action=GetFaculty`,
+                type: "GET",
+                dataType: "json",
+                success: function (res) {
+                    if (res.status !== 1) return;
+
+                    const facultyTbody = $("#teacherTableBody").empty();
+                    const studentTbody = $("#studentTableBody").empty();
+                    const q = query.toLowerCase();
+
+                    res.data
+                        .filter(user => user.account_status !== 'Pending' && user.account_status !== 'Declined') // exclude pending/declined
+                        .filter(user =>
+                            [user.firstname, user.lastname, user.email, user.department, user.user_role]
+                                .some(field => field.toLowerCase().includes(q))
+                        )
+                        .forEach((user, index) => {
+                            const row = `
+                    <tr data-id="${user.user_id}">
+                        <td class="px-4 py-2">${index + 1}</td>
+                        <td class="px-4 py-2">${user.firstname} ${user.middlename} ${user.lastname}</td>
+                        <td class="px-4 py-2">${user.email}</td>
+                        <td class="px-4 py-2">${user.department}</td>
+                        <td class="px-2 py-2 text-center flex justify-center gap-1">
+                            <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
+                            <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
+                            <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
+                        </td>
+                    </tr>`;
+                            user.user_role === 'faculty' ? facultyTbody.append(row) : studentTbody.append(row);
+                        });
+                },
+                error: xhr => console.error(xhr.responseText)
+            });
+
+        }
+
+        // --- VIEW, EDIT, DELETE ACTIONS ---
+        $(document).on("click", ".view-btn, .edit-btn, .delete-btn", function () {
+            const tr = $(this).closest("tr");
+            const userId = tr.data("id");
+
+            if ($(this).hasClass("view-btn")) viewUser(userId);
+            else if ($(this).hasClass("edit-btn")) editUser(userId);
+            else if ($(this).hasClass("delete-btn")) deleteUser(userId, tr);
+        });
+
+        function viewUser(userId) {
+            activateTab(`.tab-panel`, '#view-content');
+            loadStudentActivities(userId);
+            $.post(`${base_url}auth/action.php?action=GetUser`, { action: 'GetFaculty', user_id: userId }, function (res) {
+                if (res.status !== 1) return alert(res.message);
+                const data = res.data;
+                $("#viewstudent_id").text(data.student_id);
+                $("#viewfirstname").text(data.firstname);
+                $("#viewlastname").text(data.lastname);
+                $("#viewmiddlename").text(data.middlename);
+                $("#viewsuffix").text(data.suffix);
+                $("#viewcourse").text(data.course);
+                $("#viewsection").text(data.section);
+                $("#viewEmail").text(data.email);
+                $("#viewUsername").text(data.username);
+                $("#viewdepartment").text(data.department);
+                $("#viewStatus").text(data.account_status);
+                $("#viewProfilePic").attr("src", data.profile_pic ? base_url + "auth/" + data.profile_pic : "../../assets/default-profile.png");
+
+             }, "json").fail(() => alert("Server error"));
+        }
+
+        function editUser(userId) {
+            activateTab(`.tab-panel`, '#edit-content');
+            $.post(`${base_url}auth/action.php?action=GetUser`, { user_id: userId, action: 'GetFaculty' }, function (res) {
+                if (res.status !== 1) return alert(res.message || "Failed to load user.");
+                const data = res.data;
+                $("#edit-firstname").val(data.firstname);
+                $("#edit-lastname").val(data.lastname);
+                $("#edit-middlename").val(data.middlename);
+                $("#edit-suffix").val(data.suffix);
+                $("#edit-email").val(data.email);
+                $("#edit-student_id").val(data.student_id);
+                $("#edit-section").val(data.section);
+                $("#edit-username").val(data.username);
+                $("#edit-department").val(data.department);
+                $("#edit-course").val(data.course);
+                $("#edit-user_role").val(data.user_role);
+                $("#edit-user_id").val(userId);
+                $("#editProfilePreview").attr("src", data.profile_pic ? base_url + "auth/" + data.profile_pic : "../../assets/default-profile.png");
+            }, "json").fail(() => alert("Server error while loading user."));
+        }
+
+        function deleteUser(userId, tr) {
+            if (!confirm("Are you sure you want to delete this user?")) return;
+            $.post(`${base_url}auth/action.php?action=GetUser`, { action: 'DeleteUser', user_id: userId }, function (res) {
+                if (res.status === 1) {
+                    alert(res.message);
+                    tr.remove();
+                    loadUsers();
+                } else alert(res.message);
+            }, "json").fail(() => alert("Server error"));
+        }
+
+        // --- PROFILE PREVIEW ---
+        $("#profile, #edit-profile_pic").change(function () {
+            const file = this.files[0];
+            if (!file) return;
+            const target = $(this).attr("id") === "profile" ? profilePreview : $("#editProfilePreview");
+            target.attr("src", URL.createObjectURL(file));
+        });
+
+        // --- ROLE TOGGLE ---
         $('input[name="role"]').change(function () {
             if ($(this).val() === "student") {
                 studentFields.removeClass("hidden");
@@ -685,132 +725,207 @@
             }
         });
 
-        // Profile preview
-        $("#profile").on('change', function () {
-            const file = this.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                profilePreview.attr("src", e.target.result);
-            }
-            reader.readAsDataURL(file);
-        });
-
-        // Register form submission
+        // --- REGISTER FORM ---
         $("#register").submit(function (e) {
             e.preventDefault();
-
             const role = $('input[name="role"]:checked').val();
-            const formData = {
-                role: role,
-                firstname: $("input[name='firstname']").val(),
-                lastname: $("input[name='lastname']").val(),
-                middlename: $("input[name='middlename']").val(),
-                suffix: $("input[name='suffix']").val(),
-                department: $("input[name='department']").val(),
-                course: $("input[name='course']").val(),
-                section: $("input[name='section']").val(),
-                email: $("input[name='email']").val(),
-                username: $("input[name='username']").val(),
-                password: $("input[name='password']").val(),
-                confirm_password: $("input[name='confirm_password']").val(),
-                profile_pic: ""
-            };
+            const formData = new FormData(this);
+            formData.append('role', role);
 
-            // Add role-specific fields
-            if (role === "student") {
-                formData.student_id = $("input[name='student_id']").val();
-                formData.section = $("input[name='section']").val();
-            } else {
-                formData.employee_id = $("input[name='employee_id']").val();
-            }
-
-            // Password confirmation check
-            if (formData.password !== formData.confirm_password) {
-                registerMessage.text("Passwords do not match")
-                    .removeClass("hidden text-green-500")
-                    .addClass("text-red-500");
-                return;
-            }
-
-            // Convert profile image to Base64 if selected
-            const fileInput = $('#profile')[0].files[0];
-            if (fileInput) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    formData.profile_pic = e.target.result;
-                    sendAjax(formData);
-                }
-                reader.readAsDataURL(fileInput);
-            } else {
-                sendAjax(formData);
-            }
-
-        });
-
-        function sendAjax(data) {
             $.ajax({
                 url: `${base_url}auth/action.php?action=register_user`,
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                dataType: 'json',
-                success: function (result) {
-                    registerMessage.text(result.message).removeClass("hidden");
-                    if (result.status === 1) {
-                        registerMessage.removeClass("text-red-500").addClass("text-green-500");
-                        $("#register")[0].reset();
-                        profilePreview.attr("src", "../../assets/default-profile.png");
-                        studentFields.removeClass("hidden");
-                        facultyFields.addClass("hidden");
-                    } else {
-                        registerMessage.removeClass("text-green-500").addClass("text-red-500");
-                    }
-                    loadFaculty();
-                },
-                error: function () {
-                    registerMessage.text("An error occurred. Please try again.")
-                        .removeClass("hidden text-green-500")
-                        .addClass("text-red-500");
-                }
-            });
-        }
-
-        $("#edit-profile_pic").on("change", function () {
-            const file = this.files[0];
-            if (!file) return;
-
-            $("#editProfilePreview").attr("src", URL.createObjectURL(file));
-        });
-
-        $("#updateForm").on("submit", function (e) {
-            e.preventDefault();
-
-            const formData = new FormData(this);
-
-            $.ajax({
-                url: `${base_url}auth/action.php?action=updateUser`,
                 type: "POST",
                 data: formData,
                 contentType: false,
                 processData: false,
                 dataType: "json",
                 success: function (res) {
+                    registerMessage.text(res.message).removeClass("hidden")
+                        .toggleClass("text-green-500", res.status === 1)
+                        .toggleClass("text-red-500", res.status !== 1);
                     if (res.status === 1) {
-                        alert("Updated successfully.");
-                        loadFaculty(); // refresh table
-                    } else {
-                        alert(res.message || "Update failed.");
+                        $("#register")[0].reset();
+                        profilePreview.attr("src", "../../assets/default-profile.png");
+                        studentFields.removeClass("hidden");
+                        facultyFields.addClass("hidden");
+                        loadUsers();
                     }
                 },
-                error: function (xhr) {
-                    console.error(xhr.responseText);
-                    alert("Server error while updating.");
+                error: function () {
+                    registerMessage.text("An error occurred. Please try again.").removeClass("hidden").addClass("text-red-500");
                 }
             });
         });
 
+        // --- UPDATE FORM ---
+        $("#updateForm").submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                url: `${base_url}auth/action.php?action=updateUser`,
+                type: "POST",
+                data: new FormData(this),
+                contentType: false,
+                processData: false,
+                dataType: "json",
+                success: res => {
+                    if (res.status === 1) { alert("Updated successfully."); loadUsers(); }
+                    else alert(res.message || "Update failed.");
+                },
+                error: xhr => { console.error(xhr.responseText); alert("Server error while updating."); }
+            });
+        });
 
-
+        // --- APPROVE / DECLINE ---
+        $(document).on('click', '.approveBtn, .declineBtn', function () {
+            const user_id = $(this).data('id');
+            const action = $(this).hasClass('approveBtn') ? 'Approved' : 'Declined';
+            if (!confirm(`${action} this request?`)) return;
+            $.post(`${base_url}auth/action.php?action=account_status`, { user_id, action }, res => {
+                if (res.status) { alert(`Request ${action.toLowerCase()}`); loadUsers(); }
+                else alert(res.message || 'Operation failed');
+            }, 'json').fail(() => alert('Server error'));
+        });
     });
+
+    function loadApprovalRequests() {
+        const approvalTable = $("#approvalTable");
+        approvalTable.html(`<tr><td colspan="5" class="text-center py-4">Loading...</td></tr>`);
+
+        $.post(`${base_url}auth/action.php?action=GetFaculty`, { action: 'GetFaculty' }, res => {
+            if (!res.status || !res.data?.length) {
+                return approvalTable.html(`<tr><td colspan="5" class="text-center py-4 text-gray-500">No pending requests</td></tr>`);
+            }
+
+            const statusClasses = {
+                Pending: 'bg-yellow-100 text-yellow-700',
+                Approved: 'bg-green-100 text-green-700',
+                Declined: 'bg-red-100 text-red-700'
+            };
+
+            const filteredData = res.data.filter(req => req.account_status === 'Pending' || req.account_status === 'Declined');
+
+            if (!filteredData.length) {
+                return approvalTable.html(`<tr><td colspan="5" class="text-center py-4 text-gray-500">No pending requests</td></tr>`);
+            }
+
+            const rows = filteredData.map(req => `
+                    <tr class="border-b dark:border-gray-700">
+                        <td class="px-4 py-2">${req.user_id}</td>
+                        <td class="px-6 py-2">${req.firstname} ${req.lastname}</td>
+                        <td class="px-4 py-2">${req.email}</td>
+                        <td class="px-4 py-2">${req.department}</td>
+                        <td class="px-4 py-2">
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClasses[req.account_status] || 'bg-gray-100 text-gray-700'}">
+                                ${req.account_status}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2 text-center">
+                            <button data-id="${req.user_id}" class="reviewBtn px-2 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600 mr-1">Review</button>
+                            <button data-id="${req.user_id}" class="approveBtn px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 mr-1">Approve</button>
+                            <button data-id="${req.user_id}" class="declineBtn px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600">Decline</button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            approvalTable.html(rows);
+        }, 'json').fail(() => {
+            approvalTable.html(`<tr><td colspan="5" class="text-center text-red-500 py-4">Failed to load requests</td></tr>`);
+        });
+    }
+
+
+    $(document).on('click', '.approveBtn, .declineBtn, .reviewBtn', function () {
+        const user_id = $(this).data('id');
+
+        // === HANDLE REVIEW BUTTON ===
+        if ($(this).hasClass('reviewBtn')) {
+            // Show modal
+            $('#reviewModal').removeClass('hidden').addClass('flex');
+            // Load user data into modal
+            $.post(`${base_url}auth/action.php?action=GetUser`, { action: 'GetFaculty', user_id }, function (res) {
+                if (res.status !== 1) return alert(res.message);
+                const data = res.data;
+                $("#firstname").text(data.firstname);
+                $("#lastname").text(data.lastname);
+                $("#middlename").text(data.middlename);
+                $("#suffix").text(data.suffix);
+                $("#department").text(data.department);
+                $("#student_id").text(data.student_id);
+                $("#course").text(data.course);
+                $("#section").text(data.section);
+                $("#reviewEmail").text(data.email);
+                $("#reviewUsername").text(data.username);
+                $("#viewStatus").text(data.account_status);
+                $("#ReviewProfilePic").attr("src", data.profile_pic ? base_url + "auth/" + data.profile_pic : "../assets/image/users.png");
+            }, "json").fail(() => alert("Server error"));
+
+            return; // stop the approve/decline flow
+        }
+
+        // === NORMAL APPROVE / DECLINE ===
+        let action = $(this).hasClass('approveBtn') ? 'Approved' : 'Declined';
+
+        if (!confirm(`${action} this request?`)) return;
+
+        $.post(`${base_url}auth/action.php?action=account_status`,
+            { user_id, action },
+            res => {
+                if (res.status) {
+                    alert(`Request ${action.toLowerCase()}`);
+                    loadApprovalRequests();
+                    loadUsers();
+                } else {
+                    alert(res.message || 'Operation failed');
+                }
+            },
+            'json'
+        ).fail(() => alert('Server error'));
+    });
+
+
+
+    // ---------------- Initial Load ----------------
+    loadApprovalRequests();
+
+
+
+
+    function loadStudentActivities(user_id) {
+        const tbody = $("#studentActivitiesBody");
+        tbody.html('<tr><td colspan="5" class="text-center py-4">Loading...</td></tr>');
+
+        $.ajax({
+            url: `${base_url}auth/action.php?action=GetStudentActivities`,
+            type: 'GET', // or POST if you prefer
+            data: { user_id },
+            dataType: 'json',
+            success: function (res) {
+                if (!res.status || !res.data.length) {
+                    tbody.html('<tr><td colspan="5" class="text-center py-4">No activities found</td></tr>');
+                    return;
+                }
+
+                const rows = res.data.map((act, index) => `
+            <tr class="border-b dark:border-gray-700">
+                <td class="px-4 py-2">${index + 1}</td>
+                <td class="px-4 py-2">${act.book_title}</td>
+                <td class="px-4 py-2">${act.start_time}</td>
+                <td class="px-4 py-2">${act.end_time || 'In Progress'} / ${act.total_read_time}</td>
+                <td class="px-4 py-2">${act.remark}</td>
+            </tr>
+        `).join('');
+
+                tbody.html(rows);
+            },
+            error: function (xhr) {
+                tbody.html('<tr><td colspan="5" class="text-center text-red-500 py-4">Failed to load activities</td></tr>');
+                console.error(xhr.responseText);
+            }
+        });
+
+    }
+
+    // Usage example:
+    // loadStudentActivities(2025001);
+
 </script>

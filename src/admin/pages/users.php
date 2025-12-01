@@ -345,21 +345,7 @@
                         </tr>
                     </thead>
                     <tbody id="studentActivitiesBody" class="divide-y divide-gray-200 dark:divide-gray-700">
-                        <!-- Example Row -->
-                        <tr class="border-b dark:border-gray-700">
-                            <td class="px-4 py-2">1</td>
-                            <td class="px-4 py-2">Introduction to Algorithms</td>
-                            <td class="px-4 py-2">2025-11-28 08:30</td>
-                            <td class="px-4 py-2">09:30 / 1 hour</td>
-                            <td class="px-4 py-2">Favorited</td>
-                        </tr>
-                        <tr class="border-b dark:border-gray-700">
-                            <td class="px-4 py-2">2</td>
-                            <td class="px-4 py-2">Clean Code</td>
-                            <td class="px-4 py-2">2025-11-28 10:00</td>
-                            <td class="px-4 py-2">11:00 / 1 hour</td>
-                            <td class="px-4 py-2">Favorited</td>
-                        </tr>
+                        
                         <!-- Dynamic rows can be appended via JS -->
                     </tbody>
                 </table>
@@ -924,7 +910,7 @@
                 <td class="px-4 py-2">${index + 1}</td>
                 <td class="px-4 py-2">${act.book_title}</td>
                 <td class="px-4 py-2">${act.start_time}</td>
-                <td class="px-4 py-2">${act.end_time || 'In Progress'} / ${act.consumed}</td>
+                <td class="px-4 py-2">${act.end_time || 'In Progress'} / ${act.total_read_time}</td>
                 <td class="px-4 py-2">${act.remark}</td>
             </tr>
         `).join('');

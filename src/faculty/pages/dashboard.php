@@ -5,35 +5,42 @@
     </h1>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-indigo-500 cursor-pointer 
-                hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
-            data-panel="booksPanel">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Available Books</p>
-            <p id="statBooks" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <p class="text-xs text-green-500 mt-2">↑ 0% this month</p>
-        </div>
-        <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-red-500 cursor-pointer 
-                hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
-            data-panel="panelDepartment">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Department Folder</p>
-            <p id="statDepartment" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <!-- <p class="text-xs text-red-500 mt-2">Action required</p> -->
-        </div>
-        <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-emerald-500 cursor-pointer 
-                hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
-            data-panel="OnlinePanel">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active Users</p>
-            <p id="OnlineUsers" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <!-- <p class="text-xs text-red-500 mt-2">↓ 0% this month</p> -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
+
+        <div data-panel="booksPanel" class="stat-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl border-l-8 border-indigo-500 cursor-pointer 
+                transform transition duration-300 ease-in-out flex flex-col items-center text-center w-full max-w-xs">
+            <div class="flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-indigo-50 dark:bg-indigo-900">
+                <svg class="w-8 h-8 text-indigo-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M19 2H9a2 2 0 00-2 2v16l7-3 7 3V4a2 2 0 00-2-2z" />
+                </svg>
+            </div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Available Books</p>
+            <p id="statBooks" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">0</p>
         </div>
 
-        <div class="stat-card bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-yellow-500 cursor-pointer 
-                hover:shadow-2xl hover:scale-105 transform transition duration-300 ease-in-out"
-            data-panel="requestsPanel">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Registered Account </p>
-            <p id="statRequests" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">0</p>
-            <!-- <p class="text-xs text-yellow-500 mt-2">Last updated just now</p> -->
+        <div data-panel="OnlinePanel" class="stat-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl border-l-8 border-emerald-500 cursor-pointer 
+                transform transition duration-300 ease-in-out flex flex-col items-center text-center w-full max-w-xs">
+            <div class="flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-emerald-50 dark:bg-emerald-900">
+                <svg class="w-8 h-8 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Active Users</p>
+            <p id="OnlineUsers" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">0</p>
+        </div>
+
+        <div data-panel="requestsPanel" class="stat-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl border-l-8 border-yellow-500 cursor-pointer 
+                transform transition duration-300 ease-in-out flex flex-col items-center text-center w-full max-w-xs">
+            <div class="flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-yellow-50 dark:bg-yellow-900">
+                <svg class="w-8 h-8 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Registered Accounts
+            </p>
+            <p id="statRequests" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">0</p>
         </div>
 
 
@@ -41,66 +48,103 @@
 
 </div>
 
-<!-- Panels -->
-<div id="booksPanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
-    <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Under Maintenance</h2>
-    <canvas id="booksChart" class="mt-4"></canvas>
+<div id="booksPanel" class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6 hidden">
+    <button class="backBtn mb-4 px-5 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+        Back
+    </button>
+
+    <h2 class="text-xl text-gray-900 dark:text-gray-100 mb-2">
+        Books by Category
+    </h2>
+
+    <div class="space-y-2">
+        <div id="booksContainer" class="space-y-4"></div>
+        <!-- <div class="border rounded-lg bg-gray-50 dark:bg-gray-700">
+            <button class="w-full flex justify-between items-center p-3 categoryBtn">
+                <span class="font-semibold text-gray-900 dark:text-gray-100">Science</span>
+                <span class="bg-indigo-500 text-white text-xs px-3 text-2xl font-bold py-2 rounded font-bold">Total book: <span class="">12</span></span>
+            </button>
+
+            <hr class="border-gray-300 dark:border-gray-600">
+
+            <div class="categoryList hidden px-4 pb-3">
+                <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-1">
+                    <li>Physics Handbook</li>
+                    <li>Chemistry Essentials</li>
+                    <li>Biology Intro</li>
+                </ol>
+            </div>
+        </div>
+
+        <div class="border rounded-lg bg-gray-50 dark:bg-gray-700">
+            <button class="w-full flex justify-between items-center p-3 categoryBtn">
+                <span class="font-semibold text-gray-900 dark:text-gray-100">Science</span>
+                <span class="bg-indigo-500 text-white text-xs px-3 text-2xl font-bold py-2 rounded font-bold">Total book: <span class="">12</span></span>
+            </button>
+
+            <hr class="border-gray-300 dark:border-gray-600">
+
+            <div class="categoryList hidden px-4 pb-3">
+                <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-1">
+                    <li>Physics Handbook</li>
+                    <li>Chemistry Essentials</li>
+                    <li>Biology Intro</li>
+                </ol>
+            </div>
+        </div>
+ -->
+    </div>
 </div>
 
+<script>
+    $(document).on('click', '.categoryBtn', function () {
+        $(this).closest('div').find('.categoryList').toggleClass('hidden');
+    });
+</script>
+
+
+
+
+
 <div id="OnlinePanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
-    <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
-    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Users Logged Monitoring</h2>
-    <canvas id="usersChart" class="mt-4"></canvas>
+    <button class="backBtn mb-4 px-4 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
+
+    <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100 mb-4">Users Logged Monitoring</h2>
+    <canvas id="usersChart" class="mt-6"></canvas>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- ONLINE USERS -->
+        <div>
+            <h3 class="text-lg font-bold mb-2 text-green-600">Online</h3>
+            <ul id="onlineList" class="space-y-2 text-sm">
+
+            </ul>
+        </div>
+
+        <!-- OFFLINE USERS -->
+        <div>
+            <h3 class="text-lg font-bold mb-2 text-red-600">Offline</h3>
+            <ul id="offlineList" class="space-y-2 text-sm">
+
+            </ul>
+        </div>
+
+    </div>
+
+
 </div>
+
 <div id="panelDepartment" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
     <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
     <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Department Books Monitoring</h2>
     <canvas id="offlineChart" class="mt-4"></canvas>
 </div>
 <div id="requestsPanel" class="hidden p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6">
-    <button class="backBtn mb-4 px-4 py-2 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
+    <button class="backBtn mb-4 px-4 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600">Back</button>
 
     <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Registration Requests Approval</h2>
 
     <canvas id="requestsChart" class="mt-4"></canvas>
-
-    <!-- Approval Table -->
-    <div class="mt-8">
-        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3">Approval Requests</h3>
-
-        <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-            <table class="min-w-full text-sm text-left">
-                <thead class="bg-gray-100 dark:bg-gray-700 dark:text-gray-200">
-                    <tr>
-                        <th class="px-4 py-2">User</th>
-                        <th class="px-4 py-2">Request Type</th>
-                        <th class="px-4 py-2">Date</th>
-                        <th class="px-4 py-2 text-center">Status</th>
-                        <th class="px-4 py-2 text-center">Action</th>
-                    </tr>
-                </thead>
-
-                <tbody id="approvalTable" class="text-gray-800 dark:text-gray-100">
-                    <!-- Dynamic rows go here -->
-                    <!-- Example row:
-                    <tr class="border-b dark:border-gray-700">
-                        <td class="px-4 py-2">John Doe</td>
-                        <td class="px-4 py-2">Account Activation</td>
-                        <td class="px-4 py-2">2025-11-20</td>
-                        <td class="px-4 py-2 text-center">
-                            <span class="px-3 py-1 text-xs font-semibold rounded bg-yellow-100 text-yellow-700">Pending</span>
-                        </td>
-                        <td class="px-4 py-2 text-center">
-                            <button class="approveBtn px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs">Approve</button>
-                            <button class="declineBtn px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs ml-2">Decline</button>
-                        </td>
-                    </tr>
-                    -->
-                </tbody>
-            </table>
-        </div>
-    </div>
 </div>
 
 
@@ -165,19 +209,106 @@
                         offline: 0
                     };
 
-
                     dashboardData.stats = {
                         totalDepartment: res.stats.totalDepartment || 0, //locked this
                         folder_names: res.stats.folder_names || [], //locked this
                         booksperfolder: res.stats.booksperfolder || {}
                     };
 
+                    if (res.status !== 1) {
+                        $('#onlineList, #offlineList').html('<li class="text-red-500">No data found</li>');
+                        return;
+                    }
+
+                    const users = res.stats || { online_users: [], offline_users: [] };
+                    $('#OnlineUsers').text(res.stats.totalusers || 0);
+                    let onlineHtml = '';
+                    (users.online_users || []).forEach((user, index) => {
+                        let details = JSON.parse(user.personal_details);
+                        let fullName = [details.firstname, details.middlename, details.lastname].filter(Boolean).join(' ');
+                        let userId = user.admin_id || user.user_id || 'N/A';
+                        onlineHtml += `
+                            <li class="p-2 bg-green-50 dark:bg-green-900/40 rounded flex justify-between items-center">
+                                <span class="flex-1"><span class="font-bold">${index + 1}.</span> ${fullName}</span>
+                                <span class="flex-1 text-center text-gray-600">ID: ${details.library_id}</span>
+                                <span class="flex-1 text-right text-blue-600">${user.updated_date}</span>
+                            </li>`;
+                    });
+                    $('#onlineList').html(onlineHtml);
+
+
+                    let offlineHtml = '';
+                    (users.offline_users || []).forEach((user, index) => {
+                        let details = JSON.parse(user.personal_details);
+
+                        let fullName = [details.firstname, details.middlename, details.lastname].filter(Boolean).join(' ');
+                        let userId = user.admin_id || user.user_id || 'N/A';
+                        offlineHtml += `
+                        <li class="p-2 bg-red-50 dark:bg-red-900/40 rounded flex justify-between items-center">
+                            <span class="flex-1"><span class="font-bold">${index + 1}.</span> ${fullName}</span>
+                            <span class="flex-1 text-center text-gray-600">ID: ${details.library_id}</span>
+                            <span class="flex-1 text-right text-blue-600">${user.updated_date}</span>
+                        </li>`;
+                    });
+                    $('#offlineList').html(offlineHtml);
 
                     const allBooks = Object.values(dashboardData.stats.booksperfolder)
                         .flat();
 
-                    console.log(allBooks);
+                    console.log('Array: ', allBooks);
                     console.log('Total books:', allBooks.length);
+
+
+                    if (res.status !== 1 || !res.stats || !res.stats.booksperfolder) {
+                        $("#booksContainer").html("<p class='text-red-500'>No data found.</p>");
+                        return;
+                    }
+                    const folders = res.stats.booksperfolder;
+                    let html = "";
+
+                    $.each(folders, function (folderName, files) {
+
+                        // Extract titles properly
+                        const titles = files.map(file => {
+                            if (file.metadata?.Title) return file.metadata.Title;
+                            if (file.metadata?.["dc:title"]) return file.metadata["dc:title"];
+                            return file.filename; // fallback
+                        });
+
+                        html += `
+                                <div class="border rounded-lg bg-gray-50 dark:bg-gray-700">
+                            <button class="w-full flex justify-between items-center p-3 categoryBtn">
+                                <span class="font-semibold text-gray-900 dark:text-gray-100">${folderName}</span>
+                                <span class="bg-indigo-500 text-white text-xs px-3 text-2xl font-bold py-2 rounded">
+                                    Total book: <span>${titles.length}</span>
+                                </span>
+                            </button>
+
+                            <hr class="border-gray-300 dark:border-gray-600">
+
+                            <div class="categoryList hidden px-4 pb-3">
+                                <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-1">
+                                    ${files
+                                .map(file => `
+                                            <li>
+                                                <a 
+                                                    href="javascript:void(0)" 
+                                                    onclick="openBook('${folderName}', '${file.metadata?.Title ?? file.filename}', '${file.filename}')"
+                                                    class="text-indigo-600 dark:text-indigo-400 hover:underline"
+                                                >
+                                                    ${file.metadata?.Title ?? file.filename}
+                                                </a>
+                                            </li>
+                                        `)
+                                .join("")}
+                                </ol>
+                            </div>
+                        </div>
+                    `;
+                        $("#booksContainer").html(html);
+                    });
+
+
 
                     $('#statBooks').text(allBooks.length || null);
 
@@ -187,7 +318,7 @@
 
                     $('#statDepartment').text(dashboardData.stats.totalDepartment);
                     $('#statRequests').text(totalRequests);
-                    $('#OnlineUsers').text(dashboardData.users.totalusers || 0);
+                    // $('#OnlineUsers').text(dashboardData.users.totalusers || 0);
 
 
 
@@ -231,11 +362,10 @@
                     ctx = $('#requestsChart');
                     chartData = [
                         dashboardData.requests.pending || 0,
-                        dashboardData.requests.approved || 0,
-                        dashboardData.requests.declined || 0
+                        dashboardData.requests.approved || 0
                     ];
-                    chartLabel = ['Pending', 'Approved', 'Declined'];
-                    chartColors = ['#facc15', '#34d399', '#ef4444'];
+                    chartLabel = ['Pending', 'Approved'];
+                    chartColors = ['#facc15', '#34d399'];
                     break;
 
                 case 'OnlinePanel':
@@ -244,7 +374,7 @@
                         dashboardData.users.online || 0,
                         dashboardData.users.offline || 0
                     ];
-                    chartLabel = ['Online Users', 'Offline Users'];
+                    chartLabel = ['Online', 'Offline'];
                     chartColors = ['#10b981', '#ef4444'];
                     break;
 
@@ -290,7 +420,11 @@
                 data: {
                     labels: chartLabel,
                     datasets: [{
-                        label: panelId.includes('Online') ? 'Online' : panelId.includes('Offline') ? 'Offline' : 'Requests',
+                        label:
+                            panelId.includes('Online') && !panelId.includes('Offline') ? 'Users' :
+                                panelId.includes('Offline') && !panelId.includes('Online') ? 'Users' :
+                                    '',
+
                         data: chartData,
                         backgroundColor: chartColors
                     }]
@@ -382,7 +516,6 @@
 
         // ---------------- Initial Load ----------------
         loadDashboardStats();
-        loadApprovalRequests();
 
     });
 </script>
