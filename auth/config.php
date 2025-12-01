@@ -6,6 +6,11 @@ function db_connect()
     $username = 'root';
     $password = '';
     $database = 'universitydb';
+    /* 
+    $host = 'sql100.infinityfree.com';
+    $username = 'if0_40273735';
+    $password = 'UywgtSOntOaxBVT';
+    $database = 'if0_40273735_lib'; */
 
     try {
         $pdo = new PDO("mysql:host=$host;charset=utf8mb4", $username, $password);
