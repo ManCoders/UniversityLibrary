@@ -206,7 +206,9 @@
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Department</th>
-                    
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Account Status</th>
                     <th
                         class="px-1 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Actions</th>
@@ -250,19 +252,19 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">First Name</p>
-                            <p id="firstname" class="text-gray-800 dark:text-gray-100 font-semibold">John</p>
+                            <p id="viewfirstname" class="text-gray-800 dark:text-gray-100 font-semibold">John</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Last Name</p>
-                            <p id="lastname" class="text-gray-800 dark:text-gray-100 font-semibold">Doe</p>
+                            <p id="viewlastname" class="text-gray-800 dark:text-gray-100 font-semibold">Doe</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Middle Name</p>
-                            <p id="middlename" class="text-gray-800 dark:text-gray-100 font-semibold">Michael</p>
+                            <p id="viewmiddlename" class="text-gray-800 dark:text-gray-100 font-semibold">Michael</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Suffix</p>
-                            <p id="suffix" class="text-gray-800 dark:text-gray-100 font-semibold">Jr.</p>
+                            <p id="viewsuffix" class="text-gray-800 dark:text-gray-100 font-semibold">Jr.</p>
                         </div>
                     </div>
                 </div>
@@ -273,20 +275,21 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Department</p>
-                            <p id="department" class="text-gray-800 dark:text-gray-100 font-semibold">Computer Science
+                            <p id="viewdepartment" class="text-gray-800 dark:text-gray-100 font-semibold">Computer
+                                Science
                             </p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Student ID</p>
-                            <p id="student_id" class="text-gray-800 dark:text-gray-100 font-semibold">2025001</p>
+                            <p id="viewstudent_id" class="text-gray-800 dark:text-gray-100 font-semibold">2025001</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Course</p>
-                            <p id="course" class="text-gray-800 dark:text-gray-100 font-semibold">BSIT</p>
+                            <p id="viewcourse" class="text-gray-800 dark:text-gray-100 font-semibold">BSIT</p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-500 dark:text-gray-400">Section</p>
-                            <p id="section" class="text -gray-800 dark:text-gray-100 font-semibold">A</p>
+                            <p id="viewsection" class="text -gray-800 dark:text-gray-100 font-semibold">A</p>
                         </div>
                     </div>
                 </div>
@@ -363,6 +366,80 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL OVERLAY -->
+    <div id="reviewModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden justify-center items-center z-50">
+
+        <!-- MODAL CONTENT -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-[95%] max-w-4xl p-6 overflow-y-auto max-h-[90vh]">
+
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-100">Review Overview</h2>
+                <button id="closeViewBtn"
+                    class="bg-indigo-600 text-white px-6 py-1 rounded-lg hover:bg-indigo-700 transition">
+                    Back
+                </button>
+            </div>
+
+            <!-- ORIGINAL CONTENT -->
+            <div class="flex flex-col sm:flex-row gap-6">
+
+                <!-- LEFT: Profile Picture & Status -->
+                <div
+                    class="flex flex-col items-center my-auto justify-start w-full sm:w-[35%] border-r border-[#b03060]/40 dark:border-[#800000]/40 pr-4">
+                    <div class="relative w-50 h-50 overflow-hidden border border-[#b03060] dark:border-[#ff4d6d]">
+                        <img id="ReviewProfilePic" src="../../assets/default-profile.png" alt="Profile Preview"
+                            class="w-full h-full object-cover">
+                    </div>
+                    <p id="viewStatus" class="mt-3 text-sm font-bold text-[#b03060] dark:text-[#ff4d6d]">Pending</p>
+
+                </div>
+
+                <!-- RIGHT CONTENT (unchanged from yours) -->
+                <div class="flex-1 flex flex-col gap-4">
+                    <!-- Name Section -->
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                        <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200 mb-2">Complete Name</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <p><span class="text-gray-500 dark:text-gray-400">First Name</span><br><span id="firstname"
+                                    class="font-semibold"></span></p>
+                            <p><span class="text-gray-500 dark:text-gray-400">Last Name</span><br><span id="lastname"
+                                    class="font-semibold"></span></p>
+                            <p><span class="text-gray-500 dark:text-gray-400">Middle Name</span><br><span
+                                    id="middlename" class="font-semibold"></span></p>
+                            <p><span class="text-gray-500 dark:text-gray-400">Suffix</span><br><span id="suffix"
+                                    class="font-semibold"></span></p>
+                        </div>
+                    </div>
+
+                    <!-- Student Info Section -->
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                        <h3 class="text-md font-semibold mb-2">Student Information</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <p><span class="text-gray-500 dark:text-gray-400">Department</span><br><span id="department"
+                                    class="font-semibold"></span></p>
+                            <p><span class="text-gray-500 dark:text-gray-400">Student ID</span><br><span id="student_id"
+                                    class="font-semibold"></span></p>
+                            <p><span class="text-gray-500 dark:text-gray-400">Course</span><br><span id="course"
+                                    class="font-semibold"></span></p>
+                            <p><span class="text-gray-500 dark:text-gray-400">Section</span><br><span id="section"
+                                    class="font-semibold"></span></p>
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg shadow-sm">
+                        <h3 class="text-md font-semibold mb-2">Contact</h3>
+                        <p><span class="text-gray-500 dark:text-gray-400">Email</span><br><span id="reviewEmail"
+                                class="font-semibold"></span></p>
+                        <p><span class="text-gray-500 dark:text-gray-400">Username</span><br><span id="reviewUsername"
+                                class="font-semibold"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Edit info tab -->
     <div id="edit-content" class="tab-panel hidden">
@@ -524,6 +601,7 @@
 
         // Close view/edit tabs
         $('#closeViewBtn, #closeEditBtn').click(() => {
+            $('#reviewModal').addClass('hidden');
             $('.tab-panel').addClass('hidden');
             activateTab('#tab-faculty', '#user-content');
         });
@@ -594,19 +672,20 @@
             $.post(`${base_url}auth/action.php?action=GetUser`, { action: 'GetFaculty', user_id: userId }, function (res) {
                 if (res.status !== 1) return alert(res.message);
                 const data = res.data;
-                $("#student_id").val(data.student_id);
-                $("#firstname").val(data.firstname);
-                $("#lastname").val(data.lastname);
-                $("#middlename").val(data.middlename);
-                $("#suffix").val(data.suffix);
-                $("#course").val(data.course);
-                $("#section").val(data.section);
-                $("#viewEmail").val(data.email);
-                $("#viewUsername").val(data.username);
-                $("#department").val(data.department);
+                $("#viewstudent_id").text(data.student_id);
+                $("#viewfirstname").text(data.firstname);
+                $("#viewlastname").text(data.lastname);
+                $("#viewmiddlename").text(data.middlename);
+                $("#viewsuffix").text(data.suffix);
+                $("#viewcourse").text(data.course);
+                $("#viewsection").text(data.section);
+                $("#viewEmail").text(data.email);
+                $("#viewUsername").text(data.username);
+                $("#viewdepartment").text(data.department);
                 $("#viewStatus").text(data.account_status);
                 $("#viewProfilePic").attr("src", data.profile_pic ? base_url + "auth/" + data.profile_pic : "../../assets/default-profile.png");
-            }, "json").fail(() => alert("Server error"));
+
+             }, "json").fail(() => alert("Server error"));
         }
 
         function editUser(userId) {
@@ -749,8 +828,13 @@
                         <td class="px-6 py-2">${req.firstname} ${req.lastname}</td>
                         <td class="px-4 py-2">${req.email}</td>
                         <td class="px-4 py-2">${req.department}</td>
-                        
+                        <td class="px-4 py-2">
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold ${statusClasses[req.account_status] || 'bg-gray-100 text-gray-700'}">
+                                ${req.account_status}
+                            </span>
+                        </td>
                         <td class="px-4 py-2 text-center">
+                            <button data-id="${req.user_id}" class="reviewBtn px-2 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600 mr-1">Review</button>
                             <button data-id="${req.user_id}" class="approveBtn px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600 mr-1">Approve</button>
                             <button data-id="${req.user_id}" class="declineBtn px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600">Decline</button>
                         </td>
@@ -764,22 +848,55 @@
     }
 
 
-
-    // Approve / Decline handlers
-    $(document).on('click', '.approveBtn, .declineBtn', function () {
+    $(document).on('click', '.approveBtn, .declineBtn, .reviewBtn', function () {
         const user_id = $(this).data('id');
-        const action = $(this).hasClass('approveBtn') ? 'Approved' : 'Declined';
+
+        // === HANDLE REVIEW BUTTON ===
+        if ($(this).hasClass('reviewBtn')) {
+            // Show modal
+            $('#reviewModal').removeClass('hidden').addClass('flex');
+            // Load user data into modal
+            $.post(`${base_url}auth/action.php?action=GetUser`, { action: 'GetFaculty', user_id }, function (res) {
+                if (res.status !== 1) return alert(res.message);
+                const data = res.data;
+                $("#firstname").text(data.firstname);
+                $("#lastname").text(data.lastname);
+                $("#middlename").text(data.middlename);
+                $("#suffix").text(data.suffix);
+                $("#department").text(data.department);
+                $("#student_id").text(data.student_id);
+                $("#course").text(data.course);
+                $("#section").text(data.section);
+                $("#reviewEmail").text(data.email);
+                $("#reviewUsername").text(data.username);
+                $("#viewStatus").text(data.account_status);
+                $("#ReviewProfilePic").attr("src", data.profile_pic ? base_url + "auth/" + data.profile_pic : "../assets/image/users.png");
+            }, "json").fail(() => alert("Server error"));
+
+            return; // stop the approve/decline flow
+        }
+
+        // === NORMAL APPROVE / DECLINE ===
+        let action = $(this).hasClass('approveBtn') ? 'Approved' : 'Declined';
 
         if (!confirm(`${action} this request?`)) return;
 
-        $.post(`${base_url}auth/action.php?action=account_status`, { user_id, action }, res => {
-            if (res.status) {
-                alert(`Request ${action.toLowerCase()}`);
-                loadApprovalRequests(); // reload the approval table
-                loadUsers();
-            } else alert(res.message || 'Operation failed');
-        }, 'json').fail(() => alert('Server error'));
+        $.post(`${base_url}auth/action.php?action=account_status`,
+            { user_id, action },
+            res => {
+                if (res.status) {
+                    alert(`Request ${action.toLowerCase()}`);
+                    loadApprovalRequests();
+                    loadUsers();
+                } else {
+                    alert(res.message || 'Operation failed');
+                }
+            },
+            'json'
+        ).fail(() => alert('Server error'));
     });
+
+
 
     // ---------------- Initial Load ----------------
     loadApprovalRequests();

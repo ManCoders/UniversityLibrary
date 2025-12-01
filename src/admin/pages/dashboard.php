@@ -362,11 +362,10 @@
                     ctx = $('#requestsChart');
                     chartData = [
                         dashboardData.requests.pending || 0,
-                        dashboardData.requests.approved || 0,
-                        dashboardData.requests.declined || 0
+                        dashboardData.requests.approved || 0
                     ];
-                    chartLabel = ['Pending', 'Approved', 'Declined'];
-                    chartColors = ['#facc15', '#34d399', '#ef4444'];
+                    chartLabel = ['Pending', 'Approved'];
+                    chartColors = ['#facc15', '#34d399'];
                     break;
 
                 case 'OnlinePanel':
@@ -424,7 +423,7 @@
                         label:
                             panelId.includes('Online') && !panelId.includes('Offline') ? 'Users' :
                                 panelId.includes('Offline') && !panelId.includes('Online') ? 'Users' :
-                                    'Requests',
+                                    '',
 
                         data: chartData,
                         backgroundColor: chartColors

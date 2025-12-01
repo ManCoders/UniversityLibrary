@@ -158,10 +158,11 @@ class Action
 
         // Update login status
         $stmt = $this->db->prepare("
-        UPDATE {$table} 
-        SET is_logged_in = 0, updated_date = NOW() 
-        WHERE {$id_column} = ?
-    ");
+            UPDATE {$table} 
+            SET is_logged_in = 0, updated_date = NOW() 
+            WHERE {$id_column} = ?
+        ");
+        
         $stmt->execute([$library_id]);
 
         // Log action

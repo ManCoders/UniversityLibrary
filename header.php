@@ -114,38 +114,55 @@ if (session_status() === PHP_SESSION_NONE) {
             initializeDarkModeToggle();
         };
 
-
         let inactivityTime = 0;
-        const logoutTime = 30; 
+        const logoutTime = 10; // seconds before autologout
+        let idleTimeout;
 
-        // Reset inactivity timer
+        // Detect activity
         function resetTimer() {
-            inactivityTime = 0;
+            inactivityTime = 0;      
+            clearTimeout(idleTimeout);
+
+            idleTimeout = setTimeout(() => {
+                startIdleCountdown();
+            }, 2000); 
         }
 
+        function startIdleCountdown() {
+            const interval = setInterval(() => {
+                if (inactivityTime === 0) {
+                    clearInterval(interval);
+                    return;
+                }
+
+                inactivityTime++;
+
+                if (inactivityTime >= logoutTime) {
+                    clearInterval(interval);
+
+                    fetch(`${base_url}auth/action.php?action=autologout`)
+                        .then(res => res.json())
+                        .then(data => {
+                            alert("Auto-logged out for security reasons.");
+                            window.location.href = data.redirect_url;
+                        })
+                        .catch(() => {
+                            alert("Session expired.");
+                            window.location.href = base_url;
+                        });
+                }
+            }, 1000);
+        }
+
+        // Attach activity listeners
         document.onmousemove = resetTimer;
         document.onkeydown = resetTimer;
         document.onclick = resetTimer;
         document.onscroll = resetTimer;
 
-        // Check every second
-        setInterval(() => {
-            inactivityTime++;
+        // Initialize on load
+        resetTimer();
 
-            if (inactivityTime >= logoutTime) {
-                fetch(`${base_url}auth/action.php?action=autologout`)
-                    .then(res => res.json())
-                    .then(data => {
-                        alert("Auto-logged out for security reasons.");
-                        window.location.href = data.redirect_url;
-                    })
-                    .catch(() => {
-                        alert("Session expired.");
-                        window.location.href = base_url;
-                    });
-            }
-
-        }, 1000);
 
 
     </script>
