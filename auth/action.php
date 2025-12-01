@@ -119,6 +119,9 @@ switch ($action) {
     case 'getDashboardStats':
         echo $crud->getDashboardStats();
         break;
+    case 'getAnalyticsStats':
+        echo $crud->getAnalyticsStats();
+        break;
     case 'recently_viewed':
         echo $crud->usercrude();
         break;
@@ -133,6 +136,9 @@ switch ($action) {
         break;
     case 'chatSupportAI':
         echo $crud->chatSupportAI();
+        break;
+    case 'getDetailedReport':
+        echo $crud->getDetailedReport();
         break;
     
     default:

@@ -36,12 +36,7 @@ function db_connect()
                  updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                 created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )",
-            "CREATE TABLE IF NOT EXISTS books (
-                books_id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                books_details JSON,
-                 updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )",
+            
             "CREATE TABLE IF NOT EXISTS system (
                 id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
                 system_details JSON,
@@ -62,6 +57,8 @@ function db_connect()
                 file VARCHAR(255) NOT NULL,
                 book_title VARCHAR(255) NOT NULL,
                 book_author VARCHAR(255) NOT NULL,
+                count_user INT DEFAULT 0,
+                access_count INT DEFAULT 0,
                 duration INT DEFAULT 0,
                 is_favorite TINYINT(1) DEFAULT 0,
                 start_time DATETIME NOT NULL,

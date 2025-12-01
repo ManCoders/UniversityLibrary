@@ -28,7 +28,7 @@ class Action
         $this->db = null;
     }
 
-    
+
     function base_url()
     {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
@@ -113,7 +113,7 @@ class Action
     } */
 
 
-    
+
 
     function logout($auto = false)
     {
@@ -162,7 +162,7 @@ class Action
             SET is_logged_in = 0, updated_date = NOW() 
             WHERE {$id_column} = ?
         ");
-        
+
         $stmt->execute([$library_id]);
 
         // Log action
@@ -1311,7 +1311,7 @@ class Action
 
                     // ISBN
                     $isbn = '';
-                    if (!empty($meta['prism:isbn'])) {
+                    if (!empty($meta['prism:isbn'] )) {
                         if (is_array($meta['prism:isbn'])) {
                             $isbn = $meta['prism:isbn']['ISBN'] ?? '';
                             $isbn = $meta['isbn'] ?? '';
@@ -1738,17 +1738,17 @@ class Action
                 // ✅ Update existing reading session
                 $update = $this->db->prepare("
                 UPDATE reading_logs 
-                SET start_time = NOW(), end_time = NULL, total_read_time = 0, updated_at = NOW()
+                SET start_time = NOW(), end_time = NULL, count_user = 1, access_count = 1, updated_at = NOW()
                 WHERE id = ?
             ");
                 $update->execute([$row['id']]);
             } else {
                 // ✅ Insert new reading session
                 $insert = $this->db->prepare("
-                INSERT INTO reading_logs (user_id, book_title, book_author, file, start_time, is_favorite) 
-                VALUES (?, ?, ?, ?, NOW(), 0)
+                INSERT INTO reading_logs (user_id, book_title, count_user, access_count, book_author, file, start_time, is_favorite) 
+                VALUES (?, ?, ?, ?, ?, ?, NOW(), 0)
             ");
-                $insert->execute([$user_id, $book_title, $book_author, $file]);
+                $insert->execute([$user_id, $book_title, 1, 1, $book_author, $file]);
             }
 
             // ✅ Build secure viewer URL
@@ -1779,8 +1779,6 @@ class Action
 
         $file = $_POST['file'] ?? null;
         $duration = (int) ($_POST['duration'] ?? 0);
-        // $book_title = $_POST['book_title'] ?? 'Unknown Title';
-        // $book_author = $_POST['book_author'] ?? 'Unknown Author';
 
         $user_id = $_SESSION['student']['user_id'] ?? null;
         if (!$user_id) {
@@ -1798,7 +1796,6 @@ class Action
         }
 
         try {
-            // ✅ Find the active reading session
             $stmt = $this->db->prepare("SELECT id, total_read_time, start_time FROM reading_logs WHERE user_id = ? AND file = ? ORDER BY id DESC LIMIT 1");
             $stmt->execute([$user_id, $file]);
             $log = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -1810,22 +1807,21 @@ class Action
                 ]);
             }
 
-            // ✅ Calculate total reading time (add to previous total)
-            $new_total = $log['total_read_time'] + $duration;
+            $new_total_read_time = $log['total_read_time'] + $duration;
 
             // ✅ Update the reading log
             $update = $this->db->prepare("
             UPDATE reading_logs 
-            SET end_time = NOW(), duration = ?, total_read_time = ?, updated_at = NOW()
+            SET end_time = NOW(), duration = ?, total_read_time = ?, access_count=0, updated_at = NOW()
             WHERE id = ?
         ");
-            $update->execute([$duration, $new_total, $log['id']]);
+            $update->execute([$duration, $new_total_read_time, $log['id']]);
 
             return json_encode([
                 'status' => 1,
                 'message' => 'Reading session ended successfully.',
                 'duration' => $duration,
-                'total_read_time' => $new_total
+                'total_read_time' => $new_total_read_time
             ]);
         } catch (Exception $e) {
             return json_encode([
@@ -2037,29 +2033,38 @@ class Action
             }
 
             $stmt = $this->db->prepare("
-            SELECT id, book_title, start_time, end_time, duration, is_favorite
+            SELECT id, book_title, start_time, end_time, total_read_time, is_favorite
             FROM reading_logs
             WHERE user_id = ?
             ORDER BY updated_at DESC
             LIMIT 10
-        ");
+            ");
+
+
             $stmt->execute([$user_id]);
             $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+            function formatDuration($seconds)
+            {
+                if ($seconds < 60) {
+                    return $seconds . ' sec';
+                } elseif ($seconds < 3600) {
+                    $minutes = floor($seconds / 60);
+                    $secs = $seconds % 60;
+                    return "{$minutes} min {$secs} sec";
+                } else {
+                    $hours = floor($seconds / 3600);
+                    $minutes = floor(($seconds % 3600) / 60);
+                    return "{$hours} hr {$minutes} min";
+                }
+            }
             $activities = array_map(function ($log) {
-                $start = new DateTime($log['start_time']);
-                $end = $log['end_time'] ? new DateTime($log['end_time']) : new DateTime();
-                $interval = $start->diff($end);
-                $hours = $interval->h;
-                $minutes = $interval->i;
-                $consumed = ($hours ? $hours . 'h ' : '') . ($minutes ? $minutes . 'm' : '0m');
 
                 return [
                     'id' => $log['id'],
                     'book_title' => $log['book_title'],
                     'start_time' => $log['start_time'],
                     'end_time' => $log['end_time'] ?? null,
-                    'consumed' => $consumed,
+                    'total_read_time' => formatDuration($log['total_read_time']),
                     'remark' => $log['is_favorite'] ? 'Favorited' : ''
                 ];
             }, $logs);
@@ -3102,4 +3107,161 @@ class Action
             ]);
         }
     }
+
+
+    function getAnalyticsStats()
+    {
+        $response = [
+            "status" => false,
+            "data" => []
+        ];
+
+        try {
+            // ========== UTILIZATION: Top 5 most accessed books ==========
+            $q1 = $this->db->query("
+                SELECT 
+                    book_title, 
+                    SUM(count_user) AS total_access
+                FROM reading_logs
+                GROUP BY book_title
+                ORDER BY total_access DESC
+                LIMIT 5
+            ");
+
+            $utilLabels = [];
+            $utilValues = [];
+
+            while ($row = $q1->fetch(PDO::FETCH_ASSOC)) {
+                $utilLabels[] = $row['book_title'];
+                $utilValues[] = (int) $row['total_access'];
+            }
+
+
+            // ========== USERS: Top 5 users by ebook access ==========
+            $q2 = $this->db->query("
+                SELECT 
+                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.firstname')) AS firstname,
+                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.lastname')) AS lastname,
+                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.middlename')) AS middlename,
+                    SUM(r.access_count) AS total_access
+                FROM reading_logs r
+                JOIN user u ON u.user_id = r.user_id
+                GROUP BY r.user_id
+                ORDER BY total_access DESC
+                LIMIT 5
+            ");
+
+            $userLabels = [];
+            $userValues = [];
+
+            while ($row = $q2->fetch(PDO::FETCH_ASSOC)) {
+                $fullname = trim($row['firstname'] . ' ' . ($row['middlename'] ?? '') . ' ' . $row['lastname']);
+                $userLabels[] = $fullname;
+                $userValues[] = (int) $row['total_access'];
+            }
+
+
+            // ========== RESOURCES: Count accessed vs not accessed ==========
+            $q3 = $this->db->query("
+                SELECT
+                    SUM(CASE WHEN access_count > 0 THEN 1 ELSE 0 END) AS accessed,
+                    SUM(CASE WHEN access_count = 0 THEN 1 ELSE 0 END) AS not_accessed
+                FROM reading_logs
+            ");
+
+            $resLabels = ['Access', 'Not Access'];
+            $resValues = [];
+
+            if ($row = $q3->fetch(PDO::FETCH_ASSOC)) {
+                $resValues[] = (int) $row['accessed'];
+                $resValues[] = (int) $row['not_accessed'];
+            }
+
+
+
+            // Final response
+            $response["status"] = true;
+            $response["data"] = [
+                "utilization" => [
+                    "labels" => $utilLabels ?: ["No Data"],
+                    "values" => $utilValues ?: [0]
+                ],
+                "users" => [
+                    "labels" => $userLabels ?: ["No Data"],
+                    "values" => $userValues ?: [0]
+                ],
+                "resources" => [
+                    "labels" => $resLabels ?: ["No Data"],
+                    "values" => $resValues ?: [0]
+                ]
+            ];
+
+        } catch (Exception $e) {
+            $response["status"] = false;
+            $response["message"] = "Error: " . $e->getMessage();
+        }
+
+        // Return JSON
+        return json_encode($response);
+    }
+    function formatDuration($seconds)
+    {
+        if ($seconds < 60)
+            return $seconds . ' sec';
+        if ($seconds < 3600)
+            return floor($seconds / 60) . ' min ' . ($seconds % 60) . ' sec';
+        $hours = floor($seconds / 3600);
+        $minutes = floor(($seconds % 3600) / 60);
+        return $hours . ' hr ' . $minutes . ' min';
+    }
+
+    function getDetailedReport()
+    {
+        try {
+            $stmt = $this->db->query("
+        SELECT rl.*, 
+            JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.firstname')) AS firstname,
+            JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.lastname')) AS lastname,
+            JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.middlename')) AS middlename,
+            JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.student_id')) AS student_id,
+            JSON_UNQUOTE(JSON_EXTRACT(u.authentication_data, '$.email')) AS email
+        FROM reading_logs rl
+        JOIN user u ON rl.user_id = u.user_id
+        ORDER BY rl.start_time DESC
+    ");
+            $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Helper to format seconds
+
+
+            // Format data
+            $formattedLogs = array_map(function ($log) {
+                $fullname = trim($log['firstname'] . ' ' . ($log['middlename'] ?? '') . ' ' . $log['lastname']);
+                return [
+                    'user_id' => $log['user_id'],
+                    'fullname' => $fullname,
+                    'student_id' => $log['student_id'],
+                    'email' => $log['email'],
+                    'book_title' => $log['book_title'],
+                    'start_time' => $log['start_time'],
+                    'end_time' => $log['end_time'] ?? null,
+                    'total_read_time' => $log['total_read_time'],
+                    'total_read_time_formatted' => $this->formatDuration($log['total_read_time']),
+                    'remark' => $log['is_favorite'] ? 'Favorited' : ''
+                ];
+            }, $logs);
+
+            return json_encode([
+                'status' => 1,
+                'data' => $formattedLogs
+            ]);
+        } catch (Exception $e) {
+            return json_encode([
+                'status' => 0,
+                'message' => 'Error: ' . $e->getMessage()
+            ]);
+        }
+
+    }
+
 }

@@ -2,60 +2,26 @@
     Digital E-Library Analytics & Reports
 </h1>
 
-<!-- Stats Cards -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-indigo-500 hover:shadow-lg transition">
-        <div class="flex items-center justify-between">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Users</p>
-            <svg class="w-6 h-6 text-indigo-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        </div>
-        <p id="totalUsers" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">128</p>
-        <p class="text-xs text-green-500 mt-1">↑ 12% this month</p>
-    </div>
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-emerald-500 hover:shadow-lg transition">
-        <div class="flex items-center justify-between">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Ebooks Accessed</p>
-            <svg class="w-6 h-6 text-emerald-500" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6h16v12H4z" fill="none"/><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 6h16v12H4V6z"/></svg>
-        </div>
-        <p id="ebooksAccessed" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">542</p>
-        <p class="text-xs text-green-500 mt-1">↑ total usage</p>
-    </div>
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-yellow-500 hover:shadow-lg transition">
-        <div class="flex items-center justify-between">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Resources</p>
-            <svg class="w-6 h-6 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M5 4v16h14V4H5zm12 14H7V6h10v12z"/></svg>
-        </div>
-        <p id="totalResources" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">1,024</p>
-        <p class="text-xs text-yellow-500 mt-1">Last updated 5 mins ago</p>
-    </div>
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md border-l-4 border-red-500 hover:shadow-lg transition">
-        <div class="flex items-center justify-between">
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Active Users Today</p>
-            <svg class="w-6 h-6 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        </div>
-        <p id="activeUsers" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">34</p>
-        <p class="text-xs text-red-500 mt-1">Currently active</p>
-    </div>
-</div>
+
 
 <!-- Charts Section -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition flex flex-col">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Ebook Access Utilization</h2>
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Top Ebook Access</h2>
         <div class="flex-1">
             <canvas id="utilizationChart" class="w-full h-64"></canvas>
         </div>
     </div>
 
     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition flex flex-col">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Number of Users Access</h2>
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Reading Session</h2>
         <div class="flex-1">
             <canvas id="usersChart" class="w-full h-64"></canvas>
         </div>
     </div>
 
     <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition flex flex-col">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Total Ebooks & References</h2>
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Total Access & References</h2>
         <div class="flex-1">
             <canvas id="resourcesChart" class="w-full h-64"></canvas>
         </div>
@@ -67,92 +33,391 @@
     <div class="flex flex-col md:flex-row justify-between items-center mb-4">
         <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Detailed Report</h2>
         <div class="flex gap-2 mt-2 md:mt-0">
-            <button class="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition text-sm">Export CSV</button>
-            <button class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm">Export PDF</button>
+            <button onclick="exportDetailedReportCSV()"
+                class="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition text-sm">Export
+                CSV</button>
+            <button onclick="exportDetailedReportPDF()"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm">Export
+                PDF</button>
         </div>
     </div>
     <div class="overflow-x-auto max-h-[400px]">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
             <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
                 <tr>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">#</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">User</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Ebook Title</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Access Type</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Duration</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Timestamp</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        #</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        User</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Ebook Title</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Start Time</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Duration</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Timestamp</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-200 dark:divide-gray-700 hover:divide-gray-400">
-                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                    <td class="px-4 py-2">1</td>
-                    <td class="px-4 py-2">John Doe</td>
-                    <td class="px-4 py-2">Digital Research Paper 2025</td>
-                    <td class="px-4 py-2">Read</td>
-                    <td class="px-4 py-2">60 min</td>
-                    <td class="px-4 py-2">2025-11-28 08:30</td>
-                </tr>
-                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                    <td class="px-4 py-2">2</td>
-                    <td class="px-4 py-2">Jane Doe</td>
-                    <td class="px-4 py-2">Modern Library Systems</td>
-                    <td class="px-4 py-2">Downloaded</td>
-                    <td class="px-4 py-2">0 min</td>
-                    <td class="px-4 py-2">2025-11-28 10:00</td>
-                </tr>
-                <tr class="hover:bg-gray-100 dark:hover:bg-gray-700 transition">
-                    <td class="px-4 py-2">3</td>
-                    <td class="px-4 py-2">Michael Smith</td>
-                    <td class="px-4 py-2">Introduction to Algorithms</td>
-                    <td class="px-4 py-2">Read</td>
-                    <td class="px-4 py-2">45 min</td>
-                    <td class="px-4 py-2">2025-11-27 14:30</td>
-                </tr>
+            <tbody id="HistoryReading" class="divide-y divide-gray-200 dark:divide-gray-700 hover:divide-gray-400">
+
             </tbody>
         </table>
     </div>
 </div>
 
-<!-- Chart.js -->
+<!-- Detailed Books -->
+<div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Books List</h2>
+        <div class="flex gap-2 mt-2 md:mt-0">
+            <button onclick="exportBooksCSV()"
+                class="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition text-sm">
+                Export CSV
+            </button>
+            <button onclick="exportBooksPDF()"
+                class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition text-sm">
+                Export PDF
+            </button>
+        </div>
+    </div>
+    <div class="overflow-x-auto max-h-[400px]">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+            <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
+                <tr>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        #</th>
+                   
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Book ID</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Book Title</th>
+                    
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Author</th>
+                </tr>
+            </thead>
+            <tbody id="AllBooks" class="divide-y divide-gray-200 dark:divide-gray-700 hover:divide-gray-400">
+                <!-- AJAX-loaded rows will go here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const barOptions = {
-        responsive:true,
-        maintainAspectRatio:false,
-        plugins:{legend:{display:false}},
-        scales:{y:{beginAtZero:true,ticks:{precision:0}}}
-    };
+    let allBooksData = [];
 
-    // Utilization Chart
-    new Chart(document.getElementById('utilizationChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Intro to Algorithms','Clean Code','Digital Research Paper 2025','Modern Library Systems','Data Science Handbook'],
-            datasets: [{label:'Accesses',data:[25,18,12,9,7],backgroundColor:'#6366F1',borderRadius:5}]
-        },
-        options: barOptions
+    function fetchBooks() {
+        $.post(`${base_url}auth/action.php?action=getMetadata`, {}, function (res) {
+            if (!res.status || !res.data) return console.warn("No books found.");
+
+            allBooksData = res.data; // store globally for export
+
+            const tbody = $("#AllBooks");
+            tbody.empty();
+
+            res.data.forEach((book, index) => {
+                const tr = `<tr>
+                <td class="px-4 py-2">${index + 1}</td>
+                
+                <td class="px-4 py-2">${book.book_id}</td>
+                <td class="px-4 py-2 truncate max-w-xs">${book.title}</td>
+                <td class="px-4 py-2">${book.author}</td>
+            </tr>`;
+                tbody.append(tr);
+            });
+        }, 'json').fail(() => console.error("Failed to load books."));
+    }
+
+    function exportBooksCSV() {
+        if (!allBooksData.length) return console.warn("No data to export.");
+
+        const headers = ["#", "Book ID", "Book Title", "Author"];
+        let csvContent = headers.join(",") + "\n";
+
+        allBooksData.forEach((book, index) => {
+            const row = [
+                index + 1,
+               
+                book.book_id,
+                book.title,
+                book.author
+            ].map(cell => `"${String(cell).replace(/"/g, '""')}"`);
+            csvContent += row.join(",") + "\n";
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "books_list.csv";
+        link.click();
+    }
+
+    function exportBooksPDF() {
+        if (!allBooksData.length) return console.warn("No data to export.");
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'pt', 'a4');
+
+        const columns = ["#", "Book ID", "Book Title", "Author"];
+        const rows = allBooksData.map((book, index) => [
+            index + 1,
+            book.book_id,
+            book.title,
+            book.author
+        ]);
+
+        doc.setFontSize(14);
+        doc.text("Books List", 40, 40);
+
+        doc.autoTable({
+            startY: 60,
+            head: [columns],
+            body: rows,
+            theme: 'grid',
+            headStyles: { fillColor: [99, 102, 241] },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
+            styles: { fontSize: 10, cellPadding: 4 },
+            columnStyles: { 3: { cellWidth: 150 } }
+        });
+
+        doc.save('books_list.pdf');
+    }
+
+    $(document).ready(() => {
+        fetchBooks();
     });
+</script>
 
-    // Users Chart
-    new Chart(document.getElementById('usersChart'), {
-        type: 'bar',
-        data: {
-            labels:['John Doe','Jane Doe','Michael Smith','Emily Johnson','Robert Brown'],
-            datasets:[{label:'Ebooks Accessed',data:[15,12,9,8,7],backgroundColor:'#10B981',borderRadius:5}]
-        },
-        options: barOptions
-    });
 
-    // Resources Chart
-    new Chart(document.getElementById('resourcesChart'), {
-        type:'doughnut',
-        data:{labels:['Ebooks','Research Papers','References & Guides'],datasets:[{data:[850,120,54],backgroundColor:['#F59E0B','#FBBF24','#FCD34D']}]},
-        options:{
-            responsive:true,
-            maintainAspectRatio:false,
-            plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',color:'#374151'}}}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        // Load stats first
+        fetchDashboardStats();
+        fetchDetailedReport();
+        function fetchDashboardStats() {
+            $.post(`${base_url}auth/action.php?action=getAnalyticsStats`, {}, res => {
+                if (!res.status || !res.data) {
+                    console.warn("No dashboard data found.");
+                    return;
+                }
+
+                buildCharts(res.data);
+            }, 'json')
+                .fail(() => console.error("Dashboard stats failed to load"));
         }
+
+        function buildCharts(data) {
+
+            const barOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            };
+
+            // === Utilization Chart ===
+            const maxLength = 15; // max characters for display
+            const shortLabels = data.utilization.labels.map(title =>
+                title.length > maxLength ? title.slice(0, maxLength) + '…' : title
+            );
+
+            new Chart(document.getElementById('utilizationChart'), {
+                type: 'bar',
+                data: {
+                    labels: shortLabels,
+                    datasets: [{
+                        label: 'Accesses',
+                        data: data.utilization.values,
+                        backgroundColor: '#6366F1',
+                        borderRadius: 5
+                    }]
+                },
+                options: barOptions
+            });
+
+            // Truncate labels helper
+            function truncateLabels(labels) {
+                return labels.map(label => label.length > maxLength ? label.slice(0, maxLength) + '…' : label);
+            }
+
+            // Users Chart
+            new Chart(document.getElementById('usersChart'), {
+                type: 'bar',
+                data: {
+                    labels: truncateLabels(data.users.labels),
+                    datasets: [{
+                        label: 'Ebooks Accessed',
+                        data: data.users.values,
+                        backgroundColor: '#10B981',
+                        borderRadius: 5
+                    }]
+                },
+                options: barOptions
+            });
+
+            // Resources Chart
+            new Chart(document.getElementById('resourcesChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: truncateLabels(data.resources.labels),
+                    datasets: [{
+                        data: data.resources.values,
+                        backgroundColor: ['#F59E0B', '#FCD34D']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                usePointStyle: true,
+                                pointStyle: 'circle',
+                                color: '#374151'
+                            }
+                        }
+                    }
+                }
+            });
+
+        }
+
+        function fetchDetailedReport() {
+            $.post(`${base_url}auth/action.php?action=getDetailedReport`, {}, res => {
+                if (!res.status || !res.data) {
+                    console.warn("No detailed report data found.");
+                    return;
+                }
+
+                const tbody = document.getElementById('HistoryReading');
+                tbody.innerHTML = '';
+
+                res.data.forEach((record, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-4 py-2">${index + 1}</td>
+                        <td class="px-4 truncate py-2">${record.fullname}</td>
+                        <td class="px-4 truncate block max-w-xs py-2">${record.book_title}</td>
+                        <td class="px-4 py-2">${record.start_time}</td>
+                        <td class="px-4 py-2">${record.total_read_time_formatted}</td>
+                        <td class="px-4 py-2">${record.end_time}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }, 'json')
+                .fail(() => console.error("Detailed report failed to load"));
+        }
+
+        let detailedReportData = [];
+
+        function fetchDetailedReport() {
+            $.post(`${base_url}auth/action.php?action=getDetailedReport`, {}, res => {
+                if (!res.status || !res.data) {
+                    console.warn("No detailed report data found.");
+                    return;
+                }
+
+                detailedReportData = res.data; // store globally for export
+
+                const tbody = document.getElementById('HistoryReading');
+                tbody.innerHTML = '';
+
+                res.data.forEach((record, index) => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                <td class="px-4 py-2">${index + 1}</td>
+                <td class="px-4 truncate py-2">${truncate(record.fullname, 20)}</td>
+                <td class="px-4 truncate block max-w-xs py-2">${truncate(record.book_title, 25)}</td>
+                <td class="px-4 py-2">${record.start_time}</td>
+                <td class="px-4 py-2">${record.total_read_time_formatted}</td>
+                <td class="px-4 py-2">${record.end_time ?? '-'}</td>
+            `;
+                    tbody.appendChild(tr);
+                });
+            }, 'json')
+                .fail(() => console.error("Detailed report failed to load"));
+        }
+
+        function truncate(str, maxLength) {
+            if (!str) return '';
+            return str.length > maxLength ? str.slice(0, maxLength) + '…' : str;
+        }
+
+        window.exportDetailedReportPDF = function () {
+            if (!detailedReportData.length) return console.warn("No data to export.");
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'pt', 'a4');
+
+            const tableColumns = ["#", "Name", "Book Title", "Start Time", "Duration", "End Time"];
+            const tableRows = detailedReportData.map((record, index) => [
+                index + 1,
+                truncate(record.fullname, 20),
+                truncate(record.book_title, 25),
+                record.start_time ?? '-',
+                record.total_read_time_formatted ?? '-',
+                record.end_time ?? '-'
+            ]);
+
+            doc.setFontSize(14);
+            doc.text("Detailed Reading Report", 40, 40);
+
+            doc.autoTable({
+                startY: 60,
+                head: [tableColumns],
+                body: tableRows,
+                theme: 'grid',
+                headStyles: { fillColor: [99, 102, 241] },
+                alternateRowStyles: { fillColor: [245, 245, 245] },
+                styles: { fontSize: 10, cellPadding: 4 },
+                columnStyles: { 1: { cellWidth: 100 }, 2: { cellWidth: 120 } }
+            });
+
+            doc.save('detailed_reading_report.pdf');
+        };
+
+        window.exportDetailedReportCSV = function () {
+            if (!detailedReportData.length) return console.warn("No data to export.");
+
+            const headers = ["#", "Name", "Book Title", "Start Time", "Duration", "End Time"];
+            const rows = detailedReportData.map((record, index) => [
+                index + 1,
+                record.fullname,
+                record.book_title,
+                record.start_time ?? '',
+                record.total_read_time_formatted ?? '',
+                record.end_time ?? ''
+            ]);
+
+            let csvContent = headers.join(",") + "\n";
+            rows.forEach(row => {
+                const escapedRow = row.map(cell => `"${String(cell).replace(/"/g, '""')}"`);
+                csvContent += escapedRow.join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "detailed_reading_report.csv";
+            link.click();
+        };
+
     });
-});
 </script>
