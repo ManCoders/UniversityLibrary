@@ -246,6 +246,10 @@
                     <div class="flex-1 text-center sm:text-left">
                         <label class="block text-[#660000] dark:text-[#ffd1d1] font-medium mb-1">Full Name</label>
 
+                        <input type="text" name="lastname" id="edit-lastname"
+                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a] mb-2"
+                            placeholder="Enter your last name">
+
                         <input type="text" name="firstname" id="edit-firstname"
                             class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a] mb-2"
                             placeholder="Enter your first name">
@@ -253,10 +257,6 @@
                         <input type="text" name="middlename" id="edit-middlename"
                             class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a] mb-2"
                             placeholder="Enter your middle name">
-
-                        <input type="text" name="lastname" id="edit-lastname"
-                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a] mb-2"
-                            placeholder="Enter your last name">
 
                         <input type="text" name="suffix" id="edit-suffix"
                             class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]"
