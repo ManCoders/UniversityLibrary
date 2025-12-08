@@ -10,7 +10,7 @@
         <div class="flex space-x-4">
             <button id="tab-add-metadata"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 py-4 px-1 border-b-2 font-medium text-sm">
-                Add New Metadata
+                New Metadata
             </button>
 
             <button id="tab-metadata-table"
@@ -62,17 +62,10 @@
     <div id="add-metadata-content" class="tab-panel hidden">
         <!-- Toolbar -->
         <div class="flex flex-wrap gap-2 mb-4">
-            <!-- <button type="button" id="upload-files-btn"
-                class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded text-sm">
-                ⬆️ Upload Files
-            </button>
-            <button type="button" id="upload-folder-btn"
-                class="bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1 rounded text-sm">
-                📂 Upload Folder
-            </button> -->
+
             <button type="button" id="new-folder-btn"
                 class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-sm">
-                📁 Create Department
+                Select Department
             </button>
         </div>
 
@@ -123,6 +116,9 @@
                         <th
                             class="w-[15%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Folder</th>
+                        <th
+                            class="w-[15%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            Date / CopyRight</th>
                         <th
                             class="w-[20%] px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Actions</th>
@@ -228,12 +224,29 @@
 
 
     <!-- 🆕 NEW FOLDER MODAL -->
-    <div id="new-folder-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-80 p-5">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3">📁 Department Name</h3>
-            <input type="text" id="folder-name-input"
-                class="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 mb-4"
-                placeholder="Enter Department Name">
+    <div id="new-folder-modal"
+        class="fixed w-100 inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-100 p-5">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 lg:text-center ">Select Department
+            </h3>
+
+            <select id="folder-name-input" class="w-100 p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 mb-4"
+                required>
+                <option value="" disabled selected>Select Department</option>
+                <option value="College of Information Computing and Sciences">College of Information Computing and
+                    Sciences</option>
+                <option value="College of Maritime Education">College of Maritime Education</option>
+                <option value="College of Engineering & Technology Department">College of Engineering & Technology
+                    Department</option>
+                <option value="College of Arts, Humanities and Social Sciences">College of Arts, Humanities and Social
+                    Sciences</option>
+                <option value="College of Physical Education and Sports">College of Physical Education and Sports
+                </option>
+                <option value="College of Engineering and Technology">College of Engineering and Technology</option>
+                <option value="School of Business Administration">School of Business Administration</option>
+                <option value="College of Teacher Education">College of Teacher Education</option>
+            </select>
+
             <div class="flex justify-end gap-2">
                 <button id="cancel-folder-btn"
                     class="px-3 py-1 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md text-sm">Cancel</button>
@@ -295,7 +308,7 @@
                     res.folders.forEach(folder => {
                         const $li = $(`
                             <li class="folder">
-                                <div class="flex items-center justify-between cursor-pointer folder-toggle bg-white dark:bg-gray-800 border rounded-md px-3 py-2 hover:bg-indigo-50 dark:hover:bg-gray-700">
+                                <div class="flex items-center justify-between cursor-pointer folder-toggle bg-white dark:bg-gray-800 border rounded-md px-3 py-1 hover:bg-indigo-50 dark:hover:bg-gray-700">
                                     <div class="flex items-center">
                                         <span class="text-gray-400 toggle-icon">▶</span>
                                         <span class="mr-2">📂</span>
@@ -308,10 +321,30 @@
                                     </div>
                                 </div>
                                 <ul class="ml-6 mt-2 hidden space-y-1">
-                                    ${folder.files.length
-                                ? folder.files.map(f => `<li class="file bg-white dark:bg-gray-800 px-3 py-1 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer items-id">${f}</li>`).join('')
-                                : `<li class="text-gray-400 text-xs italic">Empty folder</li>`}
+
+                                ${folder.db_data && folder.db_data.folder_data
+                                ? JSON.parse(folder.db_data.folder_data).map((f, index) => {
+                                    // Convert to sentence case
+                                    const title = f.metadata?.Title
+                                        ? f.metadata.Title.charAt(0).toUpperCase() + f.metadata.Title.slice(1).toLowerCase()
+                                        : 'No title';
+                                    // Truncate to 60 characters
+                                    const truncatedTitle = title.length > 60 ? title.slice(0, 57) + '...' : title;
+
+                                    return `
+                                        <li class="file grid grid-cols-12 bg-white dark:bg-gray-800 px-3 py-1 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer items-center">
+                                            <span class=" font-semibold">${index + 1}</span> <!-- Serial Number -->
+                                            <span class="col-span-11 text-gray-500 dark:text-gray-300">${truncatedTitle}</span> <!-- Truncated Title -->
+                                        </li>
+                                        `;
+                                }).join('')
+                                : `<li class="text-gray-400 text-xs italic">Empty folder</li>`
+                            }
                                 </ul>
+
+
+
+
                                 <input type="file" class="hidden folder-file-input" accept=".pdf">
                                 <input type="file" class="hidden folder-folder-input" webkitdirectory directory multiple>
                             </li>
@@ -681,6 +714,7 @@
                                 const title = item.title && item.title.trim() !== '' ? item.title : '—';
                                 const author = item.author && item.author.trim() !== '' ? item.author : '—';
                                 const isbn = item.isbn && item.isbn.trim() !== '' ? item.isbn : '—';
+                                const copyright = item.copyright?.trim() || '—';
 
                                 const row = `
                                         <tr>
@@ -689,6 +723,7 @@
                                             <td class="px-4 py-2 truncate max-w-xs" title="${title}">${title}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${author}">${author}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${folder}">${folder}</td>
+                                            <td class="px-4 py-2 truncate max-w-xs" title="${copyright}">${copyright}</td>
                                             <td class="px-4 py-2 text-center flex justify-center gap-1">
                                                 <button class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs view-btn" data-id="${bookId}">View</button>
                                                 <button class="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs edit-btn" data-id="${bookId}">Edit</button>

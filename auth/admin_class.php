@@ -519,17 +519,9 @@ class Action
     {
         // Get raw JSON input from frontend
         $input = json_decode(file_get_contents('php://input'), true);
+
         if (!$input) {
             return json_encode(['status' => 0, 'message' => 'Invalid input data']);
-        }
-
-        // Validate role
-        if (!isset($input['role'])) {
-            return json_encode(['status' => 0, 'message' => 'User role is required']);
-        }
-
-        if (!isset($input['role'])) {
-            return json_encode(['status' => 0, 'message' => 'User role is required']);
         }
 
         if (!isset($input['role'])) {
@@ -537,63 +529,86 @@ class Action
         }
 
         $role = strtolower($input['role']);
-        if (!in_array($role, ['student', 'faculty'])) {
+        $validRoles = ['student', 'faculty', 'visitor', 'admin'];
+
+        if (!in_array($role, $validRoles)) {
             return json_encode(['status' => 0, 'message' => 'Invalid role']);
         }
 
-        // Common required fields
-        $requiredFields = ['firstname', 'lastname', 'username', 'password', 'confirm_password', 'email', 'department', 'role'];
-        foreach ($requiredFields as $field) {
-            if (empty($input[$field])) {
+        $data = array_map('trim', $input);
+
+        // ===== COMMON REQUIRED FIELDS =====
+        $requiredCommon = ['firstname', 'lastname', 'password', 'confirm_password', 'email'];
+
+        foreach ($requiredCommon as $field) {
+            if (empty($data[$field])) {
                 return json_encode(['status' => 0, 'message' => "Missing required field: $field"]);
             }
         }
 
+        // ===== ROLE-SPECIFIC VALIDATION =====
+        switch ($role) {
 
-
-
-        // Role-specific fields
-        if ($role === 'student') {
-            foreach (['student_id', 'section'] as $field) {
-                if (empty($input[$field])) {
-                    return json_encode(['status' => 0, 'message' => "Missing student field: $field"]);
+            case 'student':
+                $studentFields = ['student_id', 'student_gender', 'student_department', 'course'];
+                foreach ($studentFields as $f) {
+                    if (empty($data[$f])) {
+                        return json_encode(['status' => 0, 'message' => "Missing student field: $f"]);
+                    }
                 }
-            }
-        } else { // faculty
-            if (empty($input['employee_id'])) {
-                return json_encode(['status' => 0, 'message' => "Missing faculty field: employee_id"]);
-            }
+                break;
+
+            case 'faculty':
+                $facultyFields = ['employee_id', 'faculty_gender', 'faculty_department'];
+                foreach ($facultyFields as $f) {
+                    if (empty($data[$f])) {
+                        return json_encode(['status' => 0, 'message' => "Missing faculty field: $f"]);
+                    }
+                }
+                break;
+
+            case 'visitor':
+                $visitorFields = ['visitor_gender', 'school_name'];
+                foreach ($visitorFields as $f) {
+                    if (empty($data[$f])) {
+                        return json_encode(['status' => 0, 'message' => "Missing visitor field: $f"]);
+                    }
+                }
+                break;
+
+            case 'admin':
+                if (empty($data['admin_employee_id'])) {
+                    return json_encode(['status' => 0, 'message' => "Missing admin field: admin_employee_id"]);
+                }
+                break;
         }
 
-        // Sanitize inputs
-        $data = array_map('trim', $input);
-
-        // Hash password
-        if ($data['confirm_password'] !== $data['password']) {
-            return json_encode([
-                'status' => 0,
-                'message' => 'Confirm password not match!'
-            ]);
+        // ===== PASSWORD CHECK =====
+        if ($data['password'] !== $data['confirm_password']) {
+            return json_encode(['status' => 0, 'message' => 'Confirm password does not match']);
         }
+
         $hashed_password = password_hash($data['password'], PASSWORD_BCRYPT);
 
-        // Handle profile pic (Base64)
+        // ===== HANDLE PROFILE PICTURE =====
         $profile_pic = 'assets/default-profile.png';
+
         if (!empty($data['profile_pic'])) {
             $uploadDir = __DIR__ . '/uploads/' . $role . '_profiles/';
             if (!is_dir($uploadDir))
                 mkdir($uploadDir, 0755, true);
 
-            // Extract base64 data
             if (preg_match('/^data:image\/(\w+);base64,/', $data['profile_pic'], $type)) {
-                $imgData = substr($data['profile_pic'], strpos($data['profile_pic'], ',') + 1);
-                $imgData = base64_decode($imgData);
+                $imgData = base64_decode(substr($data['profile_pic'], strpos($data['profile_pic'], ',') + 1));
                 $ext = strtolower($type[1]);
+
                 if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
                     return json_encode(['status' => 0, 'message' => 'Invalid image type']);
                 }
+
                 $filename = uniqid($role . '_') . '.' . $ext;
                 $filepath = $uploadDir . $filename;
+
                 if (file_put_contents($filepath, $imgData)) {
                     $profile_pic = 'uploads/' . $role . '_profiles/' . $filename;
                 }
@@ -602,39 +617,63 @@ class Action
 
         $account_id = 'lib-' . str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-
-        // Prepare personal_details JSON
-        $personal_details = json_encode([
+        // ===== BUILD PERSONAL DATA JSON (DYNAMIC) =====
+        $personal_details = [
             'library_id' => $account_id,
             'firstname' => $data['firstname'],
             'lastname' => $data['lastname'],
             'middlename' => $data['middlename'] ?? '',
             'suffix' => $data['suffix'] ?? '',
-            'course' => $data['course'] ?? null,
-            'department' => $data['department'],
-            'student_id' => $data['student_id'] ?? null,
-            'section' => $data['section'] ?? null,
-            'employee_id' => $data['employee_id'] ?? null,
-            'profile_pic' => $profile_pic
-        ]);
+            'profile_pic' => $profile_pic,
+        ];
 
-        // Prepare authentication_data JSON
-        $auth_data = json_encode([
-            'username' => $data['username'],
+        // Attach fields based on role
+        if ($role === 'student') {
+            $personal_details['student_id'] = $data['student_id'];
+            $personal_details['gender'] = $data['student_gender'];
+            $personal_details['department'] = $data['student_department'];
+            $personal_details['course'] = $data['course'];
+        }
+
+        if ($role === 'faculty') {
+            $personal_details['employee_id'] = $data['employee_id'];
+            $personal_details['gender'] = $data['faculty_gender'];
+            $personal_details['department'] = $data['faculty_department'];
+        }
+
+        if ($role === 'visitor') {
+            $personal_details['gender'] = $data['visitor_gender'];
+            $personal_details['school_name'] = $data['school_name'];
+        }
+
+        if ($role === 'admin') {
+            $personal_details['employee_id'] = $data['admin_employee_id'];
+        }
+
+        $auth_data = [
+            'email' => $data['email'],
             'password' => $hashed_password,
             'user_role' => $role,
-            'account_status' => 'Pending',
-            'email' => $data['email']
-        ]);
+            'account_status' => 'Pending'
+        ];
 
-        // Insert into database
+        // ===== INSERT INTO DATABASE =====
         try {
-            $stmt = $this->db->prepare("INSERT INTO user (personal_details, authentication_data) VALUES (?, ?)");
-            $stmt->execute([$personal_details, $auth_data]);
+            $stmt = $this->db->prepare("
+        INSERT INTO user (personal_details, authentication_data)
+        VALUES (?, ?)
+    ");
+            $stmt->execute([
+                json_encode($personal_details),
+                json_encode($auth_data)
+            ]);
+
             return json_encode(['status' => 1, 'message' => ucfirst($role) . ' registered successfully']);
+
         } catch (PDOException $e) {
             return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
         }
+
     }
 
 
@@ -748,12 +787,12 @@ class Action
     }
     function getFolders()
     {
-
         $baseDir = __DIR__ . '/files/';
 
-        // Make sure directory exists
-        if (!is_dir($baseDir))
+        // Ensure directory exists
+        if (!is_dir($baseDir)) {
             mkdir($baseDir, 0777, true);
+        }
 
         $folders = [];
 
@@ -764,17 +803,29 @@ class Action
             $folderPath = $baseDir . $f;
             if (is_dir($folderPath)) {
                 $files = [];
+
                 foreach (scandir($folderPath) as $file) {
                     if ($file === '.' || $file === '..')
                         continue;
-                    $files[] = $file;
+                    $files[] = $file; // Collect file names
                 }
-                $folders[] = ['name' => $f, 'files' => $files];
+
+                // Optional: fetch folder info from DB if needed
+                $stmt = $this->db->prepare("SELECT folder_id, folder_data FROM folder_structure WHERE folder_name = ?");
+                $stmt->execute([$f]); // Use folder name, not files array
+                $folderData = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                $folders[] = [
+                    'name' => $f,
+                    'files' => $files,
+                    'db_data' => $folderData ?? null
+                ];
             }
         }
 
         return json_encode(['status' => 1, 'folders' => $folders]);
     }
+
 
     function deleteFolder()
     {
@@ -1279,7 +1330,7 @@ class Action
 
     function getMetadata()
     {
-        $sql = "SELECT folder_name, folder_data FROM folder_structure";
+        $sql = "SELECT * FROM folder_structure";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -1310,15 +1361,39 @@ class Action
                         ?? 'Unknown';
 
                     // ISBN
+                    // Extract ISBN
                     $isbn = '';
-                    if (!empty($meta['prism:isbn'] )) {
+                    if (!empty($meta['prism:isbn'])) {
                         if (is_array($meta['prism:isbn'])) {
-                            $isbn = $meta['prism:isbn']['ISBN'] ?? '';
-                            $isbn = $meta['isbn'] ?? '';
+                            // If array, try 'ISBN' key first, fallback to 'isbn'
+                            $isbn = $meta['prism:isbn']['ISBN'] ?? ($meta['isbn'] ?? '');
                         } else {
-                            $isbn = $meta['prism:isbn'];
-                            $isbn = $meta['isbn'] ?? '';
+                            // If string, use it, fallback to 'isbn'
+                            $isbn = $meta['prism:isbn'] ?? ($meta['isbn'] ?? '');
                         }
+                    } else {
+                        // fallback if 'prism:isbn' is empty but 'isbn' exists
+                        $isbn = $meta['isbn'] ?? '';
+                    }
+
+                    // Extract copyright / metadata date
+                    $metadataDate = '';
+                    if (!empty($meta['xmp:metadatadate'])) {
+                        $metadataDate = $meta['xmp:metadatadate'];
+                    } elseif (!empty($meta['xap:metadatadate'])) {
+                        $metadataDate = $meta['xap:metadatadate'];
+                    } elseif (!empty($meta['ModDate'])) {
+                        $metadataDate = $meta['ModDate'];
+                    } elseif (!empty($meta['CreationDate'])) {
+                        $metadataDate = $meta['CreationDate'];
+                    }
+
+                    // Optionally format the date to YYYY-MM-DD
+                    if ($metadataDate) {
+                        $date = preg_replace('/^D:/', '', $metadataDate); // remove PDF D: prefix
+                        $metadataDateFormatted = date('Y-m-d', strtotime($date));
+                    } else {
+                        $metadataDateFormatted = 'NA';
                     }
 
                     $metadataArray[] = [
@@ -1327,6 +1402,8 @@ class Action
                         'filename' => $file['filename'], // actual file name
                         'title' => $title,
                         'author' => $author,
+                        'copyright' => $metadataDateFormatted,
+                        // 'create_date' =>,
                         'isbn' => $isbn
                     ];
                 }
