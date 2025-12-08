@@ -31,7 +31,7 @@
 
         <div class="flex items-center">
             <input id="searchFaculty" type="text" placeholder="Search user"
-                class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg px-3 py-1 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
         </div>
 
     </div>
