@@ -59,47 +59,14 @@
 
     <div class="space-y-2">
         <div id="booksContainer" class="space-y-4"></div>
-        <!-- <div class="border rounded-lg bg-gray-50 dark:bg-gray-700">
-            <button class="w-full flex justify-between items-center p-3 categoryBtn">
-                <span class="font-semibold text-gray-900 dark:text-gray-100">Science</span>
-                <span class="bg-indigo-500 text-white text-xs px-3 text-2xl font-bold py-2 rounded font-bold">Total book: <span class="">12</span></span>
-            </button>
-
-            <hr class="border-gray-300 dark:border-gray-600">
-
-            <div class="categoryList hidden px-4 pb-3">
-                <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-1">
-                    <li>Physics Handbook</li>
-                    <li>Chemistry Essentials</li>
-                    <li>Biology Intro</li>
-                </ol>
-            </div>
-        </div>
-
-        <div class="border rounded-lg bg-gray-50 dark:bg-gray-700">
-            <button class="w-full flex justify-between items-center p-3 categoryBtn">
-                <span class="font-semibold text-gray-900 dark:text-gray-100">Science</span>
-                <span class="bg-indigo-500 text-white text-xs px-3 text-2xl font-bold py-2 rounded font-bold">Total book: <span class="">12</span></span>
-            </button>
-
-            <hr class="border-gray-300 dark:border-gray-600">
-
-            <div class="categoryList hidden px-4 pb-3">
-                <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-1">
-                    <li>Physics Handbook</li>
-                    <li>Chemistry Essentials</li>
-                    <li>Biology Intro</li>
-                </ol>
-            </div>
-        </div>
- -->
+        
     </div>
 </div>
 
 <script>
-    $(document).on('click', '.categoryBtn', function () {
-        $(this).closest('div').find('.categoryList').toggleClass('hidden');
-    });
+    // $(document).on('click', '.categoryBtn', function () {
+    //     $(this).closest('div').find('.categoryList').toggleClass('hidden');
+    // });
 </script>
 
 
