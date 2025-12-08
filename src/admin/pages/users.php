@@ -210,7 +210,8 @@
                             return [
                                 personalDetails.firstname,
                                 personalDetails.lastname,
-                                authData.email,
+                                authData.student_id,
+                                personalDetails.account_status,
                                 personalDetails.department,
                                 personalDetails.course,
                                 authData.user_role
@@ -224,8 +225,10 @@
                         <tr data-id="${user.user_id}">
                             <td class="px-4 py-2">${index + 1}</td>
                             <td class="px-4 py-2">${personalDetails.firstname} ${personalDetails.middlename} ${personalDetails.lastname}</td>
-                            <td class="px-4 py-2">${authData.email}</td>
-                            <td class="px-4 py-2">${personalDetails.department || personalDetails.course}</td>
+                            <td class="px-4 py-2">${personalDetails.student_id}</td>
+                            <td class="px-4 py-2">${personalDetails.course}</td>
+                            <td class="px-4 py-2">${personalDetails.department}</td>
+                            <td class="px-4 py-2">${authData.account_status || authData.account_status}</td>
                             <td class="px-2 py-2 text-center flex justify-center gap-1">
                                 <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
                                 <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>

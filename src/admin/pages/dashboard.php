@@ -49,19 +49,26 @@
 </div>
 
 <div id="booksPanel" class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg mt-6 hidden">
-    <button class="backBtn mb-4 px-5 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600">
+    <!-- Back Button -->
+    <button
+        class="backBtn mb-6 px-6 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-all duration-300">
         Back
     </button>
 
-    <h2 class="text-xl text-gray-900 dark:text-gray-100 mb-2">
-        Books by Category
-    </h2>
+    <!-- Scoreboard / Total Books Section -->
+    <div class="mb-6 flex justify-between items-center">
+        <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Books by Department</h2>
+        <div class="text-lg text-gray-700 dark:text-gray-300">
+            <span class="font-semibold">Total Books:</span> <span class="text-lg mx-4 font-bold " id="totalBooksCount">0</span>
+        </div>
+    </div>
 
-    <div class="space-y-2">
-        <div id="booksContainer" class="space-y-4"></div>
-        
+    <!-- Books List Container -->
+    <div id="booksContainer" class="space-y-4">
+        <!-- Books will be dynamically added here -->
     </div>
 </div>
+
 
 <script>
     // $(document).on('click', '.categoryBtn', function () {
@@ -225,7 +232,7 @@
                     console.log('Array: ', allBooks);
                     console.log('Total books:', allBooks.length);
 
-
+                    $("#totalBooksCount").text(allBooks.length);
                     if (res.status !== 1 || !res.stats || !res.stats.booksperfolder) {
                         $("#booksContainer").html("<p class='text-red-500'>No data found.</p>");
                         return;
@@ -243,35 +250,43 @@
                         });
 
                         html += `
-                                <div class="border rounded-lg bg-gray-50 dark:bg-gray-700">
-                            <button class="w-full flex justify-between items-center p-3 categoryBtn">
-                                <span class="font-semibold text-gray-900 dark:text-gray-100">${folderName}</span>
-                                <span class="bg-indigo-500 text-white text-xs px-3 text-2xl font-bold py-2 rounded">
-                                    Total book: <span>${titles.length}</span>
-                                </span>
-                            </button>
+                        
+                                <div class="border rounded-lg bg-gray-50 dark:bg-gray-700 shadow-md hover:shadow-lg transition-shadow duration-200 ease-in-out">
+                                    <!-- Button to toggle category list visibility -->
+                                    <button class="w-full flex justify-between items-center p-4 bg-white dark:bg-gray-800 rounded-t-lg hover:bg-gray-100 dark:hover:bg-gray-600">
+                                        
+                                    <span class="font-semibold text-gray-900 dark:text-gray-100 text-lg">${folderName}</span>
+                                    </button>
+                                    
+                                    <!-- Total books count with a larger, bolder number -->
+                                    <div class="px-4 py-2 text-sm text-gray-600 dark:text-gray-300">
+                                        <strong>Total Books:</strong> <span class="text-xl font-bold text-gray-900 dark:text-gray-100">${titles.length}</span>
+                                    </div>
 
-                            <hr class="border-gray-300 dark:border-gray-600">
+                                    <!-- Divider -->
+                                    <hr class="border-gray-300 dark:border-gray-600">
 
-                            <div class="categoryList hidden px-4 pb-3">
-                                <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-1">
-                                    ${files
+                                    <!-- Hidden category list -->
+                                    <div class="categoryList hidden px-4 pb-3 space-y-2">
+                                        <ol class="list-decimal list-inside text-gray-700 dark:text-gray-300 space-y-1">
+                                            ${files
                                 .map(file => `
-                                            <li>
-                                                <a 
-                                                    href="javascript:void(0)" 
-                                                    onclick="openBook('${folderName}', '${file.metadata?.Title ?? file.filename}', '${file.filename}')"
-                                                    class="text-indigo-600 dark:text-indigo-400 hover:underline"
-                                                >
-                                                    ${file.metadata?.Title ?? file.filename}
-                                                </a>
-                                            </li>
-                                        `)
+                                                    <li>
+                                                        <a 
+                                                            href="javascript:void(0)" 
+                                                            onclick="openBook('${folderName}', '${file.metadata?.Title ?? file.filename}', '${file.filename}')"
+                                                            class="text-indigo-600 dark:text-indigo-400 hover:underline hover:text-indigo-800 dark:hover:text-indigo-200 transition-colors duration-200"
+                                                        >
+                                                            ${file.metadata?.Title ?? file.filename}
+                                                        </a>
+                                                    </li>
+                                                `)
                                 .join("")}
-                                </ol>
-                            </div>
-                        </div>
-                    `;
+                                        </ol>
+                                    </div>
+                                </div>
+                                `;
+
                         $("#booksContainer").html(html);
                     });
 
