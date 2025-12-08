@@ -1764,6 +1764,89 @@ class Action
     }
 
 
+    // function readingbooks()
+    // {
+    //     if (session_status() === PHP_SESSION_NONE) {
+    //         session_start();
+    //     }
+
+    //     header('Content-Type: application/json');
+
+    //     $book_title = $_POST['book_title'] ?? 'Unknown Title';
+    //     $book_author = $_POST['book_author'] ?? 'Unknown Author';
+    //     $file = $_POST['file'] ?? null;
+    //     if (!$file) {
+    //         return json_encode([
+    //             'status' => 0,
+    //             'message' => 'Missing file parameter.'
+    //         ]);
+    //     }
+
+    //     $user_id = $_SESSION['student']['user_id'] ?? null;
+    //     if (!$user_id) {
+    //         return json_encode([
+    //             'status' => 0,
+    //             'message' => 'User not logged in.',
+    //             'session' => $_SESSION['student'] ?? null
+    //         ]);
+    //     }
+
+    //     try {
+    //         if (!isset($_SESSION['pdf_tokens'])) {
+    //             $_SESSION['pdf_tokens'] = [];
+    //         }
+
+    //         $token = bin2hex(random_bytes(16));
+    //         $_SESSION['pdf_tokens'][$token] = [
+    //             'file' => $file,
+    //             'book_title' => $book_title,
+    //             'book_author' => $book_author,
+    //             'created' => time(),
+    //             'expires' => time() + 300
+    //         ];
+
+    //         // ✅ Check if the reading log exists
+    //         $stmt = $this->db->prepare("SELECT * FROM reading_logs WHERE user_id = ? AND file = ?");
+    //         $stmt->execute([$user_id, $file]);
+    //         $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    //         $this->users_logs("User Starting Reading books title '$book_title' by '$book_author'");
+    //         if ($row) {
+    //             // ✅ Update existing reading session
+    //             $update = $this->db->prepare("
+    //             UPDATE reading_logs 
+    //             SET start_time = NOW(), end_time = NULL, count_user = 1, access_count = 1, updated_at = NOW()
+    //             WHERE id = ?
+    //         ");
+    //             $update->execute([$row['id']]);
+    //         } else {
+    //             // ✅ Insert new reading session
+    //             $insert = $this->db->prepare("
+    //             INSERT INTO reading_logs (user_id, book_title, count_user, access_count, book_author, file, start_time, is_favorite) 
+    //             VALUES (?, ?, ?, ?, ?, ?, NOW(), 0)
+    //         ");
+    //             $insert->execute([$user_id, $book_title, 1, 1, $book_author, $file]);
+    //         }
+
+    //         // ✅ Build secure viewer URL
+    //         $baseURL = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}/UniversityLibrary/";
+    //         $secure_view_url = $baseURL . "auth/viewer.php?token=" . urlencode($token);
+
+    //         return json_encode([
+    //             'status' => 1,
+    //             'user_id' => $user_id,
+    //             'message' => 'Reading session started.',
+    //             'data' => $secure_view_url
+    //         ]);
+    //     } catch (Exception $e) {
+    //         return json_encode([
+    //             'status' => 0,
+    //             'message' => 'Error: ' . $e->getMessage()
+    //         ]);
+    //     }
+    // }
+
+
     function readingbooks()
     {
         if (session_status() === PHP_SESSION_NONE) {
@@ -1775,6 +1858,7 @@ class Action
         $book_title = $_POST['book_title'] ?? 'Unknown Title';
         $book_author = $_POST['book_author'] ?? 'Unknown Author';
         $file = $_POST['file'] ?? null;
+
         if (!$file) {
             return json_encode([
                 'status' => 0,
@@ -1782,16 +1866,36 @@ class Action
             ]);
         }
 
-        $user_id = $_SESSION['student']['user_id'] ?? null;
+        // Check for different user roles: student, faculty, and admin
+        $user_role = '';
+        $user_id = null;
+
+        // Check for admin session
+        if (!empty($_SESSION['admin'])) {
+            $user_role = 'admin';
+            $user_id = $_SESSION['admin']['admin_id'];  // Admin has admin_id
+        }
+        // Check for student session
+        elseif (!empty($_SESSION['student'])) {
+            $user_role = 'student';
+            $user_id = $_SESSION['student']['user_id'];  // Student has user_id
+        }
+        // Check for faculty session
+        elseif (!empty($_SESSION['faculty'])) {
+            $user_role = 'faculty';
+            $user_id = $_SESSION['faculty']['user_id'];  // Faculty has user_id
+        }
+
         if (!$user_id) {
             return json_encode([
                 'status' => 0,
                 'message' => 'User not logged in.',
-                'session' => $_SESSION['student'] ?? null
+                'session' => $_SESSION ?? null
             ]);
         }
 
         try {
+            // For session management: storing PDF tokens
             if (!isset($_SESSION['pdf_tokens'])) {
                 $_SESSION['pdf_tokens'] = [];
             }
@@ -1802,42 +1906,62 @@ class Action
                 'book_title' => $book_title,
                 'book_author' => $book_author,
                 'created' => time(),
-                'expires' => time() + 300
+                'expires' => time() + 300 // Token valid for 5 minutes
             ];
 
-            // ✅ Check if the reading log exists
-            $stmt = $this->db->prepare("SELECT * FROM reading_logs WHERE user_id = ? AND file = ?");
-            $stmt->execute([$user_id, $file]);
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+            // If the user is a student or faculty, log the reading session
+            if ($user_role === 'student' || $user_role === 'faculty') {
+                // Check if a reading session already exists for this user and book
+                $stmt = $this->db->prepare("SELECT * FROM reading_logs WHERE user_id = ? AND file = ?");
+                $stmt->execute([$user_id, $file]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            $this->users_logs("User Starting Reading books title '$book_title' by '$book_author'");
-            if ($row) {
-                // ✅ Update existing reading session
-                $update = $this->db->prepare("
-                UPDATE reading_logs 
-                SET start_time = NOW(), end_time = NULL, count_user = 1, access_count = 1, updated_at = NOW()
-                WHERE id = ?
-            ");
-                $update->execute([$row['id']]);
-            } else {
-                // ✅ Insert new reading session
-                $insert = $this->db->prepare("
-                INSERT INTO reading_logs (user_id, book_title, count_user, access_count, book_author, file, start_time, is_favorite) 
-                VALUES (?, ?, ?, ?, ?, ?, NOW(), 0)
-            ");
-                $insert->execute([$user_id, $book_title, 1, 1, $book_author, $file]);
+                $this->users_logs("User Starting Reading book '$book_title' by '$book_author'");
+
+                if ($row) {
+                    // Update existing reading session
+                    $update = $this->db->prepare("
+                    UPDATE reading_logs 
+                    SET start_time = NOW(), end_time = NULL, count_user = count_user + 1, access_count = access_count + 1, updated_at = NOW()
+                    WHERE id = ?
+                ");
+                    $update->execute([$row['id']]);
+                } else {
+                    // Insert new reading session
+                    $insert = $this->db->prepare("
+                    INSERT INTO reading_logs (user_id, book_title, count_user, access_count, book_author, file, start_time, is_favorite) 
+                    VALUES (?, ?, 1, 1, ?, ?, NOW(), 0)
+                ");
+                    $insert->execute([$user_id, $book_title, $book_author, $file]);
+                }
             }
 
-            // ✅ Build secure viewer URL
+            // For admin, we skip the logging step but still generate a secure URL
+            if ($user_role === 'admin') {
+                // Build secure viewer URL for the admin
+                $baseURL = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}/UniversityLibrary/";
+                $secure_view_url = $baseURL . "auth/viewer.php?token=" . urlencode($token);
+
+                return json_encode([
+                    'status' => 1,
+                    'user_id' => $user_id,
+                    'message' => 'Admin reading detected, no log recorded.',
+                    'data' => $secure_view_url  // Return the secure view URL for the admin
+                ]);
+            }
+
+            // Build secure viewer URL for the user
             $baseURL = (isset($_SERVER['HTTPS']) ? "https" : "http") . "://{$_SERVER['HTTP_HOST']}/UniversityLibrary/";
             $secure_view_url = $baseURL . "auth/viewer.php?token=" . urlencode($token);
 
             return json_encode([
                 'status' => 1,
                 'user_id' => $user_id,
+                'role' => $user_role,
                 'message' => 'Reading session started.',
                 'data' => $secure_view_url
             ]);
+
         } catch (Exception $e) {
             return json_encode([
                 'status' => 0,
@@ -1845,6 +1969,69 @@ class Action
             ]);
         }
     }
+
+
+    // function endReading()
+    // {
+    //     if (session_status() === PHP_SESSION_NONE) {
+    //         session_start();
+    //     }
+
+    //     header('Content-Type: application/json');
+
+    //     $file = $_POST['file'] ?? null;
+    //     $duration = (int) ($_POST['duration'] ?? 0);
+
+    //     $user_id = $_SESSION['student']['user_id'] ?? null;
+    //     if (!$user_id) {
+    //         return json_encode([
+    //             'status' => 0,
+    //             'message' => 'User not logged in.'
+    //         ]);
+    //     }
+    //     $this->users_logs("User end the reading book session, time: $duration seconds");
+    //     if (!$file) {
+    //         return json_encode([
+    //             'status' => 0,
+    //             'message' => 'Missing file parameter.'
+    //         ]);
+    //     }
+
+    //     try {
+    //         $stmt = $this->db->prepare("SELECT id, total_read_time, start_time FROM reading_logs WHERE user_id = ? AND file = ? ORDER BY id DESC LIMIT 1");
+    //         $stmt->execute([$user_id, $file]);
+    //         $log = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    //         if (!$log) {
+    //             return json_encode([
+    //                 'status' => 0,
+    //                 'message' => 'No active reading session found.'
+    //             ]);
+    //         }
+
+    //         $new_total_read_time = $log['total_read_time'] + $duration;
+
+    //         // ✅ Update the reading log
+    //         $update = $this->db->prepare("
+    //         UPDATE reading_logs 
+    //         SET end_time = NOW(), duration = ?, total_read_time = ?, access_count=0, updated_at = NOW()
+    //         WHERE id = ?
+    //     ");
+    //         $update->execute([$duration, $new_total_read_time, $log['id']]);
+
+    //         return json_encode([
+    //             'status' => 1,
+    //             'message' => 'Reading session ended successfully.',
+    //             'duration' => $duration,
+    //             'total_read_time' => $new_total_read_time
+    //         ]);
+    //     } catch (Exception $e) {
+    //         return json_encode([
+    //             'status' => 0,
+    //             'message' => 'Error: ' . $e->getMessage()
+    //         ]);
+    //     }
+    // }
 
     function endReading()
     {
@@ -1857,14 +2044,26 @@ class Action
         $file = $_POST['file'] ?? null;
         $duration = (int) ($_POST['duration'] ?? 0);
 
-        $user_id = $_SESSION['student']['user_id'] ?? null;
+        // Check if the user is logged in (admin, student, faculty, etc.)
+        $user_id = $_SESSION['student']['user_id'] ?? $_SESSION['faculty']['user_id'] ?? $_SESSION['admin']['admin_id'] ?? null;
+
         if (!$user_id) {
             return json_encode([
                 'status' => 0,
                 'message' => 'User not logged in.'
             ]);
         }
-        $this->users_logs("User end the reading book session, time: $duration seconds");
+
+        // If the user is an admin, skip reading log updates.
+        if (isset($_SESSION['admin']) && $_SESSION['admin']['admin_id']) {
+            return json_encode([
+                'status' => 1,
+                'message' => 'Admin reading session does not require logging.'
+            ]);
+        }
+
+        $this->users_logs("User ended the reading session, time: $duration seconds");
+
         if (!$file) {
             return json_encode([
                 'status' => 0,
@@ -1886,10 +2085,10 @@ class Action
 
             $new_total_read_time = $log['total_read_time'] + $duration;
 
-            // ✅ Update the reading log
+            // Update the reading log for non-admin users
             $update = $this->db->prepare("
             UPDATE reading_logs 
-            SET end_time = NOW(), duration = ?, total_read_time = ?, access_count=0, updated_at = NOW()
+            SET end_time = NOW(), duration = ?, total_read_time = ?, access_count = 0, updated_at = NOW()
             WHERE id = ?
         ");
             $update->execute([$duration, $new_total_read_time, $log['id']]);

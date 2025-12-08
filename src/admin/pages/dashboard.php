@@ -310,7 +310,7 @@
 
 
 
-                    $('#statBooks').text(allBooks.length || null);
+                    $('#statBooks').text(allBooks.length || 0);
 
                     // Update dashboard counter
                     const totalRequests = dashboardData.requests.pending + dashboardData.requests.approved + dashboardData.requests.declined;

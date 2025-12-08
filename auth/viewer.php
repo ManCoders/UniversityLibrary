@@ -65,7 +65,7 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
 
   <main id="viewerContainer" class="hidden flex-1 overflow-auto p-2 md:p-4 space-y-4"></main>
 
-  <script>
+  <!-- <script>
     $(function () {
       const $timer = $("#timer"),
         $pageInfo = $("#pageInfo"),
@@ -187,7 +187,140 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
       });
 
     });
-  </script>
+  </script> -->
+
+<script>
+  $(function () {
+    const $timer = $("#timer"),
+      $pageInfo = $("#pageInfo"),
+      $container = $("#viewerContainer"),
+      $loader = $("#loader");
+
+    let pdfDoc = null, seconds = 0, timerInterval = null, isFavorite = false;
+    const pdfUrl = "<?php echo $pdfUrl; ?>";
+    const isAdmin = <?php echo isset($_SESSION['admin']) ? 'true' : 'false'; ?>; // Check if user is admin (using PHP session or any condition you have)
+
+    if (!pdfUrl) {
+      $loader.html(`<p class='text-red-500 font-semibold'>⚠️ Invalid or expired token.</p>`);
+      return;
+    }
+    $(document).on("contextmenu", function (e) {
+      e.preventDefault();
+    });
+
+    // --- Load PDF ---
+    pdfjsLib.getDocument(pdfUrl).promise
+      .then(pdf => {
+        pdfDoc = pdf;
+        $loader.addClass("hidden");
+        $container.removeClass("hidden");
+        $pageInfo.text(`📖 Pages: ${pdf.numPages}`);
+
+        let promise = Promise.resolve();
+        for (let i = 1; i <= pdf.numPages; i++) {
+          promise = promise.then(() => renderPage(i));
+        }
+        promise.then(() => {
+          $(document).on("keydown", e => {
+            if (e.ctrlKey && ["s", "p", "u", "c"].includes(e.key.toLowerCase())) e.preventDefault();
+          });
+          $("body").css("user-select", "none");
+        });
+
+        function renderPage(i) {
+          return pdfDoc.getPage(i).then(page => {
+            const viewport = page.getViewport({ scale: 1.3 });
+            const canvas = $("<canvas>")
+              .addClass("bg-gray-800 rounded-lg shadow-lg mx-auto block w-full max-w-4xl mb-6")[0];
+            canvas.height = viewport.height;
+            canvas.width = viewport.width;
+            $container.append(canvas);
+            return page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+          });
+        }
+      })
+      .catch(err => {
+        console.error("PDF load failed:", err);
+        $loader.html(`<p class='text-red-500 font-semibold'>⚠️ Failed to load PDF.</p>`);
+      });
+
+    startTimer();
+    // --- Timer ---
+    function startTimer() {
+      timerInterval = setInterval(() => {
+        seconds++;
+        const mins = String(Math.floor(seconds / 60)).padStart(2, "0");
+        const secs = String(seconds % 60).padStart(2, "0");
+        $timer.text(`⏱ ${mins}:${secs}`);
+      }, 1000);
+    }
+    if(isAdmin) $("#favoriteBtn").addClass('hidden');
+
+    // --- Favorite button AJAX ---
+    $("#favoriteBtn").click(function () {
+      isFavorite = !isFavorite;
+      const btn = $(this);
+      btn.toggleClass("bg-red-600", isFavorite);
+      btn.toggleClass("bg-blue-600", !isFavorite);
+
+      $.ajax({
+        url: `${base_url}auth/action.php?action=toggle_favorite`,
+        type: "POST",
+        data: {
+          file: "<?php echo $pdfFile; ?>",
+          favorite: isFavorite ? 1 : 1
+        },
+        dataType: "json",
+        success: function (response) {
+          if (response.status === 1) {
+            alert(response.message);
+          } else {
+            alert(response.message);
+          }
+        },
+        error: function (err) {
+          console.error("Favorite update failed:", err);
+        }
+      });
+    });
+
+    // --- End reading session AJAX ---
+    $("#endBtn").click(function () {
+      clearInterval(timerInterval);
+
+      $.ajax({
+        url: `${base_url}auth/action.php?action=end_reading`,
+        type: "POST",
+        data: {
+          file: "<?php echo $pdfFile; ?>",
+          book_title: "<?php echo $title; ?>",
+          book_author: "<?php echo $author; ?>",
+          duration: seconds
+        },
+        dataType: "json",
+        success: function (response) {
+          if (response.status === 1) {
+            alert(`Reading session ended. You spent ${Math.floor(seconds / 60)}m ${seconds % 60}s.`);
+            
+            // If the user is an admin, close the tab
+            if (isAdmin) {
+              window.close(); // Close the tab for admin
+            } else {
+              window.location.href = "<?php echo base_url(); ?>"; // Redirect for regular users
+            }
+          }
+        },
+        error: function (err) {
+          console.error("End reading session failed:", err);
+        }
+      });
+
+    });
+
+  });
+</script>
+
+
 </body>
 
 </html>

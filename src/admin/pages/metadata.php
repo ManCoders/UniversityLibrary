@@ -1,5 +1,5 @@
 <h1 class="text-3xl font-extrabold text-gray-800 dark:text-gray-100 mb-6 border-b dark:border-gray-700 pb-2">
-    Metadata Management Overview
+    Metadata Management
 </h1>
 
 <!-- Tabs Navigation -->
@@ -22,7 +22,7 @@
         <!-- Search -->
         <div class="flex items-center">
             <input id="searchBooks" type="text" placeholder="Search books"
-                class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg px-3 py-1 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
         </div>
 
 
@@ -32,31 +32,6 @@
 
 <div id="tab-content">
 
-    <!-- DASHBOARD -->
-    <div id="dashboard-content" class="tab-panel">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-indigo-500">
-                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Metadata Items</p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1 totalbooks">4,289</p>
-                <p class="text-xs text-green-500 mt-2">↑ 12.5% this month</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-emerald-500">
-                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">New Metadata Entries</p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">1,024</p>
-                <p class="text-xs text-red-500 mt-2">↓ 3.1% this month</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-yellow-500">
-                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pending Approvals</p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">14</p>
-                <p class="text-xs text-yellow-500 mt-2">Last updated 5 mins ago</p>
-            </div>
-            <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border-l-4 border-red-500">
-                <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Errors / Conflicts</p>
-                <p class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-1">3</p>
-                <p class="text-xs text-red-500 mt-2">Action required</p>
-            </div>
-        </div>
-    </div>
 
     <!-- ADD METADATA -->
     <div id="add-metadata-content" class="tab-panel hidden">
@@ -210,13 +185,15 @@
             </div>
 
             <!-- Footer -->
-            <div class="flex justify-end bg-gray-200 dark:bg-gray-700 p-4 rounded-b-lg">
+            <div class="flex justify-end bg-gray-200 dark:bg-gray-700 p-4 rounded-b-lg space-x-2">
                 <button onclick="$('#viewMetaModal').hide()"
                     class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
                     Close
                 </button>
+                <button id="readMetaButton" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                    Read
+                </button>
             </div>
-
         </div>
     </div>
 
@@ -269,7 +246,6 @@
             }
 
             activateTab('#tab-add-metadata', '#add-metadata-content');
-            // $('#tab-dashboard').click(() => activateTab('#tab-dashboard', '#dashboard-content'));
             $('#tab-add-metadata').click(() => activateTab('#tab-add-metadata', '#add-metadata-content'));
             $('#tab-metadata-table').click(() => activateTab('#tab-metadata-table', '#metadata-table-content'));
 
@@ -299,6 +275,10 @@
                     $icon.text($list.hasClass('hidden') ? '▶' : '▼');
                 });
             }
+
+
+
+
             loadFolders();
             function loadFolders() {
                 $.getJSON(base_url + "auth/action.php?action=getFolders", res => {
@@ -749,29 +729,25 @@
 
                 if ($(this).hasClass("view-btn")) {
                     // --- View Metadata ---
+                    $("#upload-spinner").removeClass("hidden");
+
                     $.ajax({
                         url: base_url + "auth/action.php?action=viewmeta",
                         method: "POST",
                         data: { book_id: bookId },
                         dataType: "json",
-                        beforeSend: function () {
-                            $("#upload-spinner").removeClass("hidden"); // show spinner
-                        },
                         success: function (res) {
                             if (res.status === 1) {
                                 const data = res.data;
                                 const meta = data.metadata || {};
 
-                                const coverPath = data.cover_path
-                                    ? base_url + 'auth/' + data.cover_path
-                                    : "../../assets/images/no-cover.png";
+                                // Book cover
+                                const coverPath = data.cover_path ? base_url + "auth/" + data.cover_path : "../../assets/images/no-cover.png";
+                                $("#viewMetaCover").attr("src", coverPath).on("error", function () {
+                                    $(this).attr("src", "../../assets/images/no-cover.png");
+                                });
 
-                                $("#viewMetaCover")
-                                    .attr("src", coverPath)
-                                    .on("error", function () {
-                                        $(this).attr("src", "../../assets/images/no-cover.png");
-                                    });
-
+                                // Title and author
                                 let rawTitle = meta.Title || meta.title || (data.filename ? data.filename.replace(/\.[^/.]+$/, "") : "") || meta["dc:title"] || "—";
                                 let extractedAuthor = "—";
                                 const authorMatch = rawTitle.match(/\(([^)]+)\)/);
@@ -782,21 +758,49 @@
 
                                 $("#viewMetaTitle").text(rawTitle);
                                 $("#viewMetaAuthor").text(meta.Author || meta.author || extractedAuthor || "—");
-                                $("#viewMetaISBN").text(meta["prism:isbn"]?.ISBN || meta["pdfx:isbn"] || meta["dc:identifier"] || meta["isbn"] || meta["dc:source"] || meta["dc:source"] || "—");
+
+                                // ISBN, Folder, Filename
+                                $("#viewMetaISBN").text(meta["prism:isbn"]?.ISBN || meta["pdfx:isbn"] || meta["dc:identifier"] || meta["isbn"] || "—");
                                 $("#viewMetaFolder").text(data.foldername || "—");
                                 $("#viewMetaFilename").text(data.filename || "—");
 
+                                // Other metadata
                                 let otherMeta = "";
-                                for (let key in meta) {
+                                $.each(meta, function (key, value) {
                                     if (!["Title", "Author", "prism:isbn", "pdfx:isbn"].includes(key)) {
-                                        let value = meta[key];
                                         if (typeof value === "object") value = JSON.stringify(value, null, 2);
-                                        otherMeta += `${key}: ${value}\n`;
+                                        otherMeta += key + ": " + value + "\n";
                                     }
-                                }
+                                });
                                 $("#viewMetaOther").text(otherMeta || "No other metadata available.");
 
+                                // Show modal
                                 $("#viewMetaModal").fadeIn(200);
+
+                                // Attach Read button
+                                $("#readMetaButton").off("click").on("click", function () {
+                                    $.ajax({
+                                        url: base_url + "auth/action.php?action=readingbooks",
+                                        method: "POST",
+                                        data: {
+                                            file: data.file_path,
+                                            book_title: rawTitle,
+                                            book_author: meta.Author || meta.author || extractedAuthor || "—"
+                                        },
+                                        dataType: "json",
+                                        success: function (res) {
+                                            if (res.status === 1 && res.data) {
+                                                window.open(res.data, "_blank");
+                                            } else {
+                                                alert(res.message || "Cannot open book.");
+                                            }
+                                        },
+                                        error: function () {
+                                            alert("Server error while opening the book.");
+                                        }
+                                    });
+                                });
+
                             } else {
                                 alert(res.message || "Failed to load metadata");
                             }
@@ -805,7 +809,7 @@
                             alert("Server error while fetching metadata");
                         },
                         complete: function () {
-                            $("#upload-spinner").addClass("hidden"); // hide spinner
+                            $("#upload-spinner").addClass("hidden");
                         }
                     });
 
@@ -866,9 +870,6 @@
                         const $tbody = $("#otherMetaTable tbody").empty();
                         for (let key in meta) {
                             addMetaRow(key, meta[key]);
-                            /* if (!['Title', 'Author', 'prism:isbn', 'pdfx:isbn'].includes(key)) {
-                                
-                            } */
                         }
 
                         $("#editMetaModal").show();
