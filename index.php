@@ -98,7 +98,7 @@
 
                         <div
                             class="px-3 py-2 text-sm font-semibold border-b border-[#b03060] dark:border-[#990033] truncate">
-                            <span >User ID: <i id="profile-username">test</i></span>
+                            <span>User ID: <i id="profile-username">test</i></span>
                         </div>
 
                         <a href="#" id="dropdown-my-profile" data-view-target="profile"
@@ -246,6 +246,10 @@
                     <div class="flex-1 text-center sm:text-left">
                         <label class="block text-[#660000] dark:text-[#ffd1d1] font-medium mb-1">Full Name</label>
 
+                        <input type="text" name="lastname" id="edit-lastname"
+                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a] mb-2"
+                            placeholder="Enter your last name">
+
                         <input type="text" name="firstname" id="edit-firstname"
                             class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a] mb-2"
                             placeholder="Enter your first name">
@@ -253,10 +257,6 @@
                         <input type="text" name="middlename" id="edit-middlename"
                             class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a] mb-2"
                             placeholder="Enter your middle name">
-
-                        <input type="text" name="lastname" id="edit-lastname"
-                            class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a] mb-2"
-                            placeholder="Enter your last name">
 
                         <input type="text" name="suffix" id="edit-suffix"
                             class="w-full p-2 rounded-lg border border-[#b03060] bg-white dark:bg-[#4d1a1a]"
@@ -483,7 +483,7 @@
             </button>
 
             <h3 class="text-2xl font-bold text-center mb-6 text-[#b03060] dark:text-[#ff4d6d]">
-                <i data-lucide="user-check" class="inline-block w-6 h-6 mr-1 align-text-bottom"></i> Campus Sign In
+                <i data-lucide="user-check" class="inline-block w-6 h-6 mr-1 align-text-bottom"></i> Sign In
             </h3>
 
             <form id="login" class="space-y-4">
@@ -544,7 +544,7 @@
             <!-- RIGHT: Registration Form -->
             <div class="flex-1">
                 <h3 class="text-2xl font-bold text-center mb-3 text-[#b03060] dark:text-[#ff4d6d]">
-                    <i data-lucide="user-plus" class="inline-block w-4 h-4 mr-1 align-text-bottom"></i> Campus
+                    <i data-lucide="user-plus" class="inline-block w-4 h-4 mr-1 align-text-bottom"></i>
                     Registration
                 </h3>
 
@@ -562,9 +562,10 @@
 
                     <!-- Two-row layout -->
                     <div class="grid grid-cols-2 gap-3">
-                        <input type="text" name="firstname" placeholder="First Name" required
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                         <input type="text" name="lastname" placeholder="Last Name" required
+                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+
+                        <input type="text" name="firstname" placeholder="First Name" required
                             class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
                         <input type="text" name="middlename" placeholder="Middle Name"
@@ -961,7 +962,7 @@
         $("#profile-edit-form").on("submit", function (e) {
             e.preventDefault();
             const formData = new FormData(this);
-            formData.append("user_id", <?php echo $_SESSION['student']['user_id'] ??'' ?>);
+            formData.append("user_id", <?php echo $_SESSION['student']['user_id'] ?? '' ?>);
 
             $.ajax({
                 url: `${base_url}auth/action.php?action=updateUser`,
