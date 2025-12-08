@@ -1360,20 +1360,32 @@ class Action
                         ?? ($meta['author'] ?? null)
                         ?? 'Unknown';
 
-                    // ISBN
-                    // Extract ISBN
                     $isbn = '';
+
+                    // Check for 'prism:isbn'
                     if (!empty($meta['prism:isbn'])) {
                         if (is_array($meta['prism:isbn'])) {
-                            // If array, try 'ISBN' key first, fallback to 'isbn'
+                            // If 'prism:isbn' is an array, try 'ISBN' key first
                             $isbn = $meta['prism:isbn']['ISBN'] ?? ($meta['isbn'] ?? '');
                         } else {
-                            // If string, use it, fallback to 'isbn'
+                            // If it's a string, directly use it, fallback to 'isbn'
                             $isbn = $meta['prism:isbn'] ?? ($meta['isbn'] ?? '');
                         }
-                    } else {
-                        // fallback if 'prism:isbn' is empty but 'isbn' exists
+                    }
+
+                    // Fallback to 'isbn' field directly
+                    if (empty($isbn)) {
                         $isbn = $meta['isbn'] ?? '';
+                    }
+
+                    // Further fallback to 'dc:identifier' or 'dc:source'
+                    if (empty($isbn)) {
+                        $isbn = $meta['dc:identifier'] ?? $meta['dc:source'] ?? '';
+                    }
+
+                    // If still empty, set a default value
+                    if (empty($isbn)) {
+                        $isbn = 'ISBN Not Available';
                     }
 
                     // Extract copyright / metadata date
@@ -1424,7 +1436,8 @@ class Action
 
         return json_encode([
             'status' => 1,
-            'data' => $metadataArray
+            'data' => $metadataArray,
+            'table' => $rows
         ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
     }
 
