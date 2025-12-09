@@ -3,31 +3,6 @@
 </h1>
 
 
-
-<!-- Charts Section -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition flex flex-col">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Top Ebook Access</h2>
-        <div class="flex-1">
-            <canvas id="utilizationChart" class="w-full h-64"></canvas>
-        </div>
-    </div>
-
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition flex flex-col">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Reading Session</h2>
-        <div class="flex-1">
-            <canvas id="usersChart" class="w-full h-64"></canvas>
-        </div>
-    </div>
-
-    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition flex flex-col">
-        <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">Total Access & References</h2>
-        <div class="flex-1">
-            <canvas id="resourcesChart" class="w-full h-64"></canvas>
-        </div>
-    </div>
-</div>
-
 <!-- Detailed Table -->
 <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition">
     <div class="flex flex-col md:flex-row justify-between items-center mb-4">
@@ -59,10 +34,13 @@
                         Start Time</th>
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Duration</th>
+                        Time Duration</th>
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Timestamp</th>
+                        Time Limits</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Access Date</th>
                 </tr>
             </thead>
             <tbody id="HistoryReading" class="divide-y divide-gray-200 dark:divide-gray-700 hover:divide-gray-400">
@@ -94,17 +72,21 @@
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         #</th>
-                   
+
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Book ID</th>
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Book Title</th>
-                    
+
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Author</th>
+
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Number of Visited</th>
                 </tr>
             </thead>
             <tbody id="AllBooks" class="divide-y divide-gray-200 dark:divide-gray-700 hover:divide-gray-400">
@@ -149,7 +131,7 @@
         allBooksData.forEach((book, index) => {
             const row = [
                 index + 1,
-               
+
                 book.book_id,
                 book.title,
                 book.author
@@ -316,6 +298,8 @@
                         <td class="px-4 truncate py-2">${record.fullname}</td>
                         <td class="px-4 truncate block max-w-xs py-2">${record.book_title}</td>
                         <td class="px-4 py-2">${record.start_time}</td>
+                        <td class="px-4 py-2">${record.start_time}</td>
+                        <td class="px-4 py-2">${record.total_read_time_formatted}</td>
                         <td class="px-4 py-2">${record.total_read_time_formatted}</td>
                         <td class="px-4 py-2">${record.end_time}</td>
                     `;
@@ -346,6 +330,7 @@
                 <td class="px-4 truncate py-2">${truncate(record.fullname, 20)}</td>
                 <td class="px-4 truncate block max-w-xs py-2">${truncate(record.book_title, 25)}</td>
                 <td class="px-4 py-2">${record.start_time}</td>
+                <td class="px-4 py-2">${record.total_read_time_formatted}</td>
                 <td class="px-4 py-2">${record.total_read_time_formatted}</td>
                 <td class="px-4 py-2">${record.end_time ?? '-'}</td>
             `;
