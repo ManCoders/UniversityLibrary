@@ -52,20 +52,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-4">
             <div class="border p-4 rounded-md flex flex-col">
                 <ul id="folder-list" class="space-y-2 text-sm text-gray-800 dark:text-gray-100">
-                    <li class="folder">
-                        <div
-                            class="flex items-center cursor-pointer folder-toggle bg-white dark:bg-gray-800 border rounded-md px-3 py-2 hover:bg-indigo-50 dark:hover:bg-gray-700">
-                            <span class="mr-2">📂</span>
-                            <span class="font-medium flex-1">Sample Folder</span>
-                            <span class="text-gray-400 toggle-icon">▶</span>
-                        </div>
-                        <ul class="ml-6 mt-2 hidden space-y-1">
-                            <li
-                                class="file bg-white dark:bg-gray-800 px-3 py-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer">
-                                📄 example.pdf
-                            </li>
-                        </ul>
-                    </li>
+                    
                 </ul>
             </div>
         </div>
@@ -229,7 +216,7 @@
                 <option value="School of Business Administration">School of Business Administration</option>
                 <option value="College of Teacher Education">College of Teacher Education</option>
             </select>
-
+            
             <div class="flex justify-end gap-2">
                 <button id="cancel-folder-btn"
                     class="px-3 py-1 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md text-sm">Cancel</button>

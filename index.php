@@ -530,7 +530,7 @@
                 class="flex flex-col items-center justify-center w-full sm:w-[35%] border-r border-[#b03060]/40 dark:border-[#800000]/40 pr-4">
                 <div
                     class="relative w-32 h-32 rounded-full overflow-hidden border-2 border-[#b03060] dark:border-[#800000]">
-                    <img id="profile-preview" src="./assets/images/library.png" alt="Profile Preview"
+                    <img id="profile-preview" src="http://localhost/UniversityLibrary/assets/images/system_logo/LIBRARY.png" alt="Profile Preview"
                         class="w-full h-full object-cover">
                 </div>
                 <label for="profile"
@@ -552,13 +552,13 @@
                     <!-- ROLE SELECTOR -->
                     <div class="flex gap-3 justify-center mb-2">
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="role" value="admin" class="accent-[#b03060]" checked> Admin
+                            <input type="radio" name="role" value="admin" class="accent-[#b03060]"> Admin
                         </label>
                         <label class="flex items-center gap-2">
                             <input type="radio" name="role" value="faculty" class="accent-[#b03060]"> Faculty
                         </label>
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="role" value="student" class="accent-[#b03060]" checked > Student
+                            <input type="radio" name="role" value="student" class="accent-[#b03060]"> Student
                         </label>
                         <label class="flex items-center gap-2">
                             <input type="radio" name="role" value="visitor" class="accent-[#b03060]"> Visitor
@@ -607,7 +607,8 @@
                         <select name="student_department"
                             class="col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Department</option>
-                            <option value="College of Information Computing and Sciences">College of Information Computing and Sciences</option>
+                            <option value="College of Information Computing and Sciences">College of Information
+                                Computing and Sciences</option>
                             <option value="College of Maritime Education">College of Maritime Education</option>
                             <option value="College of Engineering & Technology Department">College of Engineering &
                                 Technology </option>
@@ -621,7 +622,8 @@
                             <option value="College of Teacher Education">College of Teacher Education</option>
                         </select>
 
-                        <select id="course_select" name="course" class="col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                        <select id="course_select" name="course"
+                            class="col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Course</option>
                         </select>
                     </div>
@@ -689,9 +691,15 @@
 
                     <!-- VISITOR FIELDS -->
                     <div id="visitor-fields" class="hidden grid grid-cols-2 sm:grid-cols-2 gap-3 mt">
+                        <select name="visitor_gender"
+                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            <option disabled selected>Select Gender</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                        </select>
 
-
-
+                        <input type="text" name="schoolname" placeholder="School Name"
+                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-1 gap-1 ">
@@ -707,11 +715,6 @@
                     </div>
 
                     <!-- PASSWORD -->
-
-
-
-
-
                     <p id="register-message" class="text-sm text-red-500 hidden"></p>
 
                     <button type="submit"
@@ -852,21 +855,43 @@
                 formDataObj.role = $('input[name="role"]:checked').val();
 
                 // ----- 2. Capture all inputs -----
-                $(this).find("input").each(function () {
+                $(this).find("input, select").each(function () {
                     const type = $(this).attr("type");
                     const name = $(this).attr("name");
 
-                    if (!name) return; // Skip elements without name
+                    if (!name) return;
 
-                    // Radio handled separately
-                    if (type === "radio") return;
-
-                    // File input (handled later)
+                    // Skip file inputs
                     if (type === "file") return;
 
-                    // Normal input fields
+                    // Handle radio buttons
+                    if (type === "radio") {
+                        // Only take checked radio
+                        if ($(this).is(":checked")) {
+                            formDataObj[name] = $(this).val();
+                        } else if (!(name in formDataObj)) {
+                            // Ensure name exists in object (so we can check required later)
+                            formDataObj[name] = null;
+                        }
+                        return;
+                    }
+
+                    // Handle select elements
+                    if ($(this).is("select")) {
+                        const val = $(this).val();
+                        if (!val) {
+                            $(this).addClass("border-red-500"); // optional visual feedback
+                        } else {
+                            $(this).removeClass("border-red-500");
+                        }
+                        formDataObj[name] = val;
+                        return;
+                    }
+
+                    // Normal inputs
                     formDataObj[name] = $(this).val();
                 });
+
 
                 // ----- 3. Capture ALL select dropdowns -----
                 $(this).find("select").each(function () {
@@ -912,7 +937,7 @@
 
                         if (response.status === 1) {
                             $('#register')[0].reset();
-                            $('#profile-preview').attr('src', 'assets/default-profile.png');
+                            $('#profile-preview').attr('src', base_url+'assets/images/system_logo/library.png');
                             setTimeout(() => toggleModal('#login-modal', '#register-modal'), 1500);
                         }
                     },

@@ -6,21 +6,23 @@
     <div class="flex justify-between items-center">
         <!-- Tabs -->
         <nav class="flex space-x-4" aria-label="Tabs">
-            <button id="tab-visitor"
-                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Visitor Table
-            </button>
+
             <button id="tab-admin"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                 Admin Table
+            </button>
+
+            <button id="tab-faculty"
+                class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
+                Faculty Table
             </button>
             <button id="tab-student"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
                 Student Table
             </button>
-            <button id="tab-faculty"
+            <button id="tab-visitor"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Faculty Table
+                Visitor Table
             </button>
             <button id="tab-approval"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
@@ -42,18 +44,33 @@
 <div id="tab-content">
     <!-- Visitor Table -->
     <div id="visitor-table-content" class="tab-panel hidden">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
+        <table
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Gender</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">School from</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        ID</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Fullname</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Email</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Gender</th>
+
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        School from</th>
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Status</th>
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Actions</th>
+
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="visitorTableBody">
@@ -64,16 +81,30 @@
 
     <!-- Admin Table -->
     <div id="admin-table-content" class="tab-panel hidden">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
+        <table
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Department</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Employee ID</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Fullname</th>
+
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Email</th>
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Offices</th>
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Status</th>
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Actions</th>
+
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="adminTableBody">
@@ -84,17 +115,30 @@
 
     <!-- Student Table -->
     <div id="student-table-content" class="tab-panel hidden">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
+        <table
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Student No</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Course</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Department</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Student No</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Fullname</th>
+                    
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Course</th>
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Department</th>
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Status</th>
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Actions</th>
+
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="studentTableBody">
@@ -105,17 +149,30 @@
 
     <!-- Faculty Table -->
     <div id="faculty-table-content" class="tab-panel hidden">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
+        <table
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Employee No</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Department</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
-                
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Employee ID</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Fullname</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Email</th>
+
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Department</th>
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Status</th>
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Actions</th>
+
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="facultyTableBody">
@@ -126,14 +183,28 @@
 
     <!-- Account Approval Table -->
     <div id="approval-table-content" class="tab-panel hidden">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
+        <table
+            class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
-                    <th class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Account Status</th>
-                    <th class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        ID</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Name</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Email</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Roles</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Account Status</th>
+                    <th
+                        class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Actions</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700" id="approvalTableBody">
@@ -192,68 +263,140 @@
                 success: function (res) {
                     if (res.status !== 1) return;
 
-                    // Empty the tables before adding new rows
-                    const visitorTbody = $("#visitorTableBody").empty();
-                    const adminTbody = $("#adminTableBody").empty();
-                    const studentTbody = $("#studentTableBody").empty();
-                    const facultyTbody = $("#facultyTableBody").empty();
+                    // Empty all tables
+                    $("#visitorTableBody, #adminTableBody, #studentTableBody, #facultyTableBody, #approvalTableBody").empty();
 
                     const q = query.toLowerCase();
 
-                    res.data
-                        .filter(user => user.account_status !== 'Pending' && user.account_status !== 'Declined') // Exclude pending/declined
-                        .filter(user => {
-                            // Search in relevant fields (firstname, lastname, email, etc.)
-                            const personalDetails = JSON.parse(user.personal_details);
-                            const authData = JSON.parse(user.authentication_data);
+                    res.data.forEach((user, index) => {
+                        const personalDetails = JSON.parse(user.personal_details);
+                        const authData = JSON.parse(user.authentication_data);
+                        const accountStatus = authData.account_status?.toLowerCase() || "";
+                        const role = authData.user_role;
 
-                            return [
-                                personalDetails.firstname,
-                                personalDetails.lastname,
-                                authData.student_id,
-                                personalDetails.account_status,
-                                personalDetails.department,
-                                personalDetails.course,
-                                authData.user_role
-                            ].some(field => field.toLowerCase().includes(q)); // Check if any field matches query
-                        })
-                        .forEach((user, index) => {
-                            const personalDetails = JSON.parse(user.personal_details);
-                            const authData = JSON.parse(user.authentication_data);
+                        // Filter by search query
+                        const matchesQuery = [
+                            personalDetails.firstname,
+                            personalDetails.lastname,
+                            authData.email,
+                            personalDetails.gender,
+                            personalDetails.school_from,
+                            personalDetails.department,
+                            personalDetails.course,
+                            accountStatus,
+                            role
+                        ].some(field => field?.toLowerCase().includes(q));
 
-                            const row = `
-                        <tr data-id="${user.user_id}">
-                            <td class="px-4 py-2">${index + 1}</td>
-                            <td class="px-4 py-2">${personalDetails.firstname} ${personalDetails.middlename} ${personalDetails.lastname}</td>
-                            <td class="px-4 py-2">${personalDetails.student_id}</td>
-                            <td class="px-4 py-2">${personalDetails.course}</td>
-                            <td class="px-4 py-2">${personalDetails.department}</td>
-                            <td class="px-4 py-2">${authData.account_status || authData.account_status}</td>
-                            <td class="px-2 py-2 text-center flex justify-center gap-1">
-                                <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                            </td>
-                        </tr>`;
+                        if (!matchesQuery) return;
 
-                            // Append rows to corresponding tables based on user role
-                            const role = authData.user_role;
-                            if (role === 'visitor') {
-                                visitorTbody.append(row);  // Visitor Table
-                            } else if (role === 'admin') {
-                                adminTbody.append(row);  // Admin Table
-                            } else if (role === 'student') {
-                                studentTbody.append(row);  // Student Table
-                            } else if (role === 'faculty') {
-                                facultyTbody.append(row);  // Faculty Table
-                            }
-                        });
+                        // Row template for Approval table (Pending users)
+                        const approvalRow = `
+                                <tr data-id="${user.user_id}">
+                                    <td class="px-4 py-2">${index + 1}</td>
+                                    <td class="px-4 py-2">${personalDetails.firstname} ${personalDetails.middlename} ${personalDetails.lastname}</td>
+                                    <td class="px-4 py-2">${authData.email || '—'}</td>
+                                    <td class="px-4 py-2">${role || '—'}</td>
+                                    <td class="px-4 py-2">${authData.account_status || '—'}</td>
+                                    <td class="px-2 py-2 text-center flex justify-center gap-1">
+                                        <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
+                                        <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
+                                        <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
+                                    </td>
+                                </tr>
+                            `;
+
+                        if (accountStatus === 'pending') {
+                            $("#approvalTableBody").append(approvalRow);
+                            return;
+                        }
+
+                        if (accountStatus === 'declined') return; // Skip declined users
+
+                        // Row templates per role
+                        let row;
+                        switch (role) {
+                            case 'visitor':
+                                row = `
+                                    <tr data-id="${user.user_id}">
+                                        <td class="px-4 py-2">${index + 1}</td>
+                                        <td class="px-4 py-2">${personalDetails.firstname} ${personalDetails.middlename} ${personalDetails.lastname}</td>
+                                        <td class="px-4 py-2 ">${authData.email || '—'}</td>
+                                        <td class="px-4 py-2">${personalDetails.gender || '—'}</td>
+                                        <td class="px-4 py-2 text-center">${personalDetails.schoolname || '—'}</td>
+                                        <td class="px-4 py-2 text-center">${accountStatus}</td>
+                                        <td class="px-2 py-2 text-center flex justify-center gap-1">
+                                            <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
+                                            <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
+                                            <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
+                                        </td>
+                                    </tr>
+                                `;
+                                $("#visitorTableBody").append(row);
+                                break;
+
+                            case 'admin':
+                                row = `
+                                        <tr data-id="${user.user_id}">
+                                            <td class="px-4 py-2">${personalDetails.employee_id}</td>
+                                            <td class="px-4 py-2">${personalDetails.firstname} ${personalDetails.middlename} ${personalDetails.lastname}</td>
+                                            <td class="px-2 py-2">${authData.email || '—'}</td>
+                                            <td class="px-4 py-2 text-center">${personalDetails.admin_offices || '—'}</td>
+                                            <td class="px-4 py-2 text-center">${accountStatus}</td>
+                                            <td class="px-2 py-2 text-center flex justify-center gap-1">
+                                                <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
+                                                <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
+                                                <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                $("#adminTableBody").append(row);
+                                break;
+                            case 'student':
+                                const studentRow = `
+                                    <tr data-id="${user.user_id}">
+                                        <td class="px-4 py-2 ">${personalDetails.student_id || '—'}</td>
+                                        <td class="px-4 py-2">${personalDetails.firstname} ${personalDetails.middlename} ${personalDetails.lastname}</td>
+                                        <td class="px-4 py-2">${personalDetails.course || '—'}</td>
+                                        <td class="px-4 py-2 text-center">${personalDetails.department || '—'}</td>
+                                        <td class="px-4 py-2 text-center">${accountStatus}</td>
+                                        <td class="px-2 py-2 text-center flex justify-center gap-1">
+                                            <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
+                                            <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
+                                            <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
+                                        </td>
+                                    </tr>
+                                `;
+                                $("#studentTableBody").append(studentRow);
+                                break;
+
+
+                            case 'faculty':
+                                const facultyRow = `
+                                        <tr data-id="${user.user_id}">
+                                            <td class="px-4 py-2">${personalDetails.employee_id || '—'}</td>
+                                            <td class="px-4 py-2">${personalDetails.firstname} ${personalDetails.middlename} ${personalDetails.lastname}</td>
+                                            <td class="px-4 py-2 ">${authData.email || '—'}</td>
+                                            <td class="px-4 py-2 text-center">${personalDetails.department || '—'}</td>
+                                            <td class="px-4 py-2 text-center">${accountStatus}</td>
+                                            <td class="px-2 py-2 text-center flex justify-center gap-1">
+                                                <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
+                                                <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
+                                                <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                $("#facultyTableBody").append(facultyRow);
+                                break;
+                        }
+                    });
                 },
+
                 error: function (xhr) {
                     console.error(xhr.responseText);
                 }
             });
         }
+
 
         // Load the users initially for the visitor tab (or any other tab as needed)
         loadUsers();

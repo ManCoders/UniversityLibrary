@@ -387,7 +387,7 @@ class Action
 
             // Determine redirect path
             $redirect = ($role === 'faculty') ? 'src/faculty/index.php' : './';
-            $redirect = ($role === 'faculty') ? 'src/faculty/index.php' : './';
+            
 
             /* $_SESSION['user'] = [
                 'role' => $role,
@@ -569,7 +569,7 @@ class Action
                 break;
 
             case 'visitor':
-                $visitorFields = ['visitor_gender', 'school_name'];
+                $visitorFields = ['visitor_gender', 'schoolname'];
                 foreach ($visitorFields as $f) {
                     if (empty($data[$f])) {
                         return json_encode(['status' => 0, 'message' => "Missing visitor field: $f"]);
@@ -644,11 +644,14 @@ class Action
 
         if ($role === 'visitor') {
             $personal_details['gender'] = $data['visitor_gender'];
-            $personal_details['school_name'] = $data['school_name'];
+            $personal_details['schoolname'] = $data['schoolname'];
         }
 
         if ($role === 'admin') {
             $personal_details['employee_id'] = $data['admin_employee_id'];
+            $personal_details['admin_gender'] = $data['admin_gender'];
+            $personal_details['admin_offices'] = $data['admin_offices'];
+            $personal_details['admin_gender'] = $data['admin_gender'];
         }
 
         $auth_data = [
