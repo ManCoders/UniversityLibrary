@@ -187,7 +187,6 @@ $(document).ready(function () {
   const profileDropdown = $("#profile-dropdown");
   const allNavLinks = $(".nav-link");
   const allViewSections = $(".view-section");
-  const $spinner = $("#upload-spinner");
   const $loginMessage = $("#login-message");
 
   // Global userState

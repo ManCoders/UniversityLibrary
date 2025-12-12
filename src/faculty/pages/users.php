@@ -650,7 +650,7 @@
             if ($(this).hasClass("view-btn")) viewUser(userId);
             else if ($(this).hasClass("edit-btn")) editUser(userId);
             else if ($(this).hasClass("delete-btn")) deleteUser(userId, tr);
-        });
+        }); 
 
         function viewUser(userId) {
             activateTab(`.tab-panel`, '#view-content');

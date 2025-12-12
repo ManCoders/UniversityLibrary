@@ -352,7 +352,7 @@ class Action
 
 
             $role = strtolower($auth['user_role'] ?? '');
-            $validRoles = ['faculty', 'student', 'admin'];
+            $validRoles = ['faculty', 'student', 'admin', 'visitor'];
 
             if (!in_array($role, $validRoles)) {
 
@@ -653,20 +653,22 @@ class Action
             $personal_details['admin_offices'] = $data['admin_offices'];
             $personal_details['admin_gender'] = $data['admin_gender'];
         }
+        $access_role = in_array($role, ['visitor', 'student']) ? 'student' : 'faculty';
 
         $auth_data = [
             'email' => $data['email'],
             'password' => $hashed_password,
-            'user_role' => $role,
+            'account_role' =>$role,
+            'user_role' => 'student', //this is have 2 access, for faculty and student
             'account_status' => 'Pending'
         ];
 
         // ===== INSERT INTO DATABASE =====
-        try {
-            $stmt = $this->db->prepare("
-        INSERT INTO user (personal_details, authentication_data)
-        VALUES (?, ?)
-    ");
+            try {
+                $stmt = $this->db->prepare("
+                INSERT INTO user (personal_details, authentication_data)
+                VALUES (?, ?)
+            ");
             $stmt->execute([
                 json_encode($personal_details),
                 json_encode($auth_data)
@@ -2805,7 +2807,7 @@ class Action
                 }
             case 'recently_viewed':
                 try {
-                    $userId = $_POST['user_id'] ?? 0;
+                    $userId = $_GET['user_id'] ?? 0;
 
                     if (empty($userId) || !is_numeric($userId)) {
                         return json_encode([
@@ -2814,7 +2816,7 @@ class Action
                         ]);
                     }
 
-                    $stmt = $this->db->prepare("SELECT * FROM reading_logs WHERE user_id = ? ORDER BY updated_at DESC LIMIT 10");
+                    $stmt = $this->db->prepare("SELECT * FROM reading_logs WHERE user_id = ?");
                     $stmt->execute([$userId]);
                     $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
