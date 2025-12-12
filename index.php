@@ -487,7 +487,7 @@
             </h3>
 
             <form id="login" class="space-y-4">
-                <input type="text" id="username-input" name="username" placeholder="University ID or Email" required
+                <input type="text" id="username-input" name="username" placeholder="ID # or Email" required
                     class="w-full border-2 border-[#b03060] dark:border-[#800000] rounded-lg p-3 dark:bg-[#440000] focus:ring-[#b03060] focus:border-[#b03060] transition text-[#660000] dark:text-[#ffd1d1] placeholder-[#800000] dark:placeholder-[#ffcccc]">
                 <input type="password" name="password" id="password-input" placeholder="Password" required
                     class="w-full border-2 border-[#b03060] dark:border-[#800000] rounded-lg p-3 dark:bg-[#440000] focus:ring-[#b03060] focus:border-[#b03060] transition text-[#660000] dark:text-[#ffd1d1] placeholder-[#800000] dark:placeholder-[#ffcccc]">
