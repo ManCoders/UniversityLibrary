@@ -530,7 +530,7 @@
                 class="flex flex-col items-center justify-center w-full sm:w-[35%] border-r border-[#b03060]/40 dark:border-[#800000]/40 pr-4">
                 <div
                     class="relative w-32 h-32 rounded-full overflow-hidden border-2 border-[#b03060] dark:border-[#800000]">
-                    <img id="profile-preview" src="./assets/default-profile.png" alt="Profile Preview"
+                    <img id="profile-preview" src="./assets/images/library.png" alt="Profile Preview"
                         class="w-full h-full object-cover">
                 </div>
                 <label for="profile"
@@ -552,17 +552,19 @@
                     <!-- ROLE SELECTOR -->
                     <div class="flex gap-3 justify-center mb-2">
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="role" value="student" class="accent-[#b03060]" checked> Student
+                            <input type="radio" name="role" value="admin" class="accent-[#b03060]"> Admin
                         </label>
                         <label class="flex items-center gap-2">
                             <input type="radio" name="role" value="faculty" class="accent-[#b03060]"> Faculty
                         </label>
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="role" value="visitor" class="accent-[#b03060]"> Visitor
+                            <input type="radio" name="role" value="student" class="accent-[#b03060]" checked> Student
                         </label>
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="role" value="admin" class="accent-[#b03060]"> Admin
+                            <input type="radio" name="role" value="visitor" class="accent-[#b03060]"> Visitor
                         </label>
+
+
                     </div>
 
                     <!-- NAME FIELDS -->
@@ -587,6 +589,7 @@
                             <option value="IV">IV</option>
                             <option value="V">V</option>
                         </select>
+
                     </div>
 
                     <!-- STUDENT FIELDS -->
@@ -604,9 +607,10 @@
                         <select name="student_department"
                             class="col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Department</option>
+                            <option value="College of Information Computing and Sciences">College of Information Computing and Sciences</option>
                             <option value="College of Maritime Education">College of Maritime Education</option>
                             <option value="College of Engineering & Technology Department">College of Engineering &
-                                Technology Department</option>
+                                Technology </option>
                             <option value="College of Arts, Humanities and Social Sciences">College of Arts, Humanities
                                 and Social Sciences</option>
                             <option value="College of Physical Education and Sports">College of Physical Education and
@@ -617,8 +621,9 @@
                             <option value="College of Teacher Education">College of Teacher Education</option>
                         </select>
 
-                        <input type="text" name="course" placeholder="Course"
-                            class="col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                        <select id="course_select" name="course" class="col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            <option disabled selected>Select Course</option>
+                        </select>
                     </div>
 
                     <!-- FACULTY FIELDS -->
@@ -648,40 +653,61 @@
                             <option value="School of Business Administration">School of Business Administration</option>
                             <option value="College of Teacher Education">College of Teacher Education</option>
                         </select>
+
+
                     </div>
 
-                    <!-- VISITOR FIELDS -->
-                    <div id="visitor-fields" class="hidden grid grid-cols-2 sm:grid-cols-2 gap-3 mt-3">
+                    <div id="admin-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                        <input type="text" name="admin_employee_id" placeholder="Employee ID"
+                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
-                        <select name="visitor_gender"
+                        <select name="admin_gender"
                             class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Gender</option>
                             <option>Male</option>
                             <option>Female</option>
                         </select>
-                        <input type="text" name="school_name" placeholder="School Name"
-                            class=" border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+
+                        <select name="admin_offices"
+                            class="col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            <option disabled selected>Select Office</option>
+                            <option value="Admissions Office">Admissions Office</option>
+                            <option value="Office of Student Affairs and Services (OSAS)">Office of Student
+                                Affairs and Services (OSAS)</option>
+                            <option value="Career Services & Public Employment Service Office (PESO)">Career
+                                Services & Public Employment Service Office (PESO)</option>
+                            <option value="Public Information Office (PIO)">Public Information Office (PIO)
+                            </option>
+                            <option value="Office of the Vice President for Academic Affairs">Office of the Vice
+                                President for Academic Affairs
+                            </option>
+                            <option value="Office of the President">Office of the President</option>
+                            <option value="Medical-Dental Health Services">Medical-Dental Health Services
+                            </option>
+                        </select>
+                    </div>
+
+                    <!-- VISITOR FIELDS -->
+                    <div id="visitor-fields" class="hidden grid grid-cols-2 sm:grid-cols-2 gap-3 mt">
+
+
 
                     </div>
 
+                    <div class="grid grid-cols-1 sm:grid-cols-1 gap-1 ">
+                        <div class="grid grid-cols-3 sm:grid-cols-3 gap-3">
+                            <input type="email" name="email" placeholder="Email" required
+                                class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            <input type="password" name="password" placeholder="Password" required
+                                class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
-                    <!-- EMAIL -->
-                    <div class="grid grid-cols-1 sm:grid-cols-1 gap-3 mt-3">
-                        <input id="admin-fields" type="text" name="admin_employee_id" placeholder="Employee ID"
-                            class="hidden border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
-
-                        <input type="email" name="email" placeholder="Email" required
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            <input type="password" name="confirm_password" placeholder="Confirm Password" required
+                                class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                        </div>
                     </div>
 
                     <!-- PASSWORD -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                        <input type="password" name="password" placeholder="Password" required
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
-                        <input type="password" name="confirm_password" placeholder="Confirm Password" required
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
-                    </div>
 
 
 
@@ -718,7 +744,7 @@
             // ===== Role Toggle =====
             function toggleRoleFields(role) {
                 // Hide all first
-                $('#student-fields, #faculty-fields, #visitor-fields, #admin-fields')
+                $('#student-fields, #faculty-fields,#zppsu_offices, #visitor-fields, #admin-fields')
                     .addClass('hidden');
 
                 if (role === 'student') {
@@ -732,6 +758,7 @@
                 }
                 else if (role === 'admin') {
                     $('#admin-fields').removeClass('hidden');
+                    $("#zppsu_offices").removeClass('hideen');
                 }
             }
 
@@ -742,6 +769,67 @@
 
             // Initialize default on page load
             toggleRoleFields($('input[name="role"]:checked').val());
+
+
+            const courses = {
+                "College of Maritime Education": [
+                    "Bachelor of Science Marine Transportation",
+                    "Bachelor of Science Marine Engineering"
+                ],
+                "College of Information Computing and Sciences": [
+                    "Bachelor of Science Information Technology",
+                    "Bachelor of Science Information System"
+                ],
+                "College of Engineering & Technology Department": [
+                    "Bachelor of Science Computer Engineering",
+                    "Bachelor of Science Electrical Engineering"
+                ],
+                "College of Arts, Humanities and Social Sciences": [
+                    "BA Communication",
+                    "BA Political Science"
+                ],
+                "College of Physical Education and Sports": [
+                    "Bachelor of Science Physical Education",
+                    "Bachelor of Science Sports Science"
+                ],
+                "College of Engineering and Technology": [
+                    "Bachelor of Science Mechanical Engineering",
+                    "Bachelor of Science Civil Engineering"
+                ],
+                "School of Business Administration": [
+                    "Bachelor of Science Business Administration",
+                    "Bachelor of Science Accounting"
+                ],
+                "College of Teacher Education": [
+                    "Bachelor of Science Education major in English",
+                    "Bachelor of Science Education major in Math"
+                ]
+            };
+
+            $('select[name="student_department"]').on('change', function () {
+                let dept = $(this).val();
+                let $courseSelect = $('#course_select');
+
+                // Clear previous
+                $courseSelect.empty();
+
+                // Show the select
+                $courseSelect.removeClass('hidden');
+
+                // Add default option
+                $courseSelect.append(`<option disabled selected>Select Course</option>`);
+
+                // Insert the department's courses
+                if (courses[dept]) {
+                    courses[dept].forEach(course => {
+                        $courseSelect.append(`<option value="${course}">${course}</option>`);
+                    });
+                }
+            });
+
+
+
+
 
             // ===== Modal Controls =====
             function toggleModal(showSelector, hideSelector) {
@@ -876,8 +964,9 @@
         <div class="max-w-7xl mx-auto px-4">
             <p>&copy; <span id="current-year">2024</span> Zamboanga Peninsula Polytechnic State University Campus
                 Library — All Rights Reserved</p>
-            <p class="mt-1 text-xs">Developed for Academic Use |
-                <a href="#" class="text-[#b03060] dark:text-[#ff4d6d] hover:underline">Privacy Policy</a>
+            <p class="mt-1 text-xs">Developed for Academic Use by TechGeek Major |
+                <a href="https://privacy.gov.ph/data-privacy-act/"
+                    class="text-[#b03060] dark:text-[#ff4d6d] hover:underline">Privacy Policy</a>
             </p>
         </div>
     </footer>
