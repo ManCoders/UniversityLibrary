@@ -18,8 +18,8 @@ $navLinks = [
     <div
         class="flex items-center justify-between h-16 border-b border-gray-100 dark:border-gray-700 mb-6 flex-shrink-0">
         <div class="text-xl font-bold text-indigo-700 dark:text-indigo-400 flex items-center">
-            <i data-lucide="layout-grid" class="w-6 h-6 mr-2"></i>
-            Librarian Panel
+           <img src='../../assets/images/system_logo/LIBRARY.png' class="w-16 h-15 inline-block" alt="logo">
+            <div class="mx-3 text-3xl">DLORAS</div>
         </div>
         <button id="close-sidebar-btn"
             class="lg:hidden text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white focus:outline-none">

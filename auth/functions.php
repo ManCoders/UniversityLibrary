@@ -120,7 +120,7 @@ function get_option($key)
         $pdo = db_connect();
 
         // Fetch the system JSON column
-        $stmt = $pdo->prepare("SELECT system_details FROM system LIMIT 1");
+        $stmt = $pdo->prepare("SELECT * FROM system LIMIT 1");
         $stmt->execute();
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);

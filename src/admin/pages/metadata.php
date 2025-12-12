@@ -1,5 +1,5 @@
 <h1 class="text-3xl font-extrabold text-gray-800 dark:text-gray-100 mb-6 border-b dark:border-gray-700 pb-2">
-    Metadata Management
+    List of References
 </h1>
 
 <!-- Tabs Navigation -->
@@ -92,8 +92,8 @@
                             class="w-[15%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Isbn</th>
                         <th
-                            class="w-[15%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Date / CopyRight</th>
+                            class="w-[15%] px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                            CopyRight</th>
                         <th
                             class="w-[15%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Folder</th>
@@ -159,24 +159,25 @@
     <div id="viewMetaModal"
         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 hidden overflow-auto">
 
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-2xl w-full p-0 relative mx-auto">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-4xl w-90 p-0 relative mx-auto">
 
             <!-- Header -->
             <div class="flex justify-between items-center bg-gray-200 dark:bg-gray-700 p-4 rounded-t-lg">
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Book Metadata Preview</h2>
+                <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Bibliographic Reference</h2>
                 <button onclick="$('#viewMetaModal').hide()"
                     class="text-gray-800 dark:text-gray-100 hover:text-red-500 font-bold text-lg">&times;</button>
             </div>
 
             <!-- Body -->
-            <div class="flex flex-col md:flex-row gap-6 p-4" style="max-height: 75vh; overflow-y: auto;">
-                <!-- Book Cover -->
-                <div class="flex-shrink-0">
-                    <img id="viewMetaCover" src="" alt="Book Cover" class="w-36 h-52 object-cover rounded shadow-md">
+            <div class="grid w-100 grid-cols-2 md:grid-cols-2 p-2" style="max-height: 75vh; overflow-y: auto;">
+                <div class="flex justify-center p-2 mx-auto justify-content-evenly w-full max-w-xs">
+                    <img id="viewMetaCover" src="" alt="Book Cover"
+                        class="w-full h-auto object-cover rounded shadow-md">
                 </div>
 
-                <!-- Metadata Details -->
-                <div class="flex-1 space-y-2 text-gray-700 dark:text-gray-200 modal-body">
+
+                <!-- Right: Metadata Details -->
+                <div class="flex flex-col space-y-2 text-gray-700 dark:text-gray-200 modal-body">
                     <p><span class="font-semibold">Title:</span> <span id="viewMetaTitle">—</span></p>
                     <p><span class="font-semibold">Author:</span> <span id="viewMetaAuthor">—</span></p>
                     <p><span class="font-semibold">ISBN:</span> <span id="viewMetaISBN">—</span></p>
@@ -199,6 +200,7 @@
                 </button>
             </div>
         </div>
+
     </div>
 
 
@@ -698,7 +700,10 @@
                                 const title = item.title && item.title.trim() !== '' ? item.title : '—';
                                 const author = item.author && item.author.trim() !== '' ? item.author : '—';
                                 const isbn = item.isbn && item.isbn.trim() !== '' ? item.isbn : '—';
-                                const copyright = item.copyright?.trim() || '—';
+                                const copyright = item.copyright
+                                    ? item.copyright.trim().match(/\d{4}/)?.[0] || '—'
+                                    : '—';
+
 
                                 const row = `
                                         <tr>
@@ -707,7 +712,7 @@
                                             <td class="px-4 py-2 truncate max-w-xs" title="${title}">${title}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${author}">${author}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${isbn}">${isbn}</td>
-                                            <td class="px-4 py-2 truncate max-w-xs" title="${copyright}">${copyright}</td>
+                                            <td class="px-4 py-2 truncate max-w-xs text-center" title="${copyright}">${copyright}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${folder}">${folder}</td>
                                             <td class="px-4 py-2 text-center flex justify-center gap-1">
                                                 <button class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs view-btn" data-id="${bookId}">View</button>
@@ -765,7 +770,7 @@
                                 $("#viewMetaAuthor").text(meta.Author || meta.author || extractedAuthor || "—");
 
                                 // ISBN, Folder, Filename
-                                    
+
                                 $("#viewMetaISBN").text(meta["prism:isbn"]?.ISBN || meta["pdfx:isbn"] || meta["dc:identifier"] || meta["isbn"] || "—");
                                 $("#viewMetaFolder").text(data.foldername || "—");
                                 $("#viewMetaFilename").text(data.filename || "—");
