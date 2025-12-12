@@ -18,6 +18,8 @@ if (session_status() === PHP_SESSION_NONE) {
     <?php render_styles(); ?>
     <?php render_scripts(); ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    
+
     <script>
         var base_url = '<?php echo base_url() ?>';
 
@@ -25,6 +27,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
         // Tailwind config
         tailwind.config = {
+            
             darkMode: "class",
             theme: {
                 extend: {
@@ -175,6 +178,9 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
 
     <style>
+        input:not([type="password"]) {
+    text-transform: uppercase;
+}
         .loader {
             border-top-color: #3498db;
             border-right-color: transparent;

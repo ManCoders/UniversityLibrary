@@ -387,6 +387,7 @@ class Action
 
             // Determine redirect path
             $redirect = ($role === 'faculty') ? 'src/faculty/index.php' : './';
+            $redirect = ($role === 'faculty') ? 'src/faculty/index.php' : './';
 
             /* $_SESSION['user'] = [
                 'role' => $role,
