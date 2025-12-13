@@ -181,10 +181,7 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
 
     <style>
-        input:not([type="password"]) {
-            text-transform: uppercase;
-        }
-
+        
         .loader {
             border-top-color: #3498db;
             border-right-color: transparent;

@@ -77,9 +77,7 @@
                     <i data-lucide="home" class="inline-block w-4 h-4 mr-1 text-white"></i>
                 </button>
 
-                <!-- User Authentication Container -->
                 <div id="user-auth-container" class="relative">
-                    <!-- Logged Out State (Sign In) -->
                     <button id="auth-sign-in-btn"
                         class="bg-gradient-to-r  from-[#800000] to-[#b03060] text-white px-4 py-2 rounded-full shadow-md hover:from-[#a00000] hover:to-[#c05070] transition transform hover:scale-105 text-sm sm:text-base font-medium">
                         <i data-lucide="log-in" class="inline-block w-4 h-4 mr-1"></i>Sign In
@@ -487,7 +485,7 @@
             </h3>
 
             <form id="login" class="space-y-4">
-                <input type="text" id="username-input" name="username" placeholder="ID # or Email" required
+                <input type="text" id="username-input" name="username" placeholder="Library ID # or Email" required
                     class="w-full border-2 border-[#b03060] dark:border-[#800000] rounded-lg p-3 dark:bg-[#440000] focus:ring-[#b03060] focus:border-[#b03060] transition text-[#660000] dark:text-[#ffd1d1] placeholder-[#800000] dark:placeholder-[#ffcccc]">
                 <input type="password" name="password" id="password-input" placeholder="Password" required
                     class="w-full border-2 border-[#b03060] dark:border-[#800000] rounded-lg p-3 dark:bg-[#440000] focus:ring-[#b03060] focus:border-[#b03060] transition text-[#660000] dark:text-[#ffd1d1] placeholder-[#800000] dark:placeholder-[#ffcccc]">
@@ -544,7 +542,7 @@
             <!-- RIGHT: Registration Form -->
             <div class="flex-1">
                 <h3 class="text-2xl font-bold text-center mb-3 text-[#b03060] dark:text-[#ff4d6d]">
-                    <i data-lucide="user-plus" class="inline-block w-4 h-4 mr-1 align-text-bottom"></i>
+                    <i data-lucide="user-plus" class="inline-block w-8 h-8 mr-1 align-text-bottom"></i>
                     Registration
                 </h3>
 
@@ -570,16 +568,16 @@
                     <!-- NAME FIELDS -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <input type="text" name="lastname" placeholder="Last Name" required
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
                         <input type="text" name="firstname" placeholder="First Name" required
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class=" uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
                         <input type="text" name="middlename" placeholder="Middle Name"
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
-                        <select name="suffix"
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                        <select name=" suffix"
+                            class="uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option value="" selected>No Suffix</option>
                             <option value="Jr.">Jr.</option>
                             <option value="Sr.">Sr.</option>
@@ -595,17 +593,17 @@
                     <!-- STUDENT FIELDS -->
                     <div id="student-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                         <input type="text" name="student_id" placeholder="Student ID"
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class=" uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
                         <select name="student_gender"
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Gender</option>
                             <option>Male</option>
                             <option>Female</option>
                         </select>
 
                         <select name="student_department"
-                            class="col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="uppercase col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Department</option>
                             <option value="College of Information Computing and Sciences">College of Information
                                 Computing and Sciences</option>
@@ -623,7 +621,7 @@
                         </select>
 
                         <select id="course_select" name="course"
-                            class="col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="uppercase col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Course</option>
                         </select>
                     </div>
@@ -631,17 +629,17 @@
                     <!-- FACULTY FIELDS -->
                     <div id="faculty-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                         <input type="text" name="employee_id" placeholder="Employee ID"
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
                         <select name="faculty_gender"
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Gender</option>
                             <option>Male</option>
                             <option>Female</option>
                         </select>
 
                         <select name="faculty_department"
-                            class="col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class=" uppercase col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Department</option>
                             <option value="College of Maritime Education">College of Maritime Education</option>
                             <option value="College of Engineering & Technology Department">College of Engineering &
@@ -661,17 +659,17 @@
 
                     <div id="admin-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
                         <input type="text" name="admin_employee_id" placeholder="Employee ID"
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
                         <select name="admin_gender"
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Gender</option>
                             <option>Male</option>
                             <option>Female</option>
                         </select>
 
                         <select name="admin_offices"
-                            class="col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="uppercase col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Office</option>
                             <option value="Admissions Office">Admissions Office</option>
                             <option value="Office of Student Affairs and Services (OSAS)">Office of Student
@@ -692,22 +690,22 @@
                     <!-- VISITOR FIELDS -->
                     <div id="visitor-fields" class="hidden grid grid-cols-2 sm:grid-cols-2 gap-3 mt">
                         <select name="visitor_gender"
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Gender</option>
                             <option>Male</option>
                             <option>Female</option>
                         </select>
 
                         <input type="text" name="schoolname" placeholder="School Name"
-                            class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                            class="uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-1 gap-1 ">
                         <div class="grid grid-cols-3 sm:grid-cols-3 gap-3">
                             <input type="email" name="email" placeholder="Email" required
-                                class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                                class=" border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <input type="password" name="password" placeholder="Password" required
-                                class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
+                                class=" border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
                             <input type="password" name="confirm_password" placeholder="Confirm Password" required
                                 class="border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
