@@ -31,8 +31,6 @@
         </nav>
 
         <div class="flex items-center">
-            <input id="searchFaculty" type="text" placeholder="Search user"
-                class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg px-3 py-1 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
         </div>
 
     </div>
@@ -43,7 +41,7 @@
 <div id="tab-content">
     <!-- Visitor Table -->
     <div id="visitor-table-content" class="tab-panel hidden">
-        <table
+        <table id="visitorTable"
             class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
@@ -80,7 +78,7 @@
 
     <!-- Admin Table -->
     <div id="admin-table-content" class="tab-panel hidden">
-        <table
+        <table id="adminTable"
             class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
@@ -114,7 +112,7 @@
 
     <!-- Student Table -->
     <div id="student-table-content" class="tab-panel hidden">
-        <table
+        <table id="studentTable"
             class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
@@ -148,7 +146,7 @@
 
     <!-- Faculty Table -->
     <div id="faculty-table-content" class="tab-panel hidden">
-        <table
+        <table id="facultyTable"
             class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
@@ -182,7 +180,7 @@
 
     <!-- Account Approval Table -->
     <div id="approval-table-content" class="tab-panel hidden">
-        <table
+        <table id="approvalTable"
             class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
             <thead class="bg-gray-50 dark:bg-gray-700">
                 <tr>
@@ -214,7 +212,7 @@
 </div>
 
 <!-- MODAL BACKDROP -->
-<div id="viewModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+<div id="viewModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
 
     <!-- MODAL CONTAINER -->
     <div
@@ -275,11 +273,11 @@
                         <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200 mb-2">Student Information</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <p class="label">Department</p>
+                                <p class="label">Designation Address: </p>
                                 <p id="viewdepartment" class="value">Computer Science</p>
                             </div>
                             <div>
-                                <p class="label">Student ID</p>
+                                <p class="label">User ID</p>
                                 <p id="viewstudent_id" class="value">2025001</p>
                             </div>
                             <div>
@@ -302,8 +300,8 @@
                                 <p id="viewEmail" class="value">john.doe@example.com</p>
                             </div>
                             <div>
-                                <p class="label">Username</p>
-                                <p id="viewUsername" class="value">johndoe</p>
+                                <p class="label">Login ID</p>
+                                <p id="viewLogin" class="value">johndoe</p>
                             </div>
                         </div>
                     </div>
@@ -349,48 +347,19 @@
     <script>
         $(document).ready(function () {
             // Initialize DataTable
-            const activitiesTable = new DataTable("#activitiesTable", {
-                fixedHeight: true,
-                searchable: true,
-                paging: true,
-                perPage: 10,
-                perPageSelect: [10, 20, 50],
-                order: [[2, "desc"]] // sort by Date & Time DESC
+
+
+            // --- VIEW, EDIT, DELETE ACTIONS ---
+            $(document).on("click", ".view-btn, .edit-btn, .delete-btn", function () {
+                const tr = $(this).closest("tr");
+                const userId = tr.data("id");
+
+                if ($(this).hasClass("view-btn")) loadActivities(userId);
+                else if ($(this).hasClass("edit-btn")) editUser(userId);
+                else if ($(this).hasClass("delete-btn")) deleteUser(userId, tr);
             });
 
-            // Fetch user activities via AJAX
-            function loadActivities(userId) {
-                $.ajax({
-                    url: `${base_url}auth/action.php?action=recently_viewed&user_id=${userId}`,
-                    method: "GET",
-                    dataType: "json",
-                    success: function (res) {
-                        activitiesTable.clear();
-                        res.forEach((item, index) => {
-                            activitiesTable.row.add([
-                                index + 1,
-                                item.book_title,
-                                item.start_time,
-                                item.end_time ?? "—",
-                                item.remark ?? "—"
-                            ]);
-                        });
-                        activitiesTable.draw();
-                    },
-                    error: function (err) {
-                        console.error("Failed to fetch activities:", err);
-                    }
-                });
-            }
 
-            // Example: load activities for current student
-            const currentUserId = $("#viewstudent_id").text();
-            loadActivities(44);
-
-            // Close modal buttons
-            $("#closeViewBtn, #closeViewBtn2").click(() => {
-                $(".bg-white.dark\\:bg-gray-900").hide();
-            });
         });
     </script>
 
@@ -428,202 +397,237 @@
         // Initial Tab: Load the "Visitor Table" by default
         // activateTab('#tab-visitor', '#visitor-table-content');
         activateTab(`.tab-panel`, '#view-content');
-        // --- SEARCH FUNCTIONALITY ---
-        // Search for users based on the active tab (Visitor, Admin, Student, Faculty)
-        $("#searchFaculty").on("keyup", function () {
-            const searchQuery = $(this).val().toLowerCase();
-            const activeTab = $(".tab-button.border-indigo-500").attr('id');  // Get the active tab's id
-            loadUsers(searchQuery, activeTab);  // Load users based on search query and active tab
+
+
+
+
+        /* ================================
+   ACTIVITIES DATATABLE
+================================= */
+        const activitiesTable = new DataTable("#activitiesTable", {
+            fixedHeight: true,
+            searchable: true,
+            paging: true,
+            perPage: 10,
+            perPageSelect: [10, 20, 50],
+            order: [[2, "desc"]] // Date & Time DESC
         });
 
-        // Function to load data for different tables based on the tab
-        function loadUsers(query = "", activeTab = 'tab-visitor') {
+        function loadActivities(userId) {
+            if (!userId) return;
+
             $.ajax({
-                url: `${base_url}auth/action.php?action=GetFaculty`, // Adjust URL as needed
+                url: `${base_url}auth/action.php?action=recently_viewed&user_id=${userId}`,
                 type: "GET",
                 dataType: "json",
-                success: function (res) {
-                    if (res.status !== 1) return;
+                success(res) {
+                    activitiesTable.clear();
 
-                    // Empty all tables
-                    $("#visitorTableBody, #adminTableBody, #studentTableBody, #facultyTableBody, #approvalTableBody").empty();
+                    if (Array.isArray(res)) {
+                        res.forEach((item, index) => {
+                            activitiesTable.row.add([
+                                index + 1,
+                                item.book_title ?? "—",
+                                item.start_time ?? "—",
+                                item.end_time ?? "—",
+                                item.remark ?? "—"
+                            ]);
+                        });
+                    }
 
-                    const q = query.toLowerCase();
-
-                    res.data.forEach((user, index) => {
-                        const personalDetails = JSON.parse(user.personal_details);
-                        const authData = JSON.parse(user.authentication_data);
-                        const accountStatus = authData.account_status?.toLowerCase() || "";
-                        const role = authData.user_role;
-
-                        // Filter by search query
-                        const matchesQuery = [
-                            personalDetails.firstname,
-                            personalDetails.lastname,
-                            authData.email,
-                            personalDetails.gender,
-                            personalDetails.school_from,
-                            personalDetails.department,
-                            personalDetails.course,
-                            accountStatus,
-                            role
-                        ].some(field => field?.toLowerCase().includes(q));
-
-                        if (!matchesQuery) return;
-
-                        // Row template for Approval table (Pending users)
-                        const approvalRow = `
-                                <tr data-id="${user.user_id}">
-                                    <td class="px-4 py-2">${index + 1}</td>
-                                    <td class="px-4 py-2">${personalDetails.firstname} ${personalDetails.middlename} ${personalDetails.lastname}</td>
-                                    <td class="px-4 py-2">${authData.email || '—'}</td>
-                                    <td class="px-4 py-2">${role || '—'}</td>
-                                    <td class="px-4 py-2">${authData.account_status || '—'}</td>
-                                    <td class="px-2 py-2 text-center flex justify-center gap-1">
-                                        <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                        <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                        <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                                    </td>
-                                </tr>
-                            `;
-
-                        if (accountStatus === 'pending') {
-                            $("#approvalTableBody").append(approvalRow);
-                            return;
-                        }
-
-                        if (accountStatus === 'declined') return; // Skip declined users
-
-                        // Row templates per role
-                        let row;
-                        switch (role) {
-                            case 'visitor':
-                                row = `
-                                    <tr data-id="${user.user_id}">
-                                        <td class="px-4 py-2">${index + 1}</td>
-                                        <td class="px-4 py-2">${personalDetails.firstname} ${personalDetails.middlename} ${personalDetails.lastname}</td>
-                                        <td class="px-4 py-2 ">${authData.email || '—'}</td>
-                                        <td class="px-4 py-2">${personalDetails.gender || '—'}</td>
-                                        <td class="px-4 py-2 text-center">${personalDetails.schoolname || '—'}</td>
-                                        <td class="px-4 py-2 text-center">${accountStatus}</td>
-                                        <td class="px-2 py-2 text-center flex justify-center gap-1">
-                                            <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                            <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                            <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                                        </td>
-                                    </tr>
-                                `;
-                                $("#visitorTableBody").append(row);
-                                break;
-
-                            case 'admin':
-                                row = `
-                                        <tr data-id="${user.user_id}">
-                                            <td class="px-4 py-2">${personalDetails.employee_id}</td>
-                                            <td class="px-4 py-2">${personalDetails.firstname} ${personalDetails.middlename} ${personalDetails.lastname}</td>
-                                            <td class="px-2 py-2">${authData.email || '—'}</td>
-                                            <td class="px-4 py-2 text-center">${personalDetails.admin_offices || '—'}</td>
-                                            <td class="px-4 py-2 text-center">${accountStatus}</td>
-                                            <td class="px-2 py-2 text-center flex justify-center gap-1">
-                                                <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                                <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                                <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                                            </td>
-                                        </tr>
-                                    `;
-                                $("#adminTableBody").append(row);
-                                break;
-                            case 'student':
-                                const studentRow = `
-                                    <tr data-id="${user.user_id}">
-                                        <td class="px-4 py-2 ">${personalDetails.student_id || '—'}</td>
-                                        <td class="px-4 py-2">${personalDetails.firstname} ${personalDetails.middlename} ${personalDetails.lastname}</td>
-                                        <td class="px-4 py-2">${personalDetails.course || '—'}</td>
-                                        <td class="px-4 py-2 text-center">${personalDetails.department || '—'}</td>
-                                        <td class="px-4 py-2 text-center">${accountStatus}</td>
-                                        <td class="px-2 py-2 text-center flex justify-center gap-1">
-                                            <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                            <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                            <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                                        </td>
-                                    </tr>
-                                `;
-                                $("#studentTableBody").append(studentRow);
-                                break;
-
-
-                            case 'faculty':
-                                const facultyRow = `
-                                        <tr data-id="${user.user_id}">
-                                            <td class="px-4 py-2">${personalDetails.employee_id || '—'}</td>
-                                            <td class="px-4 py-2">${personalDetails.firstname} ${personalDetails.middlename} ${personalDetails.lastname}</td>
-                                            <td class="px-4 py-2 ">${authData.email || '—'}</td>
-                                            <td class="px-4 py-2 text-center">${personalDetails.department || '—'}</td>
-                                            <td class="px-4 py-2 text-center">${accountStatus}</td>
-                                            <td class="px-2 py-2 text-center flex justify-center gap-1">
-                                                <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs">View</button>
-                                                <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs">Edit</button>
-                                                <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs">Delete</button>
-                                            </td>
-                                        </tr>
-                                    `;
-                                $("#facultyTableBody").append(facultyRow);
-                                break;
-                            default:
-                                break;
-                        }
-                    });
+                    activitiesTable.draw();
                 },
-
-                error: function (xhr) {
-                    console.error(xhr.responseText);
+                error(err) {
+                    console.error("Failed to fetch activities:", err);
                 }
             });
         }
 
 
-        // Load the users initially for the visitor tab (or any other tab as needed)
-        loadUsers();
 
-        // --- HANDLE USER ACTIONS (VIEW, EDIT, DELETE) ---
-        $(document).on("click", ".view-btn, .edit-btn, .delete-btn", function () {
-            const tr = $(this).closest("tr");
-            const userId = tr.data("id");
 
-            if ($(this).hasClass("view-btn")) {
-                viewUser(userId);
-            } else if ($(this).hasClass("edit-btn")) {
-                editUser(userId);
-            } else if ($(this).hasClass("delete-btn")) {
-                deleteUser(userId, tr);
-            }
+
+
+
+        const tableConfigs = {
+            approvalTable: {
+                order: [[2, "desc"]],
+                perPage: 10,
+                perPageSelect: [10, 20, 50]
+            },
+            visitorTable: {},
+            adminTable: {},
+            studentTable: {},
+            facultyTable: {}
+        };
+
+        const tables = {};
+
+        Object.entries(tableConfigs).forEach(([id, config]) => {
+            tables[id] = new DataTable(`#${id}`, {
+                searchable: true,
+                paging: true,
+                perPage: 10,
+                ...config
+            });
         });
 
-        // View User Details (example)
-        function viewUser(userId) {
-            // You can load user details in a modal or a dedicated view section
-            alert(`Viewing user with ID: ${userId}`);
-        }
+        Object.entries(tables).forEach(([key, table]) => {
+            $(`#${key}`).on("click", ".view-btn", function () {
+                const userId = $(this).data("id");
+                $("#viewModal").removeClass("hidden");
 
-        // Edit User (example)
-        function editUser(userId) {
-            // You can open a modal or form to edit user details
-            alert(`Editing user with ID: ${userId}`);
-        }
+                // Optional: load user data via AJAX
+                $.ajax({
+                    url: `${base_url}auth/action.php?action=GetUser&user_id=${userId}`,
+                    type: "GET",
+                    dataType: "json",
+                    success(res) {
+                        if (!res || res.status !== 1) return;
 
-        // Delete User (example)
-        function deleteUser(userId, tr) {
-            if (!confirm("Are you sure you want to delete this user?")) return;
-            // Send a request to delete the user
-            $.post(`${base_url}auth/action.php?action=DeleteUser`, { user_id: userId }, function (res) {
-                if (res.status === 1) {
-                    alert(res.message);
-                    tr.remove();
-                } else {
-                    alert(res.message);
+                       
+
+                        const personal = res.data.personal || {};
+                        const auth = res.data.auth || {};
+
+                        // Fill modal fields
+                        $("#viewfirstname").text(personal.firstname || "Not Fill up by registree");
+                        $("#viewlastname").text(personal.lastname || "Not Fill up by registree");
+                        $("#viewmiddlename").text(personal.middlename || "No Available Middle Name");
+                        $("#viewsuffix").text(personal.suffix || "Not Fill up by registree");
+                        $("#viewdepartment").text(personal.department || personal.admin_offices || personal.schoolname || "Not Fill up by registree");
+                        $("#viewstudent_id").text(personal.employee_id || personal.student_id || personal.admin_id || "Visitor ID Not Available");
+                        $("#viewcourse").text(personal.course || "No Course Available");
+                        $("#viewgender").text(personal.gender || "Not Fill up by registree");
+                        $("#viewEmail").text(auth.email || "Not Fill up by registree");
+                        $("#viewLogin").text(personal.library_id || "Generated ID has been Error");
+                        $("#viewStatus").text(auth.account_status || "—");
+
+                        // Profile picture
+                        if (personal.profile_pic) {
+                            $("#viewProfilePic").attr("src", base_url+ '/auth/'+ personal.profile_pic);
+                        } else {
+                            $("#viewProfilePic").attr("src", "../../assets/default-profile.png");
+                        }
+
+                        // Load activities into DataTable if needed
+                        if (res.activities && Array.isArray(res.activities)) {
+                            const activitiesTable = new DataTable("#activitiesTable");
+                            activitiesTable.clear();
+                            res.activities.forEach((act, idx) => {
+                                activitiesTable.row.add([
+                                    idx + 1,
+                                    act.book_title || "—",
+                                    act.start_time || "—",
+                                    act.end_time || "—",
+                                    act.remark || "—"
+                                ]);
+                            });
+                            activitiesTable.draw();
+                        }
+                    },
+                    error(err) {
+                        console.error(err);
+                    }
+                });
+
+                
+
+            });
+
+            $(`#${key}`).on("click", ".edit-btn", function () {
+                const id = $(this).data("id");
+                alert(`Edit: ${id}`);
+            });
+
+            $(`#${key}`).on("click", ".delete-btn", function () {
+                const id = $(this).data("id");
+                alert(`Delete: ${id}`);
+            });
+        });
+        // Close modal
+                $("#closeViewBtn, #closeViewBtn2").click(function () {
+                    $("#viewModal").addClass("hidden");
+                });
+
+
+        loadUsers();
+        function loadUsers() {
+            $.ajax({
+                url: `${base_url}auth/action.php?action=GetFaculty`,
+                type: "GET",
+                dataType: "json",
+                success(res) {
+                    if (res.status !== 1) return;
+
+                    // Clear all tables safely
+                    Object.values(tables).forEach(t => t.clear());
+
+                    res.data.forEach((user, index) => {
+                        const personal = JSON.parse(user.personal_details || "{}");
+                        const auth = JSON.parse(user.authentication_data || "{}");
+
+                        const role = auth.user_role;
+                        const status = (auth.account_status || "").toLowerCase();
+
+                        if (status === "declined") return;
+
+                        /* ===== PENDING USERS ===== */
+                        if (status === "pending") {
+                            tables.approvalTable.row.add([
+                                index + 1,
+                                `${personal.firstname} ${personal.lastname}`,
+                                auth.email || "—",
+                                role || "—",
+                                auth.account_status,
+                                actionButtons(user.user_id)
+                            ]);
+                            return;
+                        }
+
+                        /* ===== ROLE TABLE ROW ===== */
+                        const row = [
+                            personal.employee_id || personal.student_id || index + 1,
+                            `${personal.firstname} ${personal.middlename || ""} ${personal.lastname}`,
+                            auth.email || "—",
+                            personal.department || personal.course || "—",
+                            auth.account_status,
+                            actionButtons(user.user_id)
+                        ];
+
+                        switch (role) {
+                            case "visitor":
+                                tables.visitorTable.row.add(row);
+                                break;
+                            case "admin":
+                                tables.adminTable.row.add(row);
+                                break;
+                            case "student":
+                                tables.studentTable.row.add(row);
+                                break;
+                            case "faculty":
+                                tables.facultyTable.row.add(row);
+                                break;
+                        }
+                    });
+
+                    // Draw all tables once
+                    Object.values(tables).forEach(t => t.draw(false));
+                },
+                error(xhr) {
+                    console.error(xhr.responseText);
                 }
-            }, "json");
+            });
+
+            function actionButtons(userId) {
+                return `
+            <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs" data-id="${userId}">View</button>
+            <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs" data-id="${userId}">Edit</button>
+            <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs" data-id="${userId}">Delete</button>
+            `;
+            }
         }
+
     });
 
 

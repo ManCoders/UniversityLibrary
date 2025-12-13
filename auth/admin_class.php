@@ -2680,35 +2680,13 @@ class Action
         }
 
 
-        $action = $_POST['action'] ?? '';
-        $user_id = $_POST['user_id'] ?? '';
+        $action = $_POST['action'] ?? $_GET['action'];
 
 
         switch ($action) {
-            case 'GetFaculty':
-                try {
-                    $stmt = $this->db->prepare("SELECT * FROM user WHERE user_id = ?");
-                    $stmt->execute([$user_id]);
-                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                    if (!$row) {
-                        return json_encode(['status' => 0, 'message' => 'User not found.']);
-                    }
-
-                    $personal = json_decode($row['personal_details'], true) ?? [];
-                    $auth = json_decode($row['authentication_data'], true) ?? [];
-
-                    $data = array_merge($personal, $auth);
-
-                    return json_encode(['status' => 1, 'data' => $data]);
-                } catch (PDOException $e) {
-                    return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
-                }
-
-
             case 'GetUser':
                 try {
-                    $userId = $_POST['user_id'] ?? 0;
+                    $userId = $_POST['user_id'] ?? $_GET['user_id'];
                     $stmt = $this->db->prepare("SELECT * FROM user WHERE user_id = ?");
                     $stmt->execute([$userId]);
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
