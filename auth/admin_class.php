@@ -387,7 +387,7 @@ class Action
 
             // Determine redirect path
             $redirect = ($role === 'faculty') ? 'src/faculty/index.php' : './';
-            
+
 
             /* $_SESSION['user'] = [
                 'role' => $role,
@@ -658,14 +658,14 @@ class Action
         $auth_data = [
             'email' => $data['email'],
             'password' => $hashed_password,
-            'account_role' =>$role,
+            'account_role' => $role,
             'user_role' => 'student', //this is have 2 access, for faculty and student
             'account_status' => 'Pending'
         ];
 
         // ===== INSERT INTO DATABASE =====
-            try {
-                $stmt = $this->db->prepare("
+        try {
+            $stmt = $this->db->prepare("
                 INSERT INTO user (personal_details, authentication_data)
                 VALUES (?, ?)
             ");
@@ -2702,6 +2702,7 @@ class Action
 
                     return json_encode([
                         'status' => 1,
+                        'user_id' => $row['user_id'],
                         'data' => [
                             'personal' => $personal,
                             'auth' => $auth
@@ -2710,25 +2711,33 @@ class Action
                 } catch (PDOException $e) {
                     return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
                 }
-            case 'updateProfile':
+            case 'UpdateUser':
                 try {
-                    $userId = $_POST['user_id'] ?? 0;
+                    $userId = $_POST['user_id'] ?? $_GET['user_id'];
+                    $account_status = $_POST['account_status'] ?? $_GET['account_status'];
+
+                    if (!$userId || !$account_status) {
+                        return json_encode(['status' => 0, 'message' => 'User ID or account status missing']);
+                        
+                    }
 
                     $stmt = $this->db->prepare(
                         "UPDATE user 
-                            SET authentication_data = JSON_SET(authentication_data, '$.account_status', 'Approved') 
+                            SET authentication_data = JSON_SET(authentication_data, '$.account_status', ?)
                             WHERE user_id = ?"
                     );
-                    $stmt->execute([$userId]);
+                    $stmt->execute([$account_status, $userId]);
 
                     if ($stmt->rowCount() > 0) {
-                        return json_encode(['status' => 1, 'message' => 'User approved successfully']);
+                        return json_encode(['status' => 1, 'message' => "User status updated to $account_status"]);
                     } else {
-                        return json_encode(['status' => 0, 'message' => 'User not found or already approved']);
+                        return json_encode(['status' => 0, 'message' => 'No changes made or user not found']);
                     }
+
                 } catch (PDOException $e) {
                     return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
                 }
+
             case 'Approved':
                 try {
                     $userId = $_POST['user_id'] ?? 0;

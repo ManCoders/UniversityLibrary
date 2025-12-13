@@ -125,11 +125,8 @@ switch ($action) {
     case 'recently_viewed':
         echo $crud->usercrude();
         break;
-    /* case 'updateProfile':
+    case 'UpdateUser':
         echo $crud->usercrude();
-        break; */
-    case 'updateUser':
-        echo $crud->updatedetails();
         break;
     case 'get_activity_log':
         echo $crud->get_activity_log();

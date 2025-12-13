@@ -54,9 +54,7 @@
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Email</th>
-                    <th
-                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Gender</th>
+                    
 
                     <th
                         class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -125,7 +123,7 @@
 
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Course</th>
+                        Email</th>
                     <th
                         class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Department</th>
@@ -239,7 +237,12 @@
                         <img id="viewProfilePic" src="../../assets/default-profile.png" alt="Profile Preview"
                             class="w-full h-full object-cover">
                     </div>
-                    <p id="viewStatus" class="mt-4 text-sm font-bold text-indigo-600 dark:text-indigo-300">Pending</p>
+                    <select id="viewStatus" name="status"
+                        class="mt-2 w-50 mx-auto p-2 border rounded text-sm font-bold text-indigo-600 dark:text-indigo-600">
+                        <option value="Pending">Pending</option>
+                        <option value="approved">Approved</option>
+                    </select>
+
                 </div>
 
                 <!-- RIGHT SIDE -->
@@ -251,19 +254,23 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <p class="label">First Name</p>
-                                <p id="viewfirstname" class="value">John</p>
+                                <input type="text" id="viewfirstname" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
                             </div>
                             <div>
                                 <p class="label">Last Name</p>
-                                <p id="viewlastname" class="value">Doe</p>
+                                <input type="text" id="viewlastname" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
                             </div>
                             <div>
                                 <p class="label">Middle Name</p>
-                                <p id="viewmiddlename" class="value">Michael</p>
+                                <input type="text" id="viewmiddlename" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
                             </div>
                             <div>
                                 <p class="label">Suffix</p>
-                                <p id="viewsuffix" class="value">Jr.</p>
+                                <input type="text" id="viewsuffix" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
                             </div>
                         </div>
                     </div>
@@ -273,20 +280,24 @@
                         <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200 mb-2">Student Information</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <p class="label">Designation Address: </p>
-                                <p id="viewdepartment" class="value">Computer Science</p>
+                                <p class="label">Designation / Address</p>
+                                <input type="text" id="viewdepartment" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
                             </div>
                             <div>
                                 <p class="label">User ID</p>
-                                <p id="viewstudent_id" class="value">2025001</p>
+                                <input type="text" id="viewstudent_id" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
                             </div>
                             <div>
                                 <p class="label">Course</p>
-                                <p id="viewcourse" class="value">BSIT</p>
+                                <input type="text" id="viewcourse" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
                             </div>
                             <div>
                                 <p class="label">Gender</p>
-                                <p id="viewgender" class="value">Male</p>
+                                <input type="text" id="viewgender" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
                             </div>
                         </div>
                     </div>
@@ -297,16 +308,28 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <p class="label">Email</p>
-                                <p id="viewEmail" class="value">john.doe@example.com</p>
+                                <input type="email" id="viewEmail" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
                             </div>
                             <div>
                                 <p class="label">Login ID</p>
-                                <p id="viewLogin" class="value">johndoe</p>
+                                <input type="text" id="viewLogin" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
+                                <input type="hidden" id="user_id" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Modal footer for Save button -->
+                    <div class="flex justify-end gap-3 mt-4">
+                        <button id="UpdateBtn"
+                            class="px-4 py-2 bg-yellow-400 text-white rounded hover:bg-yellow-500">Update</button>
+
+                    </div>
+
                 </div>
+
             </div>
 
             <!-- ACTIVITIES TABLE -->
@@ -399,56 +422,6 @@
         activateTab(`.tab-panel`, '#view-content');
 
 
-
-
-        /* ================================
-   ACTIVITIES DATATABLE
-================================= */
-        const activitiesTable = new DataTable("#activitiesTable", {
-            fixedHeight: true,
-            searchable: true,
-            paging: true,
-            perPage: 10,
-            perPageSelect: [10, 20, 50],
-            order: [[2, "desc"]] // Date & Time DESC
-        });
-
-        function loadActivities(userId) {
-            if (!userId) return;
-
-            $.ajax({
-                url: `${base_url}auth/action.php?action=recently_viewed&user_id=${userId}`,
-                type: "GET",
-                dataType: "json",
-                success(res) {
-                    activitiesTable.clear();
-
-                    if (Array.isArray(res)) {
-                        res.forEach((item, index) => {
-                            activitiesTable.row.add([
-                                index + 1,
-                                item.book_title ?? "—",
-                                item.start_time ?? "—",
-                                item.end_time ?? "—",
-                                item.remark ?? "—"
-                            ]);
-                        });
-                    }
-
-                    activitiesTable.draw();
-                },
-                error(err) {
-                    console.error("Failed to fetch activities:", err);
-                }
-            });
-        }
-
-
-
-
-
-
-
         const tableConfigs = {
             approvalTable: {
                 order: [[2, "desc"]],
@@ -485,33 +458,35 @@
                     success(res) {
                         if (!res || res.status !== 1) return;
 
-                       
+
 
                         const personal = res.data.personal || {};
                         const auth = res.data.auth || {};
 
                         // Fill modal fields
-                        $("#viewfirstname").text(personal.firstname || "Not Fill up by registree");
-                        $("#viewlastname").text(personal.lastname || "Not Fill up by registree");
-                        $("#viewmiddlename").text(personal.middlename || "No Available Middle Name");
-                        $("#viewsuffix").text(personal.suffix || "Not Fill up by registree");
-                        $("#viewdepartment").text(personal.department || personal.admin_offices || personal.schoolname || "Not Fill up by registree");
-                        $("#viewstudent_id").text(personal.employee_id || personal.student_id || personal.admin_id || "Visitor ID Not Available");
-                        $("#viewcourse").text(personal.course || "No Course Available");
-                        $("#viewgender").text(personal.gender || "Not Fill up by registree");
-                        $("#viewEmail").text(auth.email || "Not Fill up by registree");
-                        $("#viewLogin").text(personal.library_id || "Generated ID has been Error");
-                        $("#viewStatus").text(auth.account_status || "—");
+                        $("#viewfirstname").val(personal.firstname || "Not Fill up by registree");
+                        $("#viewlastname").val(personal.lastname || "Not Fill up by registree");
+                        $("#viewmiddlename").val(personal.middlename || "No Available Middle Name");
+                        $("#viewsuffix").val(personal.suffix || "Not Fill up by registree");
+                        $("#viewdepartment").val(personal.department || personal.admin_offices || personal.schoolname || "Not Fill up by registree");
+                        $("#viewstudent_id").val(personal.employee_id || personal.student_id || personal.admin_id || "Visitor ID Not Available");
+                        $("#viewcourse").val(personal.course || "No Course Available");
+                        $("#viewgender").val(personal.gender || "Not Fill up by registree");
+                        $("#viewEmail").val(auth.email || "Not Fill up by registree");
+                        $("#viewLogin").val(personal.library_id || "Generated ID has been Error");
+                        $("#viewStatus").val(auth.account_status || "—");
+                        $("#user_id").val(res.user_id);
 
                         // Profile picture
                         if (personal.profile_pic) {
-                            $("#viewProfilePic").attr("src", base_url+ '/auth/'+ personal.profile_pic);
+                            $("#viewProfilePic").attr("src", base_url + '/auth/' + personal.profile_pic);
                         } else {
                             $("#viewProfilePic").attr("src", "../../assets/default-profile.png");
                         }
 
                         // Load activities into DataTable if needed
                         if (res.activities && Array.isArray(res.activities)) {
+                            
                             const activitiesTable = new DataTable("#activitiesTable");
                             activitiesTable.clear();
                             res.activities.forEach((act, idx) => {
@@ -530,25 +505,37 @@
                         console.error(err);
                     }
                 });
-
-                
-
             });
+        });
 
-            $(`#${key}`).on("click", ".edit-btn", function () {
-                const id = $(this).data("id");
-                alert(`Edit: ${id}`);
-            });
-
-            $(`#${key}`).on("click", ".delete-btn", function () {
-                const id = $(this).data("id");
-                alert(`Delete: ${id}`);
+        $("#UpdateBtn").click(function () {
+            const account_status = $("#viewStatus").val();
+            const user_id = $("#user_id").val();
+            // alert(user_id)
+            $.ajax({
+                url: `${base_url}auth/action.php?action=UpdateUser&user_id=${user_id}&account_status=${account_status}`,
+                type: "GET",
+                dataType: "json",
+                success(res) {
+                    if (res.status === 1) {
+                        alert("User updated successfully!");
+                        loadUsers();    
+                        $("#viewModal").addClass("hidden");
+                    } else {
+                        alert(res.message || "Failed to update user.");
+                        $("#viewModal").addClass("hidden");
+                    }
+                },
+                error(xhr, status, err) {
+                    console.error(xhr.responseText);
+                    alert("Server error while updating user.");
+                }
             });
         });
         // Close modal
-                $("#closeViewBtn, #closeViewBtn2").click(function () {
-                    $("#viewModal").addClass("hidden");
-                });
+        $("#closeViewBtn, #closeViewBtn2").click(function () {
+            $("#viewModal").addClass("hidden");
+        });
 
 
         loadUsers();
@@ -567,7 +554,7 @@
                         const personal = JSON.parse(user.personal_details || "{}");
                         const auth = JSON.parse(user.authentication_data || "{}");
 
-                        const role = auth.user_role;
+                        const role = auth.account_role;
                         const status = (auth.account_status || "").toLowerCase();
 
                         if (status === "declined") return;
@@ -588,9 +575,9 @@
                         /* ===== ROLE TABLE ROW ===== */
                         const row = [
                             personal.employee_id || personal.student_id || index + 1,
-                            `${personal.firstname} ${personal.middlename || ""} ${personal.lastname}`,
+                            ` ${personal.lastname}, ${personal.firstname} ${personal.middlename || ""}`,
                             auth.email || "—",
-                            personal.department || personal.course || "—",
+                            personal.department || personal.course || personal.schoolname || "—",
                             auth.account_status,
                             actionButtons(user.user_id)
                         ];
@@ -621,9 +608,7 @@
 
             function actionButtons(userId) {
                 return `
-            <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs" data-id="${userId}">View</button>
-            <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs" data-id="${userId}">Edit</button>
-            <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs" data-id="${userId}">Delete</button>
+            <button class="view-btn mx-auto bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 text-xs" data-id="${userId}">View</button>
             `;
             }
         }
