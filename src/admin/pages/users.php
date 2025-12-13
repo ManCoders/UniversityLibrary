@@ -54,7 +54,7 @@
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Email</th>
-                    
+
 
                     <th
                         class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -219,7 +219,7 @@
         <!-- MODAL HEADER -->
         <div
             class="flex items-center justify-between p-4 border-b border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Profile Overview</h2>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Profile Inforamtion</h2>
             <button id="closeViewBtn"
                 class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-lg font-bold">✕</button>
         </div>
@@ -242,7 +242,15 @@
                         <option value="Pending">Pending</option>
                         <option value="approved">Approved</option>
                     </select>
+                    <div class="mt-3 text-center grid grid-cols-1 sm:grid-cols-2">
+                        <div>
+                            <p class="label" >Created Account:</p>
+                        </div>
+                        <div>
+                            <p class="label" id="created_at">--</p>
+                        </div>
 
+                    </div>
                 </div>
 
                 <!-- RIGHT SIDE -->
@@ -363,28 +371,6 @@
 
     </div>
 
-    <!-- DataTables Libraries -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" />
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
-
-    <script>
-        $(document).ready(function () {
-            // Initialize DataTable
-
-
-            // --- VIEW, EDIT, DELETE ACTIONS ---
-            $(document).on("click", ".view-btn, .edit-btn, .delete-btn", function () {
-                const tr = $(this).closest("tr");
-                const userId = tr.data("id");
-
-                if ($(this).hasClass("view-btn")) loadActivities(userId);
-                else if ($(this).hasClass("edit-btn")) editUser(userId);
-                else if ($(this).hasClass("delete-btn")) deleteUser(userId, tr);
-            });
-
-
-        });
-    </script>
 
 </div>
 
@@ -417,9 +403,7 @@
         $('#tab-faculty').click(() => activateTab('#tab-faculty', '#faculty-table-content'));
         $('#tab-approval').click(() => activateTab('#tab-approval', '#approval-table-content'));
 
-        // Initial Tab: Load the "Visitor Table" by default
-        // activateTab('#tab-visitor', '#visitor-table-content');
-        activateTab(`.tab-panel`, '#view-content');
+        activateTab(`.tab-panel`, '#approval-table-content');
 
 
         const tableConfigs = {
@@ -476,6 +460,7 @@
                         $("#viewLogin").val(personal.library_id || "Generated ID has been Error");
                         $("#viewStatus").val(auth.account_status || "—");
                         $("#user_id").val(res.user_id);
+                        $("#created_at").text(res.created_date);
 
                         // Profile picture
                         if (personal.profile_pic) {
@@ -486,7 +471,7 @@
 
                         // Load activities into DataTable if needed
                         if (res.activities && Array.isArray(res.activities)) {
-                            
+
                             const activitiesTable = new DataTable("#activitiesTable");
                             activitiesTable.clear();
                             res.activities.forEach((act, idx) => {
@@ -519,7 +504,7 @@
                 success(res) {
                     if (res.status === 1) {
                         alert("User updated successfully!");
-                        loadUsers();    
+                        loadUsers();
                         $("#viewModal").addClass("hidden");
                     } else {
                         alert(res.message || "Failed to update user.");
@@ -577,7 +562,7 @@
                             personal.employee_id || personal.student_id || index + 1,
                             ` ${personal.lastname}, ${personal.firstname} ${personal.middlename || ""}`,
                             auth.email || "—",
-                            personal.department || personal.course || personal.schoolname || "—",
+                            personal.department || personal.course || personal.schoolname || personal.admin_offices || "—",
                             auth.account_status,
                             actionButtons(user.user_id)
                         ];

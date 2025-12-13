@@ -310,13 +310,11 @@ class Action
 
             $stmt = $this->db->prepare("
             SELECT * FROM user 
-            WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) = ? 
-                OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ? 
-               OR JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.student_id')) = ?
-               OR JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.employee_id')) = ?
+            WHERE JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.library_id')) = ? 
+                OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ?
             LIMIT 1
                 ");
-            $stmt->execute([$username, $username, $username, $username]);
+            $stmt->execute([ $username, $username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
@@ -352,7 +350,7 @@ class Action
 
 
             $role = strtolower($auth['user_role'] ?? '');
-            $validRoles = ['faculty', 'student', 'admin', 'visitor'];
+            $validRoles = ['faculty', 'student', 'admin_office', 'visitor'];
 
             if (!in_array($role, $validRoles)) {
 
@@ -530,7 +528,7 @@ class Action
         }
 
         $role = strtolower($input['role']);
-        $validRoles = ['student', 'faculty', 'visitor', 'admin'];
+        $validRoles = ['student', 'faculty', 'visitor', 'admin_office'];
 
         if (!in_array($role, $validRoles)) {
             return json_encode(['status' => 0, 'message' => 'Invalid role']);
@@ -2703,6 +2701,7 @@ class Action
                     return json_encode([
                         'status' => 1,
                         'user_id' => $row['user_id'],
+                        'created_date'=>$row['created_date'],
                         'data' => [
                             'personal' => $personal,
                             'auth' => $auth

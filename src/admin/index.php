@@ -6,7 +6,7 @@ $page = 'dashboard'; // default page
 
 if (isset($_GET['page']) && in_array($_GET['page'], $allowed_pages)) {
   $page = $_GET['page'];
-  
+
 }
 if (!isset($_SESSION['admin'])) {
   http_response_code(404);
@@ -80,7 +80,6 @@ if (!isset($_SESSION['admin'])) {
       initializeSidebarToggle();
     });
   </script>
-
 
 
   <!-- Sidebar and Overlay Containers -->

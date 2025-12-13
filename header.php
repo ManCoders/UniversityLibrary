@@ -18,7 +18,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <?php render_styles(); ?>
     <?php render_scripts(); ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    
+
 
     <script>
         var base_url = '<?php echo base_url() ?>';
@@ -27,7 +27,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
         // Tailwind config
         tailwind.config = {
-            
+
             darkMode: "class",
             theme: {
                 extend: {
@@ -123,12 +123,12 @@ if (session_status() === PHP_SESSION_NONE) {
 
         // Detect activity
         function resetTimer() {
-            inactivityTime = 0;      
+            inactivityTime = 0;
             clearTimeout(idleTimeout);
 
             idleTimeout = setTimeout(() => {
                 startIdleCountdown();
-            }, 2000); 
+            }, 2000);
         }
 
         function startIdleCountdown() {
@@ -172,6 +172,11 @@ if (session_status() === PHP_SESSION_NONE) {
 
 </head>
 
+
+<!-- DataTables Libraries -->
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" />
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
     <div id="upload-spinner" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center hidden z-50">
         <div class="loader border-4 border-t-4 border-blue-500 rounded-full w-12 h-12 animate-spin"></div>
@@ -179,8 +184,9 @@ if (session_status() === PHP_SESSION_NONE) {
 
     <style>
         input:not([type="password"]) {
-    text-transform: uppercase;
-}
+            text-transform: uppercase;
+        }
+
         .loader {
             border-top-color: #3498db;
             border-right-color: transparent;

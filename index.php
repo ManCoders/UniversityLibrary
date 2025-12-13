@@ -552,7 +552,7 @@
                     <!-- ROLE SELECTOR -->
                     <div class="flex gap-3 justify-center mb-2">
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="role" value="admin" class="accent-[#b03060]"> Admin
+                            <input type="radio" name="role" value="admin_office" class="accent-[#b03060]"> Admin
                         </label>
                         <label class="flex items-center gap-2">
                             <input type="radio" name="role" value="faculty" class="accent-[#b03060]"> Faculty
@@ -759,7 +759,7 @@
                 else if (role === 'visitor') {
                     $('#visitor-fields').removeClass('hidden');
                 }
-                else if (role === 'admin') {
+                else if (role === 'admin_office') {
                     $('#admin-fields').removeClass('hidden');
                     $("#zppsu_offices").removeClass('hideen');
                 }
@@ -870,7 +870,6 @@
                         if ($(this).is(":checked")) {
                             formDataObj[name] = $(this).val();
                         } else if (!(name in formDataObj)) {
-                            // Ensure name exists in object (so we can check required later)
                             formDataObj[name] = null;
                         }
                         return;
