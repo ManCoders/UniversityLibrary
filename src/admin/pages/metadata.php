@@ -2,6 +2,9 @@
     List of References
 </h1>
 
+<!-- DataTables Libraries -->
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" />
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 <!-- Tabs Navigation -->
 <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
     <nav class="flex items-center justify-between">
@@ -18,13 +21,6 @@
                 Metadata Table
             </button>
         </div>
-
-        <!-- Search -->
-        <div class="flex items-center">
-            <input id="searchBooks" type="text" placeholder="Search books"
-                class="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 rounded-lg px-3 py-1 w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-        </div>
-
 
     </nav>
 </div>
@@ -52,7 +48,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-1 gap-6 mt-4">
             <div class="border p-4 rounded-md flex flex-col">
                 <ul id="folder-list" class="space-y-2 text-sm text-gray-800 dark:text-gray-100">
-                    
+
                 </ul>
             </div>
         </div>
@@ -60,18 +56,17 @@
     <!-- METADATA TABLE -->
     <div id="metadata-table-content" class="tab-panel hidden ">
         <div class="overflow-x-auto max-h-96 ">
-            <table class="w-full border-collapse bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
+            <table id="metadataTable"
+                class="w-full border-collapse bg-white dark:bg-gray-800 rounded-xl shadow-lg text-xs">
                 <thead class=" bg-gray-50 dark:bg-gray-700 top-0 z-10">
                     <tr>
                         <th
                             class="w-[5%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             #</th>
-                        <th
-                            class="w-[15%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Book&nbsp;ID</th>
+                        
                         <th
                             class="w-[25%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Title</th>
+                            Book Title</th>
                         <th
                             class="w-[20%] px-2 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Author</th>
@@ -81,9 +76,7 @@
                         <th
                             class="w-[15%] px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             CopyRight</th>
-                        <th
-                            class="w-[15%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Folder</th>
+                        
 
                         <th
                             class="w-[20%] px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -169,8 +162,8 @@
                     <p><span class="font-semibold">Author:</span> <span id="viewMetaAuthor">—</span></p>
                     <p><span class="font-semibold">ISBN:</span> <span id="viewMetaISBN">—</span></p>
                     <p><span class="font-semibold">Folder:</span> <span id="viewMetaFolder">—</span></p>
-                    <p><span class="font-semibold">Filename:</span> <span id="viewMetaFilename">—</span></p>
-                    <p><span class="font-semibold">Metadata:</span></p>
+                    <p><span class="font-semibold">Copyright:</span> <span id="viewcopyright">—</span></p>
+                    <p><span class="font-semibold">Metadata:</span> <span id="viewMetaFilename">—</span></p>
                     <pre id="viewMetaOther"
                         class="bg-gray-100 dark:bg-gray-700 p-2 rounded max-h-48 overflow-auto whitespace-pre-wrap break-words text-sm"></pre>
                 </div>
@@ -216,7 +209,7 @@
                 <option value="School of Business Administration">School of Business Administration</option>
                 <option value="College of Teacher Education">College of Teacher Education</option>
             </select>
-            
+
             <div class="flex justify-end gap-2">
                 <button id="cancel-folder-btn"
                     class="px-3 py-1 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-md text-sm">Cancel</button>
@@ -651,12 +644,6 @@
 
             /* METADATA FILE HERE */
 
-            // Initial load
-            $("#searchBooks").on("keyup", function () {
-                const q = $(this).val();
-                loadMetadata(q);
-            });
-
             loadMetadata();
             function loadMetadata(query = "") {
                 $.ajax({
@@ -668,49 +655,63 @@
                             alert(res.message || "Failed to load metadata");
                             return;
                         }
-                        const $tbody = $("#metadatafile").empty();
 
+                        // Destroy previous DataTable if initialized
+                        if ($.fn.DataTable.isDataTable("#metadataTable")) {
+                            $("#metadataTable").DataTable().destroy();
+                        }
+
+                        const $tbody = $("#metadatafile").empty();
                         const q = query.toLowerCase();
 
+                        // Filter and create rows
                         res.data
                             .filter(item => {
                                 return (
                                     item.title?.toLowerCase().includes(q) ||
                                     item.author?.toLowerCase().includes(q) ||
                                     item.book_id?.toLowerCase().includes(q) ||
-                                    item.foldername?.toLowerCase().includes(q) ||
                                     item.isbn?.toLowerCase().includes(q)
                                 );
-                            }).forEach((item, index) => {
-                                const bookId = item.book_id && item.book_id.trim() !== '' ? item.book_id : '—';
-                                const folder = item.foldername && item.foldername.trim() !== '' ? item.foldername : '—';
-                                const title = item.title && item.title.trim() !== '' ? item.title : '—';
-                                const author = item.author && item.author.trim() !== '' ? item.author : '—';
-                                const isbn = item.isbn && item.isbn.trim() !== '' ? item.isbn : '—';
-                                const copyright = item.copyright
-                                    ? item.copyright.trim().match(/\d{4}/)?.[0] || '—'
-                                    : '—';
-
+                            })
+                            .forEach((item, index) => {
+                                const bookId = item.book_id?.trim() || '—';
+                                const title = item.title?.trim() || '—';
+                                const author = item.author?.trim() || '—';
+                                const isbn = item.isbn?.trim() || '—';
+                                const copyright = item.copyright?.trim().match(/\d{4}/)?.[0] || '—';
 
                                 const row = `
                                         <tr>
                                             <td class="px-4 py-2 text-center">${index + 1}</td>
-                                            <td class="px-4 py-2 truncate max-w-xs" title="${bookId}">${bookId}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${title}">${title}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${author}">${author}</td>
                                             <td class="px-4 py-2 truncate max-w-xs" title="${isbn}">${isbn}</td>
-                                            <td class="px-4 py-2 truncate max-w-xs text-center" title="${copyright}">${copyright}</td>
-                                            <td class="px-4 py-2 truncate max-w-xs" title="${folder}">${folder}</td>
+                                            <td class="px-4 py-2 text-center truncate max-w-xs" title="${copyright}">${copyright}</td>
+                                            
                                             <td class="px-4 py-2 text-center flex justify-center gap-1">
-                                                <button class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs view-btn" data-id="${bookId}">View</button>
-                                                <button class="bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs edit-btn" data-id="${bookId}">Edit</button>
-                                                <button class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs delete-btn" data-id="${bookId}">Delete</button>
+                                                <button class="view-btn bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 text-xs" data-id="${bookId}">View</button>
+                                                <button class="edit-btn bg-yellow-400 text-white px-2 py-1 rounded hover:bg-yellow-500 text-xs" data-id="${bookId}">Edit</button>
+                                                <button class="delete-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600 text-xs" data-id="${bookId}">Delete</button>
                                             </td>
                                         </tr>
-                                        `;
+                                    `;
 
                                 $tbody.append(row);
                             });
+
+                        // Initialize DataTable
+                        $("#metadataTable").DataTable({
+                            searching: true,
+                            paging: true,
+                            ordering: true,
+                            info: true,
+                            lengthMenu: [10, 20, 50],
+                            pageLength: 10,
+                            columnDefs: [
+                                { orderable: false, targets: 4 } // Disable ordering on Actions column
+                            ]
+                        });
                     },
                     error: function () {
                         alert("Server error while loading metadata");
@@ -729,9 +730,8 @@
                     $("#upload-spinner").removeClass("hidden");
 
                     $.ajax({
-                        url: base_url + "auth/action.php?action=viewmeta",
-                        method: "POST",
-                        data: { book_id: bookId },
+                        url: base_url + `auth/action.php?action=viewmeta&book_id=${bookId}`,
+                        method: "GET",
                         dataType: "json",
                         success: function (res) {
                             if (res.status === 1) {
@@ -753,14 +753,20 @@
                                     rawTitle = rawTitle.replace(/\s*\([^)]+\)\s*$/, "").trim();
                                 }
 
+                                const formatDate = (dt) => {
+                                    if (!dt) return "—";
+                                    return new Date(dt).toISOString().split("T")[0];
+                                };
+
                                 $("#viewMetaTitle").text(rawTitle);
-                                $("#viewMetaAuthor").text(meta.Author || meta.author || extractedAuthor || "—");
+                                $("#viewMetaAuthor").text(meta.Author || meta.author || extractedAuthor || meta['Creator'] || "—");
 
                                 // ISBN, Folder, Filename
 
                                 $("#viewMetaISBN").text(meta["prism:isbn"]?.ISBN || meta["pdfx:isbn"] || meta["dc:identifier"] || meta["isbn"] || "—");
                                 $("#viewMetaFolder").text(data.foldername || "—");
                                 $("#viewMetaFilename").text(data.filename || "—");
+                                $("#viewcopyright").text(formatDate(meta['dc:date'] ?? meta['xmp:createdate']));
 
                                 // Other metadata
                                 let otherMeta = "";

@@ -46,7 +46,7 @@ function base_url()
 {
     // Detect protocol (HTTP or HTTPS)
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-    $local_ips = ['127.0.0.1', '::1', '192.168.1.117'];
+    $local_ips = ['127.0.0.1', '::1', '192.168.1.117','192.168.1.6'];
 
     // If running locally
     if (in_array($_SERVER['REMOTE_ADDR'], $local_ips)) {
@@ -85,7 +85,7 @@ function render_installer_styles()
 
     $styles = [
         base_url() . 'assets/css/all-tailwind-classes-full-min.css',
-        // base_url() . 'assets/css/dataTables.dataTables.min.css'
+        base_url() . 'assets/css/dataTables.dataTables.min.css'
     ];
 
     foreach ($styles as $style) {
@@ -102,7 +102,7 @@ function render_scripts()
         base_url() . 'assets/js/sweetalert.min.js',
         base_url() . 'assets/js/main.js',
         base_url() . 'assets/js/tailwind.js',
-        // base_url() . 'assets/js/dataTables.min.js',
+        base_url() . 'assets/js/dataTables.min.js',
         base_url() . 'assets/js/tailwindcss.js',
         base_url() . 'assets/js/landingpage.js',
         base_url() . 'assets/js/lucide.js'/* ,

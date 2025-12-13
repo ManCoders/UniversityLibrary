@@ -314,7 +314,7 @@ class Action
                 OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ?
             LIMIT 1
                 ");
-            $stmt->execute([ $username, $username]);
+            $stmt->execute([$username, $username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
@@ -350,7 +350,7 @@ class Action
 
 
             $role = strtolower($auth['user_role'] ?? '');
-            $validRoles = ['faculty', 'student', 'admin_office', 'visitor'];
+            $validRoles = ['faculty', 'student', 'admin', 'visitor'];
 
             if (!in_array($role, $validRoles)) {
 
@@ -1448,7 +1448,7 @@ class Action
     // View metadata
     function viewmeta()
     {
-        $bookId = $_POST['book_id'] ?? '';
+        $bookId = $_POST['book_id'] ?? $_GET['book_id'] ?? '';
         if (!$bookId) {
             return json_encode(['status' => 0, 'message' => 'Book ID not provided']);
         }
@@ -2685,31 +2685,108 @@ class Action
             case 'GetUser':
                 try {
                     $userId = $_POST['user_id'] ?? $_GET['user_id'];
-                    $stmt = $this->db->prepare("SELECT * FROM user WHERE user_id = ?");
+
+                    /* ===== USER + AGGREGATES ===== */
+                    $stmt = $this->db->prepare("
+                        SELECT 
+                            u.user_id,
+                            u.personal_details,
+                            u.authentication_data,
+                            u.created_date,
+
+                            COUNT(DISTINCT rl.id) AS total_books_read,
+                            COALESCE(SUM(rl.total_read_time), 0) AS total_read_time,
+                            COUNT(DISTINCT ul.log_id) AS total_logs
+                        FROM user u
+                        LEFT JOIN reading_logs rl ON rl.user_id = u.user_id
+                        LEFT JOIN user_logs ul ON ul.user_id = u.user_id
+                        WHERE u.user_id = ?
+                        GROUP BY u.user_id
+                    ");
                     $stmt->execute([$userId]);
                     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
                     if (!$row) {
-                        return json_encode(['status' => 0, 'message' => 'User not found.']);
+                        return json_encode([
+                            'status' => 0,
+                            'message' => 'User not found.'
+                        ]);
                     }
 
                     $personal = json_decode($row['personal_details'], true) ?? [];
                     $auth = json_decode($row['authentication_data'], true) ?? [];
 
-                    $data = array_merge($personal, $auth);
+                    /* ===== ACTIVITY TIMELINE ===== */
+                    $stmt = $this->db->prepare("
+                            SELECT 
+                                'reading' AS type,
+                                rl.book_title,
+                                rl.start_time,
+                                rl.end_time,
+                                rl.total_read_time,
+                                rl.count_user,
+                                rl.created_at AS activity_time
+                            FROM reading_logs rl
+                            WHERE rl.user_id = ?
 
+                            UNION ALL
+
+                            SELECT
+                                'log' AS type,
+                                ul.activity AS book_title,
+                                ul.log_time AS start_time,
+                                NULL AS end_time,
+                                NULL AS end_time,
+                                NULL AS total_read_time,
+                                ul.log_time AS activity_time
+                            FROM user_logs ul
+                            WHERE ul.user_id = ?
+
+                            ORDER BY activity_time DESC
+                            LIMIT 100
+                        ");
+                    $stmt->execute([$userId, $userId]);
+                    $activities = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+                    function formatDuration($seconds)
+                    {
+                        if ($seconds < 60) {
+                            return $seconds . ' sec';
+                        } elseif ($seconds < 3600) {
+                            $minutes = floor($seconds / 60);
+                            $secs = $seconds % 60;
+                            return "{$minutes} min {$secs} sec";
+                        } else {
+                            $hours = floor($seconds / 3600);
+                            $minutes = floor(($seconds % 3600) / 60);
+                            return "{$hours} hr {$minutes} min";
+                        }
+                    }
+                    /* ===== FINAL RESPONSE ===== */
                     return json_encode([
                         'status' => 1,
                         'user_id' => $row['user_id'],
-                        'created_date'=>$row['created_date'],
+                        'created_date' => $row['created_date'],
+                        'stats' => [
+                            'total_books_read' => (int) $row['total_books_read'],
+                            'total_read_time' => formatDuration($row['total_read_time']),
+                            'total_logs' => (int) $row['total_logs'],
+                        ],
                         'data' => [
                             'personal' => $personal,
                             'auth' => $auth
-                        ]
+                        ],
+                        'activities' => $activities
                     ]);
+
                 } catch (PDOException $e) {
-                    return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
+                    return json_encode([
+                        'status' => 0,
+                        'message' => 'Database error: ' . $e->getMessage()
+                    ]);
                 }
+
             case 'UpdateUser':
                 try {
                     $userId = $_POST['user_id'] ?? $_GET['user_id'];
@@ -2717,7 +2794,7 @@ class Action
 
                     if (!$userId || !$account_status) {
                         return json_encode(['status' => 0, 'message' => 'User ID or account status missing']);
-                        
+
                     }
 
                     $stmt = $this->db->prepare(

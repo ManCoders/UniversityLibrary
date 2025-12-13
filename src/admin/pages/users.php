@@ -1,6 +1,9 @@
 <h1 class="text-3xl font-extrabold text-gray-800 dark:text-gray-100 mb-6 border-b dark:border-gray-700 pb-2">
     User Management Overview
 </h1>
+<!-- DataTables Libraries -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" />
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 <!-- Tabs for Adding Accounts / Dashboard -->
 <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
     <div class="flex justify-between items-center">
@@ -244,7 +247,7 @@
                     </select>
                     <div class="mt-3 text-center grid grid-cols-1 sm:grid-cols-2">
                         <div>
-                            <p class="label" >Created Account:</p>
+                            <p class="label">Created Account:</p>
                         </div>
                         <div>
                             <p class="label" id="created_at">--</p>
@@ -350,9 +353,10 @@
                             <tr>
                                 <th>#</th>
                                 <th>Book Title</th>
-                                <th>Date & Time</th>
-                                <th>End Time / Consumed Reading</th>
-                                <th>Remark</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Total Time Used:</th>
+                                <th>Counted:</th>
                             </tr>
                         </thead>
                         <tbody id="studentActivitiesBody" class="divide-y divide-gray-200 dark:divide-gray-700"></tbody>
@@ -371,9 +375,7 @@
 
     </div>
 
-    <!-- DataTables Libraries -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" />
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+    
 </div>
 
 
@@ -386,7 +388,6 @@
 
         // --- TAB MANAGEMENT ---
         function activateTab(tabId, contentId) {
-            // Hide all panels and remove active class from all tab buttons
             tabPanels.addClass('hidden');
             tabButtons
                 .removeClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
@@ -472,21 +473,75 @@
                         }
 
                         // Load activities into DataTable if needed
-                        if (res.activities && Array.isArray(res.activities)) {
+                        // Reuse instance if already created
+                        let activitiesTable;
 
-                            const activitiesTable = new DataTable("#activitiesTable");
-                            activitiesTable.clear();
-                            res.activities.forEach((act, idx) => {
-                                activitiesTable.row.add([
-                                    idx + 1,
-                                    act.book_title || "—",
-                                    act.start_time || "—",
-                                    act.end_time || "—",
-                                    act.remark || "—"
-                                ]);
-                            });
-                            activitiesTable.draw();
+                        if (!activitiesTable) {
+                            activitiesTable = new DataTable("#activitiesTable");
                         }
+
+                        activitiesTable.clear();
+                        const formatDate = (dt) => {
+                            if (!dt) return "—";
+                            return new Date(dt).toISOString().split("T")[0];
+                        };
+                        function formatDuration(seconds) {
+                            seconds = parseInt(seconds, 10);
+
+                            if (!seconds || seconds <= 0) return "0 sec";
+
+                            if (seconds < 60) {
+                                return `${seconds} sec`;
+                            }
+
+                            if (seconds < 3600) {
+                                const minutes = Math.floor(seconds / 60);
+                                const secs = seconds % 60;
+                                return secs > 0
+                                    ? `${minutes} min ${secs} sec`
+                                    : `${minutes} min`;
+                            }
+
+                            const hours = Math.floor(seconds / 3600);
+                            const minutes = Math.floor((seconds % 3600) / 60);
+
+                            return minutes > 0
+                                ? `${hours} hr ${minutes} min`
+                                : `${hours} hr`;
+                        }
+
+                        function formatTimeOnly(datetime) {
+                            if (!datetime) return "—";
+
+                            const date = new Date(datetime);
+                            if (isNaN(date)) return "—";
+
+                            return date.toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            });
+                        }
+
+
+                        if (Array.isArray(res.activities) && res.activities.length) {
+                            res.activities
+                                .filter(act => act.type === "reading")
+                                .forEach((act, idx) => {
+                                    activitiesTable.row.add([
+                                        idx + 1,
+                                        act.book_title || "—",
+                                        formatDate(act.start_time),
+                                        act.start_time ? formatTimeOnly(act.start_time) : "—",
+                                        formatDuration(act.total_read_time || "—"),
+                                        act.type === "reading"
+                                            ? ` ${act.count_user || 0} times`
+                                            : act.type.toUpperCase()
+                                    ]);
+                                });
+                        }
+
+                        activitiesTable.draw(false);
+
                     },
                     error(err) {
                         console.error(err);
@@ -560,34 +615,32 @@
                         }
 
                         /* ===== ROLE TABLE ROW ===== */
+                        const libraryOrDepartment = personal.schoolname || personal.department || personal.admin_offices || personal.course || "—";
                         const row = [
                             personal.employee_id || personal.student_id || index + 1,
-                            ` ${personal.lastname}, ${personal.firstname} ${personal.middlename || ""}`,
+                            `${personal.lastname}, ${personal.firstname} ${personal.middlename || ""}`,
                             auth.email || "—",
-                            personal.department || personal.course || personal.schoolname || personal.admin_offices || "—",
+                            libraryOrDepartment, // <-- library or department name dynamically
                             auth.account_status,
                             actionButtons(user.user_id)
                         ];
 
-                        switch (role) {
-                            case "visitor":
-                                tables.visitorTable.row.add(row);
-                                break;
-                            case "admin_office":
-                                tables.adminTable.row.add(row);
-                                break;
-                            case "student":
-                                tables.studentTable.row.add(row);
-                                break;
-                            case "faculty":
-                                tables.facultyTable.row.add(row);
-                                break;
-                        }
+                        // Map role to table
+                        const roleTableMap = {
+                            visitor: tables.visitorTable,
+                            admin_office: tables.adminTable,
+                            student: tables.studentTable,
+                            faculty: tables.facultyTable
+                        };
+
+                        const tableToUse = roleTableMap[role];
+                        if (tableToUse) tableToUse.row.add(row);
                     });
 
                     // Draw all tables once
                     Object.values(tables).forEach(t => t.draw(false));
                 },
+
                 error(xhr) {
                     console.error(xhr.responseText);
                 }
