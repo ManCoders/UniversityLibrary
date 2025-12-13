@@ -63,7 +63,7 @@
                         <th
                             class="w-[5%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             #</th>
-                        
+
                         <th
                             class="w-[25%] px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             Book Title</th>
@@ -76,7 +76,7 @@
                         <th
                             class="w-[15%] px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                             CopyRight</th>
-                        
+
 
                         <th
                             class="w-[20%] px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -163,7 +163,7 @@
                     <p><span class="font-semibold">ISBN:</span> <span id="viewMetaISBN">—</span></p>
                     <p><span class="font-semibold">Folder:</span> <span id="viewMetaFolder">—</span></p>
                     <p><span class="font-semibold">Copyright:</span> <span id="viewcopyright">—</span></p>
-                    <p><span class="font-semibold">Metadata:</span> <span id="viewMetaFilename">—</span></p>
+                    <p><span class="font-semibold">Metadata:</span> </p>
                     <pre id="viewMetaOther"
                         class="bg-gray-100 dark:bg-gray-700 p-2 rounded max-h-48 overflow-auto whitespace-pre-wrap break-words text-sm"></pre>
                 </div>
@@ -707,6 +707,10 @@
                             ordering: true,
                             info: true,
                             lengthMenu: [10, 20, 50],
+                            language: {
+                                lengthMenu: "_MENU_ Number of Books",
+                                info: "Displaying _START_ to _END_ of _TOTAL_ books"
+                            },
                             pageLength: 10,
                             columnDefs: [
                                 { orderable: false, targets: 4 } // Disable ordering on Actions column
@@ -759,7 +763,7 @@
                                 };
 
                                 $("#viewMetaTitle").text(rawTitle);
-                                $("#viewMetaAuthor").text(meta.Author || meta.author || extractedAuthor || meta['Creator'] || "—");
+                                $("#viewMetaAuthor").text(meta.Author || meta.author || extractedAuthor || meta["Creator"] || "—");
 
                                 // ISBN, Folder, Filename
 

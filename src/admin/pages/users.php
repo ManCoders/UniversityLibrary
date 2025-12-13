@@ -2,8 +2,8 @@
     User Management Overview
 </h1>
 <!-- DataTables Libraries -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" />
-    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" />
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 <!-- Tabs for Adding Accounts / Dashboard -->
 <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
     <div class="flex justify-between items-center">
@@ -375,7 +375,7 @@
 
     </div>
 
-    
+
 </div>
 
 
@@ -411,9 +411,11 @@
 
         const tableConfigs = {
             approvalTable: {
-                order: [[2, "desc"]],
+                order: [[2, "asc"]],
                 perPage: 10,
                 perPageSelect: [10, 20, 50]
+                
+                
             },
             visitorTable: {},
             adminTable: {},
@@ -428,6 +430,12 @@
                 searchable: true,
                 paging: true,
                 perPage: 10,
+                
+                language: {
+                    lengthMenu: "_MENU_  # Table Row",
+                    info: "Display _START_ to _END_ of _TOTAL_ Users"
+                },
+                perPageSelect: [10, 20, 50],
                 ...config
             });
         });
