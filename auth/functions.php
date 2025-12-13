@@ -85,6 +85,7 @@ function render_installer_styles()
 
     $styles = [
         base_url() . 'assets/css/all-tailwind-classes-full-min.css',
+        // base_url() . 'assets/css/dataTables.dataTables.min.css'
     ];
 
     foreach ($styles as $style) {
@@ -101,6 +102,7 @@ function render_scripts()
         base_url() . 'assets/js/sweetalert.min.js',
         base_url() . 'assets/js/main.js',
         base_url() . 'assets/js/tailwind.js',
+        // base_url() . 'assets/js/dataTables.min.js',
         base_url() . 'assets/js/tailwindcss.js',
         base_url() . 'assets/js/landingpage.js',
         base_url() . 'assets/js/lucide.js'/* ,

@@ -371,7 +371,9 @@
 
     </div>
 
-
+    <!-- DataTables Libraries -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" />
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 </div>
 
 
@@ -453,7 +455,7 @@
                         $("#viewmiddlename").val(personal.middlename || "No Available Middle Name");
                         $("#viewsuffix").val(personal.suffix || "Not Fill up by registree");
                         $("#viewdepartment").val(personal.department || personal.admin_offices || personal.schoolname || "Not Fill up by registree");
-                        $("#viewstudent_id").val(personal.employee_id || personal.student_id || personal.admin_id || "Visitor ID Not Available");
+                        $("#viewstudent_id").val(personal.employee_id || personal.student_id || "Visitor ID Not Available");
                         $("#viewcourse").val(personal.course || "No Course Available");
                         $("#viewgender").val(personal.gender || "Not Fill up by registree");
                         $("#viewEmail").val(auth.email || "Not Fill up by registree");
@@ -571,7 +573,7 @@
                             case "visitor":
                                 tables.visitorTable.row.add(row);
                                 break;
-                            case "admin":
+                            case "admin_office":
                                 tables.adminTable.row.add(row);
                                 break;
                             case "student":

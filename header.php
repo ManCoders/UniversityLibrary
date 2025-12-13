@@ -173,9 +173,7 @@ if (session_status() === PHP_SESSION_NONE) {
 </head>
 
 
-<!-- DataTables Libraries -->
-<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" />
-<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+
 
 <body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
     <div id="upload-spinner" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center hidden z-50">

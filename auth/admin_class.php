@@ -575,7 +575,7 @@ class Action
                 }
                 break;
 
-            case 'admin':
+            case 'admin_office':
                 if (empty($data['admin_employee_id'])) {
                     return json_encode(['status' => 0, 'message' => "Missing admin field: admin_employee_id"]);
                 }
@@ -645,7 +645,7 @@ class Action
             $personal_details['schoolname'] = $data['schoolname'];
         }
 
-        if ($role === 'admin') {
+        if ($role === 'admin_office') {
             $personal_details['employee_id'] = $data['admin_employee_id'];
             $personal_details['admin_gender'] = $data['admin_gender'];
             $personal_details['admin_offices'] = $data['admin_offices'];

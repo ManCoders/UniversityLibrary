@@ -6,7 +6,7 @@ $page = 'dashboard'; // default page
 
 if (isset($_GET['page']) && in_array($_GET['page'], $allowed_pages)) {
   $page = $_GET['page'];
-
+  
 }
 if (!isset($_SESSION['admin'])) {
   http_response_code(404);
@@ -82,6 +82,8 @@ if (!isset($_SESSION['admin'])) {
   </script>
 
 
+    
+    
   <!-- Sidebar and Overlay Containers -->
   <div id="sidebar-container"><?php include "./partials/sidebar.php" ?></div>
 
