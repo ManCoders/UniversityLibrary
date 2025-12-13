@@ -41,7 +41,7 @@
 
 
 <!-- Tab Contents -->
-<div id="tab-content">
+<div id="tab-content" class="text-gray">
     <!-- Visitor Table -->
     <div id="visitor-table-content" class="tab-panel hidden">
         <table id="visitorTable"
@@ -241,7 +241,7 @@
                             class="w-full h-full object-cover">
                     </div>
                     <select id="viewStatus" name="status"
-                        class="mt-2 w-50 mx-auto p-2 border rounded text-sm font-bold text-indigo-600 dark:text-indigo-600">
+                        class="mt-2 w-50 mx-auto p-2 border rounded text-sm font-bold text-dark-600 dark:text-white-600">
                         <option value="Pending">Pending</option>
                         <option value="approved">Approved</option>
                     </select>
@@ -390,12 +390,12 @@
         function activateTab(tabId, contentId) {
             tabPanels.addClass('hidden');
             tabButtons
-                .removeClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
+                .removeClass('border text-dark-600 dark:text-white-400')
                 .addClass('border-transparent dark:text-gray-400');
 
             // Show the selected panel and highlight the selected tab
             $(contentId).removeClass('hidden');
-            $(tabId).addClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
+            $(tabId).addClass('border text-dark-600 dark:text-white-400')
                 .removeClass('border-transparent dark:text-gray-400');
         }
 
@@ -414,9 +414,9 @@
                 order: [[2, "asc"]],
                 perPage: 10,
                 perPageSelect: [10, 20, 50]
-                
-                
+
             },
+
             visitorTable: {},
             adminTable: {},
             studentTable: {},
@@ -432,7 +432,7 @@
                 perPage: 10,
                 
                 language: {
-                    lengthMenu: "_MENU_  # Table Row",
+                    lengthMenu: "_MENU_  Table Row",
                     info: "Display _START_ to _END_ of _TOTAL_ Users"
                 },
                 perPageSelect: [10, 20, 50],
@@ -480,8 +480,6 @@
                             $("#viewProfilePic").attr("src", "../../assets/default-profile.png");
                         }
 
-                        // Load activities into DataTable if needed
-                        // Reuse instance if already created
                         let activitiesTable;
 
                         if (!activitiesTable) {
@@ -493,6 +491,7 @@
                             if (!dt) return "—";
                             return new Date(dt).toISOString().split("T")[0];
                         };
+                        
                         function formatDuration(seconds) {
                             seconds = parseInt(seconds, 10);
 
@@ -656,8 +655,8 @@
 
             function actionButtons(userId) {
                 return `
-            <button class="view-btn mx-auto bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 text-xs" data-id="${userId}">View</button>
-            `;
+                <button class="view-btn mx-auto bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 text-xs" data-id="${userId}">View</button>
+                `;
             }
         }
 

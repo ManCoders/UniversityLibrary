@@ -36,8 +36,6 @@ if (session_status() === PHP_SESSION_NONE) {
                         serif: ["ui-serif", "Georgia", "Cambria", "Times New Roman", "Times", "serif"],
                     },
                     colors: {
-                        "indigo-700": "#4338ca",
-                        "indigo-600": "#4f46e5",
                         "indigo-50": "#eef2ff",
                     },
                 },

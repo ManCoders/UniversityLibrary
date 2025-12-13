@@ -542,7 +542,7 @@
             <!-- RIGHT: Registration Form -->
             <div class="flex-1">
                 <h3 class="text-2xl font-bold text-center mb-3 text-[#b03060] dark:text-[#ff4d6d]">
-                    <i data-lucide="user-plus" class="inline-block w-8 h-8 mr-1 align-text-bottom"></i>
+                    <i data-lucide="user-plus" class="inline-block w-8 h- mr-1 align-text-bottom"></i>
                     Registration
                 </h3>
 
