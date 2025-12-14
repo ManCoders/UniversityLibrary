@@ -28,19 +28,19 @@
                         User</th>
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Ebook Title</th>
+                        Book Title</th>
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Start Time</th>
+                        Date/Time</th>
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Time Duration</th>
+                        Time used</th>
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Time Limits</th>
+                        USED Counted</th>
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Access Date</th>
+                        Remark</th>
                 </tr>
             </thead>
             <tbody id="HistoryReading" class="divide-y divide-gray-200 dark:divide-gray-700 hover:divide-gray-400">
@@ -53,7 +53,7 @@
 <!-- Detailed Books -->
 <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition">
     <div class="flex flex-col md:flex-row justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Books List</h2>
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">List of Reference</h2>
         <div class="flex gap-2 mt-2 md:mt-0">
             <button onclick="exportBooksCSV()"
                 class="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition text-sm">
@@ -326,14 +326,14 @@
                 res.data.forEach((record, index) => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                <td class="px-4 py-2">${index + 1}</td>
-                <td class="px-4 truncate py-2">${truncate(record.fullname, 20)}</td>
-                <td class="px-4 truncate block max-w-xs py-2">${truncate(record.book_title, 25)}</td>
-                <td class="px-4 py-2">${record.start_time}</td>
-                <td class="px-4 py-2">${record.total_read_time_formatted}</td>
-                <td class="px-4 py-2">${record.total_read_time_formatted}</td>
-                <td class="px-4 py-2">${record.end_time ?? '-'}</td>
-            `;
+                        <td class="px-4 py-2">${index + 1}</td>
+                        <td class="px-4 truncate py-2">${truncate(record.fullname, 20)}</td>
+                        <td class="px-4 truncate block max-w-xs py-2">${truncate(record.book_title, 25)}</td>
+                        <td class="px-4 py-2">${record.start_time}</td>
+                        <td class="px-4 py-2">${record.total_read_time_formatted}</td>
+                        <td class="px-4 py-2">${record.book_count} times</td>
+                        <td class="px-4 py-2">${record.remark ?? '-'}</td>
+                    `;
                     tbody.appendChild(tr);
                 });
             }, 'json')

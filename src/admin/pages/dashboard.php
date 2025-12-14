@@ -26,11 +26,25 @@
                         d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                 </svg>
             </div>
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Active Users</p>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Active Approved</p>
             <p id="OnlineUsers" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">0</p>
         </div>
 
-        <div data-panel="requestsPanel" class="stat-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl border-l-8 border-yellow-500 cursor-pointer 
+        <div data-panel="requestsPanel" class="stat-card bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl border-l-8 border-red-500 cursor-pointer 
+                transform transition duration-300 ease-in-out flex flex-col items-center text-center w-full max-w-xs">
+            <div class="flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-red-50 dark:bg-red-900">
+                <svg class="w-8 h-8 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Pending Account
+                Request
+            </p>
+            <p id="statRequests" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">0</p>
+        </div>
+
+        <div data-panel="requestsPanel" class=" bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl border-l-8 border-yellow-500 cursor-pointer 
                 transform transition duration-300 ease-in-out flex flex-col items-center text-center w-full max-w-xs">
             <div class="flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-yellow-50 dark:bg-yellow-900">
                 <svg class="w-8 h-8 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
@@ -38,9 +52,34 @@
                         d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
                 </svg>
             </div>
-            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Registered Accounts
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Employees
             </p>
-            <p id="statRequests" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">0</p>
+            <p id="facultyStats" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">0</p>
+        </div>
+
+        <div data-panel="requestsPanel" class=" bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl border-l-8 border-yellow-500 cursor-pointer 
+                transform transition duration-300 ease-in-out flex flex-col items-center text-center w-full max-w-xs">
+            <div class="flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-yellow-50 dark:bg-yellow-900">
+                <svg class="w-8 h-8 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Students
+            </p>
+            <p id="studentstat" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">0</p>
+        </div>
+        <div data-panel="requestsPanel" class=" bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-md hover:shadow-xl border-l-8 border-yellow-500 cursor-pointer 
+                transform transition duration-300 ease-in-out flex flex-col items-center text-center w-full max-w-xs">
+            <div class="flex items-center justify-center w-16 h-16 mb-3 rounded-full bg-yellow-50 dark:bg-yellow-900">
+                <svg class="w-8 h-8 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
+                    <path
+                        d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+            </div>
+            <p class="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Visitors
+            </p>
+            <p id="visitorStat" class="text-3xl font-bold text-gray-900 dark:text-gray-100 mt-2">0</p>
         </div>
 
 
@@ -59,7 +98,8 @@
     <div class="mb-6 flex justify-between items-center">
         <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">Books by Department</h2>
         <div class="text-lg text-gray-700 dark:text-gray-300">
-            <span class="font-semibold">Total Books:</span> <span class="text-lg mx-4 font-bold " id="totalBooksCount">0</span>
+            <span class="font-semibold">Total Books:</span> <span class="text-lg mx-4 font-bold "
+                id="totalBooksCount">0</span>
         </div>
     </div>
 
@@ -171,6 +211,51 @@
                         return;
                     }
 
+
+                    if (
+                        res.stats &&
+                        Array.isArray(res.stats.users)
+                    ) {
+                        const usersRole = res.stats.users;
+
+                        let faculty = 0;
+                        let student = 0;
+                        let visitor = 0;
+
+                        usersRole.forEach(u => {
+                            if (!u.authentication_data) return;
+
+                            let auth;
+                            try {
+                                auth = JSON.parse(u.authentication_data);
+                            } catch (e) {
+                                console.error("Invalid JSON:", u.authentication_data);
+                                return;
+                            }
+
+                            // 🚫 skip pending accounts
+                            if (auth.account_status !== 'approved') return;
+
+                            switch (auth.account_role) {
+                                case 'faculty':
+                                case 'admin_office':
+                                    faculty++;
+                                    break;
+                                case 'student':
+                                    student++;
+                                    break;
+                                case 'visitor':
+                                    visitor++;
+                                    break;
+                            }
+                        });
+
+                        $("#facultyStats").text(faculty);
+                        $("#studentstat").text(student);
+                        $("#visitorStat").text(visitor);
+                    }
+
+
                     // Only keep request-related stats
                     dashboardData.requests = res.stats.requests || {
                         pending: 0,
@@ -189,42 +274,94 @@
                         booksperfolder: res.stats.booksperfolder || {}
                     };
 
-                    if (res.status !== 1) {
-                        $('#onlineList, #offlineList').html('<li class="text-red-500">No data found</li>');
-                        return;
-                    }
-
+                     $('#OnlineUsers').text(res.stats.totalusers);
                     const users = res.stats || { online_users: [], offline_users: [] };
-                    $('#OnlineUsers').text(res.stats.totalusers || 0);
+
+                    /* ---------- ONLINE USERS ---------- */
                     let onlineHtml = '';
-                    (users.online_users || []).forEach((user, index) => {
+                    let onlineCount = 0;
+
+                    (users.online_users || []).forEach(user => {
+                        if (!user.authentication_data) return;
+
+                        let auth;
+                        try {
+                            auth = JSON.parse(user.authentication_data);
+                        } catch {
+                            return;
+                        }
+
+                        // 🚫 skip pending
+                        if (auth.account_status !== 'approved') return;
+
                         let details = JSON.parse(user.personal_details);
-                        let fullName = [details.firstname, details.middlename, details.lastname].filter(Boolean).join(' ');
-                        let userId = user.admin_id || user.user_id || 'N/A';
+                        let fullName = [details.firstname, details.middlename, details.lastname]
+                            .filter(Boolean)
+                            .join(' ');
+
+                        onlineCount++;
+
                         onlineHtml += `
-                            <li class="p-2 bg-green-50 dark:bg-green-900/40 rounded flex justify-between items-center">
-                                <span class="flex-1"><span class="font-bold">${index + 1}.</span> ${fullName}</span>
-                                <span class="flex-1 text-center text-gray-600">ID: ${details.library_id}</span>
-                                <span class="flex-1 text-right text-blue-600">${user.updated_date}</span>
-                            </li>`;
-                    });
-                    $('#onlineList').html(onlineHtml);
-
-
-                    let offlineHtml = '';
-                    (users.offline_users || []).forEach((user, index) => {
-                        let details = JSON.parse(user.personal_details);
-
-                        let fullName = [details.firstname, details.middlename, details.lastname].filter(Boolean).join(' ');
-                        let userId = user.admin_id || user.user_id || 'N/A';
-                        offlineHtml += `
-                        <li class="p-2 bg-red-50 dark:bg-red-900/40 rounded flex justify-between items-center">
-                            <span class="flex-1"><span class="font-bold">${index + 1}.</span> ${fullName}</span>
-                            <span class="flex-1 text-center text-gray-600">ID: ${details.library_id}</span>
-                            <span class="flex-1 text-right text-blue-600">${user.updated_date}</span>
+                        <li class="p-2 bg-green-50 dark:bg-green-900/40 rounded flex justify-between items-center">
+                            <span class="flex-1">
+                                <span class="font-bold">${onlineCount}.</span> ${fullName}
+                            </span>
+                            <span class="flex-1 text-center text-gray-600">
+                                ID: ${details.library_id}
+                            </span>
+                            <span class="flex-1 text-right text-blue-600">
+                                ${user.updated_date}
+                            </span>
                         </li>`;
                     });
-                    $('#offlineList').html(offlineHtml);
+
+                   
+                    $('#onlineList').html(
+                        onlineHtml || '<li class="text-gray-400">No approved users online</li>'
+                    );
+
+                    /* ---------- OFFLINE USERS ---------- */
+                    let offlineHtml = '';
+                    let offlineCount = 0;
+
+                    (users.offline_users || []).forEach(user => {
+                        if (!user.authentication_data) return;
+
+                        let auth;
+                        try {
+                            auth = JSON.parse(user.authentication_data);
+                        } catch {
+                            return;
+                        }
+
+                        // 🚫 skip pending
+                        if (auth.account_status !== 'approved') return;
+
+                        let details = JSON.parse(user.personal_details);
+                        let fullName = [details.firstname, details.middlename, details.lastname]
+                            .filter(Boolean)
+                            .join(' ');
+
+                        offlineCount++;
+
+                        offlineHtml += `
+                        <li class="p-2 bg-red-50 dark:bg-red-900/40 rounded flex justify-between items-center">
+                            <span class="flex-1">
+                                <span class="font-bold">${offlineCount}.</span> ${fullName}
+                            </span>
+                            <span class="flex-1 text-center text-gray-600">
+                                ID: ${details.library_id}
+                            </span>
+                            <span class="flex-1 text-right text-blue-600">
+                                ${user.updated_date}
+                            </span>
+                        </li>`;
+                    });
+
+                    $('#offlineList').html(
+                        offlineHtml || '<li class="text-gray-400">No approved users offline</li>'
+                    );
+
 
                     const allBooks = Object.values(dashboardData.stats.booksperfolder)
                         .flat();
@@ -295,12 +432,17 @@
                     $('#statBooks').text(allBooks.length || 0);
 
                     // Update dashboard counter
-                    const totalRequests = dashboardData.requests.pending + dashboardData.requests.approved + dashboardData.requests.declined;
-
+                    const totalRequests = dashboardData.requests.pending;
+                    //  + dashboardData.requests.approved + dashboardData.requests.declined;z
 
                     $('#statDepartment').text(dashboardData.stats.totalDepartment);
                     $('#statRequests').text(totalRequests);
-                    // $('#OnlineUsers').text(dashboardData.users.totalusers || 0);
+
+
+
+
+
+
 
 
 

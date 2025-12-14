@@ -1,5 +1,5 @@
 <h1 class="text-3xl font-extrabold text-gray-800 dark:text-gray-100 mb-6 border-b dark:border-gray-700 pb-2">
-    List of References
+    Library References
 </h1>
 
 <!-- DataTables Libraries -->

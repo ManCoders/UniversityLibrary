@@ -1412,6 +1412,13 @@ class Action
                         $metadataDateFormatted = 'NA';
                     }
 
+                    $sql = "SELECT * FROM reading_logs WHERE book_title = ? ";
+                    $stmt = $this->db->prepare($sql);
+                    $stmt->execute([$title]);
+                    $readinglog = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+
                     $metadataArray[] = [
                         'book_id' => $bookId,
                         'foldername' => $folderName,
@@ -1419,7 +1426,7 @@ class Action
                         'title' => $title,
                         'author' => $author,
                         'copyright' => $metadataDateFormatted,
-                        // 'create_date' =>,
+                        'readinglog', $readinglog,
                         'isbn' => $isbn
                     ];
                 }
@@ -2728,15 +2735,22 @@ class Action
 
             // Count online users (students + faculty)
             $stmtActiveUsers = $this->db->query("
-                SELECT * FROM user WHERE is_logged_in = 1
+                SELECT *
+                FROM user
+                WHERE is_logged_in = 1
+                AND JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.account_status')) = 'approved'
             ");
             $activeUsers = $stmtActiveUsers->fetchAll(PDO::FETCH_ASSOC);
 
+
             // Count online admins
             $stmtActiveAdmins = $this->db->query("
-                SELECT * FROM admin WHERE is_logged_in = 1
-            ");
+                    SELECT *
+                    FROM admin
+                    WHERE is_logged_in = 1
+                ");
             $activeAdmins = $stmtActiveAdmins->fetchAll(PDO::FETCH_ASSOC);
+
 
             // Total active users including admins
             $totalActiveUsers = array_merge($activeUsers, $activeAdmins);
@@ -2744,16 +2758,22 @@ class Action
 
             // Count offline users (students + faculty)
             $stmtOfflineUsers = $this->db->query("
-                SELECT * FROM user WHERE is_logged_in = 0
+                SELECT *
+                FROM user
+                WHERE is_logged_in = 0
+                AND JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.account_status')) = 'approved'
             ");
             $offlineUsers = $stmtOfflineUsers->fetchAll(PDO::FETCH_ASSOC);
 
+
             // Count offline admins
             $stmtOfflineAdmins = $this->db->query("
-                SELECT * FROM admin WHERE is_logged_in = 0
+                SELECT *
+                FROM admin
+                WHERE is_logged_in = 0
             ");
-
             $offlineAdmins = $stmtOfflineAdmins->fetchAll(PDO::FETCH_ASSOC);
+
             // Total offline users including admins
             // $totalOfflineUsers = $offlineUsers + $offlineAdmins;
             $totalOfflineUsers = array_merge($offlineUsers, $offlineAdmins);
@@ -2801,9 +2821,21 @@ class Action
             $totalFolders = count($departments);
             $folderNames = array_map(fn($d) => $d['folder_name'], $departments);
 
+
+
+            $stmt = $this->db->prepare("
+                    SELECT *
+                    FROM user
+                    ORDER BY created_date ASC
+                ");
+            $stmt->execute();
+
+            $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
             return json_encode([
                 'status' => 1,
                 'stats' => [
+                    'users' => $users,
                     'booksperfolder' => $books,
                     'filesperfolder' => $filesInFolders,
                     'totalBooks' => $totalBooks,
@@ -3339,24 +3371,30 @@ class Action
     {
         try {
             $stmt = $this->db->query("
-        SELECT rl.*, 
-            JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.firstname')) AS firstname,
-            JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.lastname')) AS lastname,
-            JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.middlename')) AS middlename,
-            JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.student_id')) AS student_id,
-            JSON_UNQUOTE(JSON_EXTRACT(u.authentication_data, '$.email')) AS email
-        FROM reading_logs rl
-        JOIN user u ON rl.user_id = u.user_id
-        ORDER BY rl.start_time DESC
-    ");
+                SELECT rl.*, 
+                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.firstname')) AS firstname,
+                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.lastname')) AS lastname,
+                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.middlename')) AS middlename,
+                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.student_id')) AS student_id,
+                    JSON_UNQUOTE(JSON_EXTRACT(u.authentication_data, '$.email')) AS email
+                FROM reading_logs rl
+                INNER JOIN user u ON rl.user_id = u.user_id
+                ORDER BY rl.start_time DESC
+            ");
             $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             // Helper to format seconds
-
+            usort($logs, function ($a, $b) {
+                if ($b['total_read_time'] === $a['total_read_time']) {
+                    return $b['count_user'] <=> $a['count_user'];
+                }
+                return $b['total_read_time'] <=> $a['total_read_time'];
+            });
 
             // Format data
-            $formattedLogs = array_map(function ($log) {
+            $formattedLogs = array_map(function ($log, $index) {
                 $fullname = trim($log['firstname'] . ' ' . ($log['middlename'] ?? '') . ' ' . $log['lastname']);
+
                 return [
                     'user_id' => $log['user_id'],
                     'fullname' => $fullname,
@@ -3367,9 +3405,10 @@ class Action
                     'end_time' => $log['end_time'] ?? null,
                     'total_read_time' => $log['total_read_time'],
                     'total_read_time_formatted' => $this->formatDuration($log['total_read_time']),
-                    'remark' => $log['is_favorite'] ? 'Favorited' : ''
+                    'remark' => 'TOP ' . ($index + 1),  // Dynamic TOP 1, TOP 2, ...
+                    'book_count' => $log['count_user']
                 ];
-            }, $logs);
+            }, $logs, array_keys($logs));
 
             return json_encode([
                 'status' => 1,

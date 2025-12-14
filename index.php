@@ -592,7 +592,7 @@
 
                     <!-- STUDENT FIELDS -->
                     <div id="student-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                        <input type="text" name="student_id" placeholder="Student ID"
+                        <input type="text" name="student_id" placeholder="ID NO:"
                             class=" uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
                         <select name="student_gender"
@@ -628,7 +628,7 @@
 
                     <!-- FACULTY FIELDS -->
                     <div id="faculty-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                        <input type="text" name="employee_id" placeholder="Employee ID"
+                        <input type="text" name="employee_id" placeholder="ID NO:"
                             class="uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
                         <select name="faculty_gender"
@@ -658,7 +658,7 @@
                     </div>
 
                     <div id="admin-fields" class="hidden grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                        <input type="text" name="admin_employee_id" placeholder="Employee ID"
+                        <input type="text" name="admin_employee_id" placeholder="ID NO:"
                             class="uppercase border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
 
                         <select name="admin_gender"
