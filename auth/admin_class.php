@@ -3076,7 +3076,7 @@ class Action
             }
 
             // --- API Setup ---
-            $apiKey = 'AIzaSyCG1Nph8zT4B8tzx3jlvg8n261oDuMcusQ';
+            $apiKey = 'AIzaSyAWQePnSmQTun0NwsCButPjkGyQRSGET24';
             $model = 'gemini-2.5-flash';
             $url = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey";
 
