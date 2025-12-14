@@ -2,9 +2,7 @@
     Library References
 </h1>
 
-<!-- DataTables Libraries -->
-<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" />
-<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
+
 <!-- Tabs Navigation -->
 <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
     <nav class="flex items-center justify-between">

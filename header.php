@@ -18,7 +18,8 @@ if (session_status() === PHP_SESSION_NONE) {
     <?php render_styles(); ?>
     <?php render_scripts(); ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" />
+    <script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 
     <script>
         var base_url = '<?php echo base_url() ?>';
@@ -179,7 +180,6 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
 
     <style>
-        
         .loader {
             border-top-color: #3498db;
             border-right-color: transparent;

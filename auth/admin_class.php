@@ -1426,7 +1426,7 @@ class Action
                         'title' => $title,
                         'author' => $author,
                         'copyright' => $metadataDateFormatted,
-                        'readinglog', $readinglog,
+                        'readinglog'=> $readinglog,
                         'isbn' => $isbn
                     ];
                 }
