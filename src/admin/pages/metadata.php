@@ -34,7 +34,7 @@
 
             <button type="button" id="new-folder-btn"
                 class="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-sm">
-                Select Department
+                Enter Department - Years Level
             </button>
         </div>
 
@@ -188,10 +188,10 @@
     <div id="new-folder-modal"
         class="fixed w-100 inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-100 p-5">
-            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 lg:text-center ">Select Department
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-3 lg:text-center ">Enter Department & Year Level
             </h3>
 
-            <select id="folder-name-input" class="w-100 p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 mb-4"
+            <!-- <select id="folder-name-input" class="w-100 p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 mb-4"
                 required>
                 <option value="" disabled selected>Select Department</option>
                 <option value="College of Information Computing and Sciences">College of Information Computing and
@@ -206,7 +206,10 @@
                 <option value="College of Engineering and Technology">College of Engineering and Technology</option>
                 <option value="School of Business Administration">School of Business Administration</option>
                 <option value="College of Teacher Education">College of Teacher Education</option>
-            </select>
+            </select> -->
+            <input type="text" id="folder-name-input" placeholder="Enter Department Name"
+                class="w-full p-2 border rounded-md dark:bg-gray-700 dark:text-gray-200 mb-4" required />
+
 
             <div class="flex justify-end gap-2">
                 <button id="cancel-folder-btn"
@@ -235,12 +238,14 @@
 
 
             const $modal = $('#new-folder-modal');
-            const $input = $('#folder-name-input');
+            // const $input = $('#folder-name-input');
+            const name = $('#folder-name-input').val().trim();
 
             // --- Show modal ---
             $('#new-folder-btn').on('click', function () {
+                
                 $modal.removeClass('hidden').addClass('flex');
-                $input.focus();
+                $name.focus();
             });
 
             // --- Hide modal ---
@@ -259,8 +264,6 @@
                     $icon.text($list.hasClass('hidden') ? '▶' : '▼');
                 });
             }
-
-
 
 
             loadFolders();
@@ -631,14 +634,12 @@
 
                 $.post(base_url + "auth/action.php?action=createFolder", { folder_name: name }, res => {
                     if (res.status === 1) {
+                        window.location.reload();
                         closeModal();
                         loadFolders();
                     } else alert(res.message || 'Failed to create folder');
                 }, 'json').fail(() => alert('Server error')).always(() => $btn.text("Create Folder"));
             });
-
-
-
 
             /* METADATA FILE HERE */
 
@@ -720,8 +721,6 @@
                     }
                 });
             }
-
-
 
             // Delegate button clicks
             $("#metadatafile").on("click", ".view-btn, .edit-btn, .delete-btn", function () {
@@ -957,4 +956,7 @@
 
 
         });
+
+
+
     </script>

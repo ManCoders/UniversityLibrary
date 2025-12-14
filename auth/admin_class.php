@@ -1756,9 +1756,7 @@ class Action
                 'expires' => time() + 300 // Token valid for 5 minutes
             ];
 
-            // If the user is a student or faculty, log the reading session
             if ($user_role === 'student' || $user_role === 'faculty') {
-                // Check if a reading session already exists for this user and book
                 $stmt = $this->db->prepare("SELECT * FROM reading_logs WHERE user_id = ? AND file = ?");
                 $stmt->execute([$user_id, $file]);
                 $row = $stmt->fetch(PDO::FETCH_ASSOC);
