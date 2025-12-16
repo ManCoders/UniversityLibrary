@@ -3,8 +3,8 @@ $currentPage = $page ?? 'dashboard';
 
 // Define navigation links
 $navLinks = [
-    ['id' => 'dashboard', 'text' => 'Dashboard', 'icon' => 'layout-dashboard'],
-    ['id' => 'metadata', 'text' => 'Metadata Management', 'icon' => 'book-open'],
+    ['id' => 'dashboard', 'text' => 'Home', 'icon' => 'layout-dashboard'],
+    ['id' => 'metadata', 'text' => 'Resources Management', 'icon' => 'book-open'],
     ['id' => 'users', 'text' => 'User Management', 'icon' => 'users'],
      ['id' => 'reports', 'text' => 'Analytics & Reports', 'icon' => 'bar-chart-3'],
     /*['id' => 'settings', 'text' => 'Settings', 'icon' => 'settings'], */

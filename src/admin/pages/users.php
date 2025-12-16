@@ -1,5 +1,5 @@
 <h1 class="text-3xl font-extrabold text-gray-800 dark:text-gray-100 mb-6 border-b dark:border-gray-700 pb-2">
-    User Management Overview
+    Users Management
 </h1>
 <div class="mb-6 border-b border-gray-200 dark:border-gray-700">
     <div class="flex justify-between items-center">
@@ -8,20 +8,20 @@
 
             <button id="tab-admin"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Admin Table
+                Admin 
             </button>
 
             <button id="tab-faculty"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Faculty Table
+                Faculty 
             </button>
             <button id="tab-student"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Student Table
+                Student 
             </button>
             <button id="tab-visitor"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Visitor Table
+                Visitor 
             </button>
             <button id="tab-approval"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">

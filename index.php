@@ -550,13 +550,13 @@
                     <!-- ROLE SELECTOR -->
                     <div class="flex gap-3 justify-center mb-2">
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="role" value="admin_office" class="accent-[#b03060]"> Admin
+                            <input type="radio" name="role" value="student" active class="accent-[#b03060]"> Student
                         </label>
-                        <label class="flex items-center gap-2">
+                         <label class="flex items-center gap-2">
                             <input type="radio" name="role" value="faculty" class="accent-[#b03060]"> Faculty
                         </label>
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="role" value="student" class="accent-[#b03060]"> Student
+                            <input type="radio" name="role" value="admin_office" class="accent-[#b03060]"> Admin
                         </label>
                         <label class="flex items-center gap-2">
                             <input type="radio" name="role" value="visitor" class="accent-[#b03060]"> Visitor
@@ -605,8 +605,7 @@
                         <select name="student_department"
                             class="uppercase col-span-1 sm:col-span-2 border-2 border-[#b03060] rounded-lg p-3 dark:bg-[#440000] text-[#660000] dark:text-[#ffd1d1]">
                             <option disabled selected>Select Department</option>
-                            <option value="College of Information Computing and Sciences">College of Information
-                                Computing and Sciences</option>
+                            <option value="College of Information and Computing Sciences">College of Information and Computing Sciences</option>
                             <option value="College of Maritime Education">College of Maritime Education</option>
                             <option value="College of Engineering & Technology Department">College of Engineering &
                                 Technology </option>
@@ -777,7 +776,7 @@
                     "Bachelor of Science Marine Transportation",
                     "Bachelor of Science Marine Engineering"
                 ],
-                "College of Information Computing and Sciences": [
+                "College of Information and Computing Sciences": [
                     "Bachelor of Science Information Technology",
                     "Bachelor of Science Information System"
                 ],

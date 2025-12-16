@@ -11,12 +11,12 @@
         <div class="flex space-x-4">
             <button id="tab-add-metadata"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 py-4 px-1 border-b-2 font-medium text-sm">
-                New Metadata
+                Department
             </button>
 
             <button id="tab-metadata-table"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 py-4 px-1 border-b-2 font-medium text-sm">
-                Metadata Table
+                Catalog
             </button>
         </div>
 

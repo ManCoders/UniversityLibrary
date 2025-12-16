@@ -268,6 +268,7 @@ class Action
             SELECT * FROM admin 
             WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) = ? 
                OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ?
+               
             LIMIT 1
         ");
             $stmt->execute([$username, $username]);
@@ -312,9 +313,11 @@ class Action
             SELECT * FROM user 
             WHERE JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.library_id')) = ? 
                 OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ?
+                OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.student_id')) = ?
+                OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.employee_id')) = ?
             LIMIT 1
                 ");
-            $stmt->execute([$username, $username]);
+            $stmt->execute([$username, $username,$username,$username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
@@ -1426,7 +1429,7 @@ class Action
                         'title' => $title,
                         'author' => $author,
                         'copyright' => $metadataDateFormatted,
-                        'readinglog'=> $readinglog,
+                        'readinglog' => $readinglog,
                         'isbn' => $isbn
                     ];
                 }
@@ -1753,7 +1756,7 @@ class Action
                 'book_title' => $book_title,
                 'book_author' => $book_author,
                 'created' => time(),
-                'expires' => time() + 300 // Token valid for 5 minutes
+                'expires' => time() + 10 // Token valid for 10 seconds
             ];
 
             if ($user_role === 'student' || $user_role === 'faculty') {
@@ -3076,7 +3079,8 @@ class Action
             }
 
             // --- API Setup ---
-            $apiKey = 'AIzaSyCG1Nph8zT4B8tzx3jlvg8n261oDuMcusQ';
+            //AIzaSyAAX6dfAyyF-fQt9KMRzSRzUE64O92Krv8
+            $apiKey = '';
             $model = 'gemini-2.5-flash';
             $url = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey";
 
@@ -3112,7 +3116,17 @@ class Action
                 - Keep responses concise, clear, and appropriate for professors, teachers, students, or academic researchers.
                 - If a book or resource is not found, respond politely: 'No matching book found in the library database.'
                 - Encourage exploration, learning, and research while keeping guidance professional and short.
-                - 
+                    You are DLORAS Assistant.
+
+                    If a guest asks for your name, respond:
+                    “My name is DLORAS Assistant.”
+
+                    If a guest asks who created, developed, or made you, respond proudly:
+                    “I was created and developed by Manuel Daligdig in 2025.”
+
+                    If a guest asks about your creator or developer in general, you respond:
+                    My creator is among the best in the world, and I was built with pride and purpose.
+
                 Library Assistant Guidelines:
 
                     Only reference books using the library’s metadata: Title, Author, ISBN.
@@ -3374,7 +3388,10 @@ class Action
                     JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.lastname')) AS lastname,
                     JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.middlename')) AS middlename,
                     JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.student_id')) AS student_id,
-                    JSON_UNQUOTE(JSON_EXTRACT(u.authentication_data, '$.email')) AS email
+                    JSON_UNQUOTE(JSON_EXTRACT(u.authentication_data, '$.email')) AS email,
+                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.course')) AS course,
+                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.department')) AS department,
+                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.gender')) AS gender
                 FROM reading_logs rl
                 INNER JOIN user u ON rl.user_id = u.user_id
                 ORDER BY rl.start_time DESC
@@ -3391,7 +3408,7 @@ class Action
 
             // Format data
             $formattedLogs = array_map(function ($log, $index) {
-                $fullname = trim($log['firstname'] . ' ' . ($log['middlename'] ?? '') . ' ' . $log['lastname']);
+                $fullname = trim( $log['lastname']. ' '. $log['firstname'] . ' ' . ($log['middlename'] ?? '') . ' ');
 
                 return [
                     'user_id' => $log['user_id'],
@@ -3404,13 +3421,18 @@ class Action
                     'total_read_time' => $log['total_read_time'],
                     'total_read_time_formatted' => $this->formatDuration($log['total_read_time']),
                     'remark' => 'TOP ' . ($index + 1),  // Dynamic TOP 1, TOP 2, ...
-                    'book_count' => $log['count_user']
+                    'book_count' => $log['count_user'],
+                    'course'=>$log['course'],
+                    'department'=>$log['department'],
+                    'gender'=>$log['gender']
+                    
                 ];
             }, $logs, array_keys($logs));
 
             return json_encode([
                 'status' => 1,
-                'data' => $formattedLogs
+                'data' => $formattedLogs,
+                
             ]);
         } catch (Exception $e) {
             return json_encode([

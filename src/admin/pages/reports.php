@@ -6,7 +6,7 @@
 <!-- Detailed Table -->
 <div class="mt-12 bg-white dark:bg-gray-800 p-6 rounded-xl shadow-md hover:shadow-lg transition">
     <div class="flex flex-col md:flex-row justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Detailed Report</h2>
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-100">Top user </h2>
         <div class="flex gap-2 mt-2 md:mt-0">
             <button onclick="exportDetailedReportCSV()"
                 class="bg-emerald-500 text-white px-4 py-2 rounded-lg hover:bg-emerald-600 transition text-sm">Export
@@ -28,7 +28,14 @@
                         FullNAME</th>
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Book Title</th>
+                        College</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Course</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        Gender</th>
+
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Date/Time</th>
@@ -37,7 +44,7 @@
                         Time used</th>
                     <th
                         class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                         Count Visited</th>
+                        Count Visited</th>
                     <th
                         class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Remark</th>
@@ -75,14 +82,17 @@
 
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Book ID</th>
+                        AUTHOR</th>
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Book Title</th>
+                        BOOK TITLE</th>
 
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Author</th>
+                        COPYRIGHT</th>
+                    <th
+                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        ISBN</th>
 
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -102,30 +112,30 @@
 <script>
     let allBooksData = [];
 
-    function fetchBooks() {
-        $.post(`${base_url}auth/action.php?action=getMetadata`, {}, function (res) {
-            if (!res.status || !res.data) return console.warn("No books found.");
-
-            allBooksData = res.data; // store globally for export
-
-            const tbody = $("#AllBooks");
-            tbody.empty();
-
-            res.data.forEach((book, index) => {
-                const totalCount = (book.readinglog || []).reduce((sum, log) => sum + (log.count_user || 0), 0);
-                const tr = `<tr>
-                <td class="px-4 py-2">${index + 1}</td>
-                
-                <td class="px-4 py-2">${book.isbn}</td>
-                <td class="px-4 py-2 truncate max-w-xs">${book.title}</td>
-                <td class="px-4 py-2">${book.author}</td>
-                <td class="px-4 py-2">${totalCount}</td>
-            </tr>`;
-                tbody.append(tr);
-            });
-        }, 'json').fail(() => console.error("Failed to load books."));
-    }
-
+    /*   function fetchBooks() {
+          $.post(`${base_url}auth/action.php?action=getMetadata`, {}, function (res) {
+              if (!res.status || !res.data) return console.warn("No books found.");
+  
+              allBooksData = res.data; // store globally for export
+  
+              const tbody = $("#AllBooks");
+              tbody.empty();
+  
+              res.data.forEach((book, index) => {
+                  const totalCount = (book.readinglog || []).reduce((sum, log) => sum + (log.count_user || 0), 0);
+                  const tr = `<tr>
+                  <td class="px-4 py-2">${index + 1}</td>
+                  
+                  <td class="px-4 py-2">${book.isbn}</td>
+                  <td class="px-4 py-2 truncate max-w-xs">${book.title}</td>
+                  <td class="px-4 py-2">${book.author}</td>
+                  <td class="px-4 py-2">${totalCount}</td>
+              </tr>`;
+                  tbody.append(tr);
+              });
+          }, 'json').fail(() => console.error("Failed to load books."));
+      }
+   */
     function exportBooksCSV() {
         if (!allBooksData.length) return console.warn("No data to export.");
 
@@ -238,7 +248,9 @@
                     userTable.row.add([
                         index + 1,
                         truncate(record.fullname, 20),
-                        truncate(record.book_title, 25),
+                       truncate(record.department, 20),
+                       truncate(record.course, 20),
+                       truncate(record.gender, 20),
                         record.start_time ?? '-',
                         record.total_read_time_formatted ?? '-',
                         record.book_count ?? 0,
@@ -262,9 +274,10 @@
                     const totalCount = (book.readinglog || []).reduce((sum, log) => sum + (log.count_user || 0), 0);
                     bookTable.row.add([
                         index + 1,
-                        book.book_id,
-                        truncate(book.title, 40),
                         book.author,
+                        truncate(book.title, 40),
+                        book.copyright?.trim().match(/\d{4}/)?.[0] || '—', //item.copyright?.trim().match(/\d{4}/)?.[0] || '—';
+                        book.isbn,
                         totalCount
                     ]);
                 });
