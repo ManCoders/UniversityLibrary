@@ -112,84 +112,6 @@
 <script>
     let allBooksData = [];
 
-    /*   function fetchBooks() {
-          $.post(`${base_url}auth/action.php?action=getMetadata`, {}, function (res) {
-              if (!res.status || !res.data) return console.warn("No books found.");
-  
-              allBooksData = res.data; // store globally for export
-  
-              const tbody = $("#AllBooks");
-              tbody.empty();
-  
-              res.data.forEach((book, index) => {
-                  const totalCount = (book.readinglog || []).reduce((sum, log) => sum + (log.count_user || 0), 0);
-                  const tr = `<tr>
-                  <td class="px-4 py-2">${index + 1}</td>
-                  
-                  <td class="px-4 py-2">${book.isbn}</td>
-                  <td class="px-4 py-2 truncate max-w-xs">${book.title}</td>
-                  <td class="px-4 py-2">${book.author}</td>
-                  <td class="px-4 py-2">${totalCount}</td>
-              </tr>`;
-                  tbody.append(tr);
-              });
-          }, 'json').fail(() => console.error("Failed to load books."));
-      }
-   */
-    function exportBooksCSV() {
-        if (!allBooksData.length) return console.warn("No data to export.");
-
-        const headers = ["#", "Book ID", "Book Title", "Author"];
-        let csvContent = headers.join(",") + "\n";
-
-        allBooksData.forEach((book, index) => {
-            const row = [
-                index + 1,
-
-                book.isbn,
-                book.title,
-                book.author
-            ].map(cell => `"${String(cell).replace(/"/g, '""')}"`);
-            csvContent += row.join(",") + "\n";
-        });
-
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "books_list.csv";
-        link.click();
-    }
-
-    function exportBooksPDF() {
-        if (!allBooksData.length) return console.warn("No data to export.");
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'pt', 'a4');
-
-        const columns = ["#", "Book ID", "Book Title", "Author"];
-        const rows = allBooksData.map((book, index) => [
-            index + 1,
-            book.book_id,
-            book.title,
-            book.author
-        ]);
-
-        doc.setFontSize(14);
-        doc.text("Books List", 40, 40);
-
-        doc.autoTable({
-            startY: 60,
-            head: [columns],
-            body: rows,
-            theme: 'grid',
-            headStyles: { fillColor: [99, 102, 241] },
-            alternateRowStyles: { fillColor: [245, 245, 245] },
-            styles: { fontSize: 10, cellPadding: 4 },
-            columnStyles: { 3: { cellWidth: 150 } }
-        });
-
-        doc.save('books_list.pdf');
-    }
 
     $(document).ready(() => {
 
@@ -248,9 +170,9 @@
                     userTable.row.add([
                         index + 1,
                         truncate(record.fullname, 20),
-                       truncate(record.department, 20),
-                       truncate(record.course, 20),
-                       truncate(record.gender, 20),
+                        truncate(record.department, 20),
+                        truncate(record.course, 20),
+                        truncate(record.gender, 20),
                         record.start_time ?? '-',
                         record.total_read_time_formatted ?? '-',
                         record.book_count ?? 0,
@@ -314,7 +236,6 @@
             link.download = "detailed_report.csv";
             link.click();
         };
-
         window.exportDetailedReportPDF = function () {
             if (!detailedReportData.length) return console.warn("No data to export.");
             const { jsPDF } = window.jspdf;
@@ -334,42 +255,73 @@
             doc.autoTable({ startY: 60, head: [columns], body: rows, theme: 'grid', headStyles: { fillColor: [99, 102, 241] }, styles: { fontSize: 10, cellPadding: 4 } });
             doc.save('detailed_report.pdf');
         };
-
         window.exportBooksCSV = function () {
             if (!allBooksData.length) return console.warn("No data to export.");
-            const headers = ["#", "Book ID", "Book Title", "Author", "Count Visited"];
+
+            const headers = ["#", "Author", "Title", "Year", "ISBN", "Visited"];
             let csv = headers.join(",") + "\n";
+
             allBooksData.forEach((book, i) => {
-                const totalCount = (book.readinglog || []).reduce((sum, log) => sum + (log.count_user || 0), 0);
+                const totalCount = (book.readinglog || []).reduce(
+                    (sum, log) => sum + (log.count_user || 0), 0
+                );
+                const year = book.copyright?.trim().match(/\d{4}/)?.[0] || '—';
+
                 const row = [
                     i + 1,
-                    book.book_id,
-                    book.title,
                     book.author,
+                    book.title,
+                    year,
+                    book.isbn,
                     totalCount
                 ].map(c => `"${String(c).replace(/"/g, '""')}"`);
+
                 csv += row.join(",") + "\n";
             });
+
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
             link.download = "books_list.csv";
             link.click();
         };
-
         window.exportBooksPDF = function () {
             if (!allBooksData.length) return console.warn("No data to export.");
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'pt', 'a4');
-            const columns = ["#", "Book ID", "Book Title", "Author", "Visited"];
+
+            const columns = ["#", "Author", "Title", "Copyright", "ISBN", "Visited"];
             const rows = allBooksData.map((book, i) => {
-                const totalCount = (book.readinglog || []).reduce((sum, log) => sum + (log.count_user || 0), 0);
-                return [i + 1, book.book_id, truncate(book.title, 40), book.author, totalCount];
+                const totalCount = (book.readinglog || []).reduce(
+                    (sum, log) => sum + (log.count_user || 0), 0
+                );
+                const year = book.copyright?.trim().match(/\d{4}/)?.[0] || '—';
+
+                return [
+                    i + 1,
+                    book.author,
+                    truncate(book.title, 40),
+                    year,
+                    book.isbn,
+                    totalCount
+                ];
             });
+
             doc.setFontSize(14);
             doc.text("Books List", 40, 40);
-            doc.autoTable({ startY: 60, head: [columns], body: rows, theme: 'grid', headStyles: { fillColor: [99, 102, 241] }, styles: { fontSize: 10, cellPadding: 4 }, columnStyles: { 2: { cellWidth: 150 } } });
-            doc.save('books_list.pdf');
+
+            doc.autoTable({
+                startY: 60,
+                head: [columns],
+                body: rows,
+                theme: 'grid',
+                styles: { fontSize: 10, cellPadding: 4 },
+                headStyles: { fillColor: [99, 102, 241] },
+                columnStyles: { 2: { cellWidth: 160 } }
+            });
+
+            doc.save("books_list.pdf");
         };
 
     });

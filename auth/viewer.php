@@ -218,9 +218,9 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
               expiredShown = true;
 
               Swal.fire({
-                icon: 'warning',
-                title: 'Session Expired',
-                text: 'Your access to this PDF has expired.',
+                icon: 'info',
+                title: 'NOTE ALERT',
+                text: 'You’ve reached the time limit. Please open it again to continue.',
                 confirmButtonText: 'OK',
                 allowOutsideClick: false,
                 allowEscapeKey: false
