@@ -1756,7 +1756,7 @@ class Action
                 'book_title' => $book_title,
                 'book_author' => $book_author,
                 'created' => time(),
-                'expires' => time() + 10 // Token valid for 10 seconds
+                'expires' => time() + 60 // Token valid for 10 seconds
             ];
 
             if ($user_role === 'student' || $user_role === 'faculty') {
