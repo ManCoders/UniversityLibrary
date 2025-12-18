@@ -373,7 +373,8 @@
 
 
 </div>
-
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.8/css/dataTables.dataTables.min.css" />
+<script src="https://cdn.datatables.net/2.1.8/js/dataTables.min.js"></script>
 
 
 <script>
@@ -386,13 +387,13 @@
         function activateTab(tabId, contentId) {
             tabPanels.addClass('hidden');
             tabButtons
-                .removeClass('border text-dark-600 dark:text-white-400')
-                .addClass('border-transparent dark:text-gray-400');
+                .removeClass(' text-dark-600 dark:text-white-400')
+                .addClass(' dark:text-gray-400');
 
             // Show the selected panel and highlight the selected tab
             $(contentId).removeClass('hidden');
-            $(tabId).addClass('border text-dark-600 dark:text-white-400')
-                .removeClass('border-transparent dark:text-gray-400');
+            $(tabId).addClass('text-dark-600 dark:text-white-400')
+                .removeClass(' dark:text-gray-400');
         }
 
         // Tab click handlers
