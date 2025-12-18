@@ -3383,51 +3383,60 @@ class Action
     {
         try {
             $stmt = $this->db->query("
-                SELECT rl.*, 
-                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.firstname')) AS firstname,
-                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.lastname')) AS lastname,
-                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.middlename')) AS middlename,
-                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.student_id')) AS student_id,
-                    JSON_UNQUOTE(JSON_EXTRACT(u.authentication_data, '$.email')) AS email,
-                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.course')) AS course,
-                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.department')) AS department,
-                    JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.gender')) AS gender
-                FROM reading_logs rl
-                INNER JOIN user u ON rl.user_id = u.user_id
-                ORDER BY rl.start_time DESC
-            ");
+            SELECT 
+                rl.user_id,
+
+                -- Personal Info (one time only)
+                JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.firstname')) AS firstname,
+                JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.lastname')) AS lastname,
+                JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.middlename')) AS middlename,
+                JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.student_id')) AS student_id,
+                JSON_UNQUOTE(JSON_EXTRACT(u.authentication_data, '$.email')) AS email,
+                JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.course')) AS course,
+                JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.department')) AS department,
+                JSON_UNQUOTE(JSON_EXTRACT(u.personal_details, '$.gender')) AS gender,
+
+                -- Aggregates
+                COUNT(DISTINCT rl.count_user) AS book_count,
+                SUM(rl.count_user) AS count_access,
+                SUM(rl.total_read_time) AS total_read_time,
+                MAX(rl.end_time) AS last_read_time
+
+            FROM reading_logs rl
+            INNER JOIN user u ON rl.user_id = u.user_id
+            GROUP BY rl.user_id
+            ORDER BY total_read_time DESC, book_count DESC
+        ");
+
             $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            // Helper to format seconds
-            usort($logs, function ($a, $b) {
-                if ($b['total_read_time'] === $a['total_read_time']) {
-                    return $b['count_user'] <=> $a['count_user'];
-                }
-                return $b['total_read_time'] <=> $a['total_read_time'];
-            });
+$formattedLogs = array_map(function ($log, $index) {
+    $fullname = trim(
+        $log['lastname'] . ' ' .
+        $log['firstname'] . ' ' .
+        ($log['middlename'] ?? '')
+    );
 
-            // Format data
-            $formattedLogs = array_map(function ($log, $index) {
-                $fullname = trim( $log['lastname']. ' '. $log['firstname'] . ' ' . ($log['middlename'] ?? '') . ' ');
+    return [
+        'user_id' => $log['user_id'],
+        'fullname' => $fullname,
+        'student_id' => $log['student_id'],
+        'email' => $log['email'],
+        'course' => $log['course'],
+        'department' => $log['department'],
+        'gender' => $log['gender'],
+        'count_access'=>$log['count_access'],
+        // Aggregated results
+        'book_count' => $log['book_count'],                 // ✅ different books only
+        'total_read_time' => $log['total_read_time'],
+        'total_read_time_formatted' => $this->formatDuration($log['total_read_time']),
+        'last_read_time' => $log['last_read_time'],
 
-                return [
-                    'user_id' => $log['user_id'],
-                    'fullname' => $fullname,
-                    'student_id' => $log['student_id'],
-                    'email' => $log['email'],
-                    'book_title' => $log['book_title'],
-                    'start_time' => $log['start_time'],
-                    'end_time' => $log['end_time'] ?? null,
-                    'total_read_time' => $log['total_read_time'],
-                    'total_read_time_formatted' => $this->formatDuration($log['total_read_time']),
-                    'remark' => 'TOP ' . ($index + 1),  // Dynamic TOP 1, TOP 2, ...
-                    'book_count' => $log['count_user'],
-                    'course'=>$log['course'],
-                    'department'=>$log['department'],
-                    'gender'=>$log['gender']
-                    
-                ];
-            }, $logs, array_keys($logs));
+        // Ranking
+        'remark' => 'TOP ' . ($index + 1)
+    ];
+}, $logs, array_keys($logs));
+
 
             return json_encode([
                 'status' => 1,

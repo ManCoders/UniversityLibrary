@@ -36,15 +36,13 @@
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Gender</th>
 
-                    <th
-                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Date/Time</th>
+                    
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Time used</th>
                     <th
                         class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        Count Visited</th>
+                        Books Count</th>
                     <th
                         class="px-4 py-2 text-center font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Remark</th>
@@ -173,9 +171,8 @@
                         truncate(record.department, 20),
                         truncate(record.course, 20),
                         truncate(record.gender, 20),
-                        record.start_time ?? '-',
                         record.total_read_time_formatted ?? '-',
-                        record.book_count ?? 0,
+                        record.count_access ?? 0,
                         record.remark ?? '-'
                     ]);
                 });
