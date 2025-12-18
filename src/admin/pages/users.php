@@ -385,16 +385,13 @@
 
         // --- TAB MANAGEMENT ---
         function activateTab(tabId, contentId) {
-            tabPanels.addClass('hidden');
-            tabButtons
-                .removeClass(' text-dark-600 dark:text-white-400')
-                .addClass(' dark:text-gray-400');
-
-            // Show the selected panel and highlight the selected tab
-            $(contentId).removeClass('hidden');
-            $(tabId).addClass('text-dark-600 dark:text-white-400')
-                .removeClass(' dark:text-gray-400');
-        }
+                $('.tab-panel').addClass('hidden');
+                $('.tab-button').removeClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
+                    .addClass('border-transparent text-gray-500 dark:text-gray-400');
+                $(contentId).removeClass('hidden');
+                $(tabId).addClass('border-indigo-500 text-dark-600 dark:text-dark-400')
+                    .removeClass('border-transparent text-gray-500 dark:text-gray-400');
+            }
 
         // Tab click handlers
         $('#tab-visitor').click(() => activateTab('#tab-visitor', '#visitor-table-content'));
