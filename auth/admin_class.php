@@ -313,8 +313,8 @@ class Action
             SELECT * FROM user 
             WHERE JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.library_id')) = ? 
                 OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ?
-                OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.student_id')) = ?
-                OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.employee_id')) = ?
+                OR JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.student_id')) = ?
+                OR JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.employee_id')) = ?
             LIMIT 1
                 ");
             $stmt->execute([$username, $username,$username,$username]);
@@ -3080,7 +3080,7 @@ class Action
 
             // --- API Setup ---
             //AIzaSyAAX6dfAyyF-fQt9KMRzSRzUE64O92Krv8
-            $apiKey = '';
+            $apiKey = 'AIzaSyAAX6dfAyyF-fQt9KMRzSRzUE64O92Krv8';
             $model = 'gemini-2.5-flash';
             $url = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey";
 
