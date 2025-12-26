@@ -8,20 +8,20 @@
 
             <button id="tab-admin"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Admin 
+                Admin
             </button>
 
             <button id="tab-faculty"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Faculty 
+                Faculty
             </button>
             <button id="tab-student"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Student 
+                Student
             </button>
             <button id="tab-visitor"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
-                Visitor 
+                Visitor
             </button>
             <button id="tab-approval"
                 class="tab-button border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">
@@ -37,7 +37,7 @@
 
 
 <!-- Tab Contents -->
-<div id="tab-content" class="text-gray">
+<div id="tab-content" class="text-gray uppercase ">
     <!-- Visitor Table -->
     <div id="visitor-table-content" class="tab-panel hidden">
         <table id="visitorTable"
@@ -218,7 +218,7 @@
         <!-- MODAL HEADER -->
         <div
             class="flex items-center justify-between p-4 border-b border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800">
-            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Profile Inforamtion</h2>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Profile Information</h2>
             <button id="closeViewBtn"
                 class="text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white text-lg font-bold">✕</button>
         </div>
@@ -287,18 +287,8 @@
                         <h3 class="text-md font-semibold text-gray-700 dark:text-gray-200 mb-2">Student Information</h3>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <p class="label">Designation / Address</p>
+                                <p class="label" id="school_name">School Department</p>
                                 <input type="text" id="viewdepartment" class="value border rounded px-2 py-1 w-full"
-                                    disabled>
-                            </div>
-                            <div>
-                                <p class="label">User ID</p>
-                                <input type="text" id="viewstudent_id" class="value border rounded px-2 py-1 w-full"
-                                    disabled>
-                            </div>
-                            <div>
-                                <p class="label">Course</p>
-                                <input type="text" id="viewcourse" class="value border rounded px-2 py-1 w-full"
                                     disabled>
                             </div>
                             <div>
@@ -306,6 +296,17 @@
                                 <input type="text" id="viewgender" class="value border rounded px-2 py-1 w-full"
                                     disabled>
                             </div>
+                            <div>
+                                <p class="label" id="label_id">User ID</p>
+                                <input type="text" id="viewstudent_id" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
+                            </div>
+                            <div>
+                                <p class="label" id="label_course">Course</p>
+                                <input type="text" id="viewcourse" class="value border rounded px-2 py-1 w-full"
+                                    disabled>
+                            </div>
+
                         </div>
                     </div>
 
@@ -385,13 +386,13 @@
 
         // --- TAB MANAGEMENT ---
         function activateTab(tabId, contentId) {
-                $('.tab-panel').addClass('hidden');
-                $('.tab-button').removeClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
-                    .addClass('border-transparent text-gray-500 dark:text-gray-400');
-                $(contentId).removeClass('hidden');
-                $(tabId).addClass('border-indigo-500 text-dark-600 dark:text-dark-400')
-                    .removeClass('border-transparent text-gray-500 dark:text-gray-400');
-            }
+            $('.tab-panel').addClass('hidden');
+            $('.tab-button').removeClass('border-indigo-500 text-indigo-600 dark:text-indigo-400')
+                .addClass('border-transparent text-gray-500 dark:text-gray-400');
+            $(contentId).removeClass('hidden');
+            $(tabId).addClass('border-indigo-500 text-dark-600 dark:text-dark-400')
+                .removeClass('border-transparent text-gray-500 dark:text-gray-400');
+        }
 
         // Tab click handlers
         $('#tab-visitor').click(() => activateTab('#tab-visitor', '#visitor-table-content'));
@@ -424,7 +425,7 @@
                 searchable: true,
                 paging: true,
                 perPage: 10,
-                
+
                 language: {
                     lengthMenu: "_MENU_  Table Row",
                     info: "Display _START_ to _END_ of _TOTAL_ Users"
@@ -457,7 +458,32 @@
                         $("#viewlastname").val(personal.lastname || "Not Fill up by registree");
                         $("#viewmiddlename").val(personal.middlename || "No Available Middle Name");
                         $("#viewsuffix").val(personal.suffix || "Not Fill up by registree");
-                        $("#viewdepartment").val(personal.department || personal.admin_offices || personal.schoolname || "Not Fill up by registree");
+                        if (personal.department) {
+                            $("#school_name").text("School Department: ");
+                            $("#viewdepartment").val(personal.department);
+
+                            $("#viewcourse").removeClass('hidden');
+                            $("#viewstudent_id").removeClass('hidden');
+                            $("#label_id").removeClass('hidden');
+                            $("#label_course").removeClass('hidden');
+                        }
+                        if (personal.schoolname) {
+                            $("#school_name").text("School Name: ");
+                            $("#viewdepartment").val(personal.schoolname);
+                            $("#viewcourse").addClass('hidden');
+                            $("#viewstudent_id").addClass('hidden');
+                            $("#label_id").addClass('hidden');
+                            $("#label_course").addClass('hidden');
+                        }
+                        if (personal.admin_offices) {
+                            $("#school_name").text("School Offie: ");
+                            $("#viewdepartment").val(personal.admin_offices);
+
+                            $("#viewcourse").removeClass('hidden');
+                            $("#viewstudent_id").removeClass('hidden');
+                            $("#label_id").removeClass('hidden');
+                            $("#label_course").removeClass('hidden');
+                        }
                         $("#viewstudent_id").val(personal.employee_id || personal.student_id || "Visitor ID Not Available");
                         $("#viewcourse").val(personal.course || "No Course Available");
                         $("#viewgender").val(personal.gender || "Not Fill up by registree");
@@ -485,7 +511,7 @@
                             if (!dt) return "—";
                             return new Date(dt).toISOString().split("T")[0];
                         };
-                        
+
                         function formatDuration(seconds) {
                             seconds = parseInt(seconds, 10);
 

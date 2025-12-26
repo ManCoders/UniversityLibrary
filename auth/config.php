@@ -2,15 +2,12 @@
 
 function db_connect()
 {
-    $host = 'localhost';
-    $username = 'root';
-    $password = '';
-    $database = 'universitydb';
-    /* 
-    $host = 'sql100.infinityfree.com';
-    $username = 'if0_40273735';
-    $password = 'UywgtSOntOaxBVT';
-    $database = 'if0_40273735_lib'; */
+    $host = 'localhost' ?? 'sql100.infinityfree.com';
+    $username = 'root' ?? 'if0_40273735' ;
+    $password = '' ?? 'UywgtSOntOaxBVT';
+    $database = 'universitydb' ?? 'if0_40273735_new';
+    
+    
 
     try {
         $pdo = new PDO("mysql:host=$host;charset=utf8mb4", $username, $password);

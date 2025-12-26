@@ -54,7 +54,7 @@ function base_url()
     }
 
     // ✅ LIVE SITE PATH
-    return $protocol . "://campus-chat-rooms.gamer.gd/UniversityLibrary/" ?? '//localhost/UniversityLibrary/';
+    return $protocol . "://zppsu-library.great-site.net//UniversityLibrary/" ?? '//localhost/UniversityLibrary/';
 }
 
 function get_current_page()

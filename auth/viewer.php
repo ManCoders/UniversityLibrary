@@ -218,9 +218,9 @@ $pdfUrl = $pdfFile ? htmlspecialchars(base_url() . "auth/" . $pdfFile, ENT_QUOTE
               expiredShown = true;
 
               Swal.fire({
-                icon: 'info',
-                title: 'NOTE ALERT',
-                text: 'You’ve reached the time limit. Please open it again to continue.',
+                icon: 'warning',
+                title: 'TIME EXPIRED',
+                text: 'Load the page to view again!',
                 confirmButtonText: 'OK',
                 allowOutsideClick: false,
                 allowEscapeKey: false

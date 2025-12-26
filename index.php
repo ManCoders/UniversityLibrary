@@ -261,7 +261,7 @@
                             placeholder="Suffix (Optional)">
 
                         <p class="text-sm text-[#800000] dark:text-[#ffcccc] font-medium mt-2">
-                            Role:
+                            Access Role:
                             <span id="profile-role" class="ml-1"></span>
                         </p>
                     </div>
@@ -437,7 +437,7 @@
 
             <div class="flex justify-between items-center mb-3 border-b pb-2 border-[#b03060] dark:border-[#800000]">
                 <h4 class="font-bold flex items-center text-[#b03060] dark:text-[#ff4d6d]">
-                    <i data-lucide="bot" class="w-5 h-5 mr-2"></i>LiBot Assistance
+                    <i data-lucide="bot" class="w-5 h-5 mr-2"></i>Dloras Assistance
                 </h4>
                 <button id="close-chat" class="text-[#800000] dark:text-[#ffcccc] hover:text-red-500 transition p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
@@ -600,6 +600,7 @@
                             <option disabled selected>Select Gender</option>
                             <option>Male</option>
                             <option>Female</option>
+                            <option>Others</option>
                         </select>
 
                         <select name="student_department"
@@ -635,6 +636,7 @@
                             <option disabled selected>Select Gender</option>
                             <option>Male</option>
                             <option>Female</option>
+                            <option>Others</option>
                         </select>
 
                         <select name="faculty_department"
@@ -665,6 +667,7 @@
                             <option disabled selected>Select Gender</option>
                             <option>Male</option>
                             <option>Female</option>
+                            <option>Others</option>
                         </select>
 
                         <select name="admin_offices"
@@ -693,6 +696,7 @@
                             <option disabled selected>Select Gender</option>
                             <option>Male</option>
                             <option>Female</option>
+                            <option>Others</option>
                         </select>
 
                         <input type="text" name="schoolname" placeholder="School Name"
@@ -919,6 +923,8 @@
                     contentType: 'application/json',
                     data: JSON.stringify(data),
                     success: function (res) {
+                        $('#register')[0].reset();
+                        
                         let response;
                         try {
                             response = typeof res === 'string' ? JSON.parse(res) : res;
@@ -932,7 +938,7 @@
                             .text(response.message);
 
                         if (response.status === 1) {
-                            $('#register')[0].reset();
+                            $('#register-message').text();
                             $('#profile-preview').attr('src', base_url+'assets/images/system_logo/library.png');
                             setTimeout(() => toggleModal('#login-modal', '#register-modal'), 1500);
                         }
@@ -1119,8 +1125,9 @@
                     if (!res.status) return;
 
                     let html = "";
-
+					const user_id = '<?php echo $_SESSION['student']['user_id'] ?? '' ?>';
                     res.data.forEach(item => {
+                        if (item.user_id != user_id) return;
                         html += `
                             <li>
                                 <span class="font-mono text-[#800000] dark:text-[#ffcccc] mr-2">

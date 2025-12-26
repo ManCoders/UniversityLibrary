@@ -292,9 +292,15 @@
                                 ${folder.db_data && folder.db_data.folder_data
                                 ? JSON.parse(folder.db_data.folder_data).map((f, index) => {
                                     // Convert to sentence case
-                                    const title = f.metadata?.Title
-                                        ? f.metadata.Title.charAt(0).toUpperCase() + f.metadata.Title.slice(1).toLowerCase()
-                                        : 'No title';
+                                    const title = (() => {
+                                        const t = f.metadata?.Title || f.metadata?.['dc:title'] || f.metadata?.title;
+                                        if (!t || (Array.isArray(t) ? t[0].toLowerCase().includes('untitled') : t.toLowerCase().includes('untitled'))) {
+                                            return f.filename.replace(/\.pdf$/i, '');
+                                        }
+                                        const str = Array.isArray(t) ? t[0] : t;
+                                        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+                                    })();
+
                                     // Truncate to 60 characters
                                     const truncatedTitle = title.length > 60 ? title.slice(0, 57) + '...' : title;
 

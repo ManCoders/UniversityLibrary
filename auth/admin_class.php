@@ -32,7 +32,7 @@ class Action
     function base_url()
     {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-        $host = $_SERVER['HTTP_HOST']; // Detects local or live automatically
+        $host = $_SERVER['HTTP_HOST'] ?? 'zppsu-library.great-site.net'; // Detects local or live automatically
 
         return "$protocol://$host/UniversityLibrary/";
     }
@@ -267,8 +267,7 @@ class Action
             $stmt = $this->db->prepare("
             SELECT * FROM admin 
             WHERE JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.username')) = ? 
-               OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ?
-               
+               OR JSON_UNQUOTE(JSON_EXTRACT(authentication_data, '$.email')) = ? 
             LIMIT 1
         ");
             $stmt->execute([$username, $username]);
@@ -518,170 +517,189 @@ class Action
 
 
     function register_user()
-    {
-        // Get raw JSON input from frontend
-        $input = json_decode(file_get_contents('php://input'), true);
+{
+    $input = json_decode(file_get_contents('php://input'), true);
 
-        if (!$input) {
-            return json_encode(['status' => 0, 'message' => 'Invalid input data']);
+    if (!$input) {
+        return json_encode(['status' => 0, 'message' => 'Invalid input data']);
+    }
+
+    if (!isset($input['role'])) {
+        return json_encode(['status' => 0, 'message' => 'User role is required']);
+    }
+
+    $role = strtolower($input['role']);
+    $validRoles = ['student', 'faculty', 'visitor', 'admin_office'];
+
+    if (!in_array($role, $validRoles)) {
+        return json_encode(['status' => 0, 'message' => 'Invalid role']);
+    }
+
+    $data = array_map('trim', $input);
+
+    // ===== COMMON REQUIRED FIELDS =====
+    $requiredCommon = ['firstname', 'lastname', 'password', 'confirm_password', 'email'];
+    foreach ($requiredCommon as $field) {
+        if (empty($data[$field])) {
+            return json_encode(['status' => 0, 'message' => "Missing required field: $field"]);
         }
+    }
 
-        if (!isset($input['role'])) {
-            return json_encode(['status' => 0, 'message' => 'User role is required']);
-        }
-
-        $role = strtolower($input['role']);
-        $validRoles = ['student', 'faculty', 'visitor', 'admin_office'];
-
-        if (!in_array($role, $validRoles)) {
-            return json_encode(['status' => 0, 'message' => 'Invalid role']);
-        }
-
-        $data = array_map('trim', $input);
-
-        // ===== COMMON REQUIRED FIELDS =====
-        $requiredCommon = ['firstname', 'lastname', 'password', 'confirm_password', 'email'];
-
-        foreach ($requiredCommon as $field) {
-            if (empty($data[$field])) {
-                return json_encode(['status' => 0, 'message' => "Missing required field: $field"]);
-            }
-        }
-
-        // ===== ROLE-SPECIFIC VALIDATION =====
-        switch ($role) {
-
-            case 'student':
-                $studentFields = ['student_id', 'student_gender', 'student_department', 'course'];
-                foreach ($studentFields as $f) {
-                    if (empty($data[$f])) {
-                        return json_encode(['status' => 0, 'message' => "Missing student field: $f"]);
-                    }
-                }
-                break;
-
-            case 'faculty':
-                $facultyFields = ['employee_id', 'faculty_gender', 'faculty_department'];
-                foreach ($facultyFields as $f) {
-                    if (empty($data[$f])) {
-                        return json_encode(['status' => 0, 'message' => "Missing faculty field: $f"]);
-                    }
-                }
-                break;
-
-            case 'visitor':
-                $visitorFields = ['visitor_gender', 'schoolname'];
-                foreach ($visitorFields as $f) {
-                    if (empty($data[$f])) {
-                        return json_encode(['status' => 0, 'message' => "Missing visitor field: $f"]);
-                    }
-                }
-                break;
-
-            case 'admin_office':
-                if (empty($data['admin_employee_id'])) {
-                    return json_encode(['status' => 0, 'message' => "Missing admin field: admin_employee_id"]);
-                }
-                break;
-        }
-
-        // ===== PASSWORD CHECK =====
-        if ($data['password'] !== $data['confirm_password']) {
-            return json_encode(['status' => 0, 'message' => 'Confirm password does not match']);
-        }
-
-        $hashed_password = password_hash($data['password'], PASSWORD_BCRYPT);
-
-        // ===== HANDLE PROFILE PICTURE =====
-        $profile_pic = 'assets/default-profile.png';
-
-        if (!empty($data['profile_pic'])) {
-            $uploadDir = __DIR__ . '/uploads/' . $role . '_profiles/';
-            if (!is_dir($uploadDir))
-                mkdir($uploadDir, 0755, true);
-
-            if (preg_match('/^data:image\/(\w+);base64,/', $data['profile_pic'], $type)) {
-                $imgData = base64_decode(substr($data['profile_pic'], strpos($data['profile_pic'], ',') + 1));
-                $ext = strtolower($type[1]);
-
-                if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
-                    return json_encode(['status' => 0, 'message' => 'Invalid image type']);
-                }
-
-                $filename = uniqid($role . '_') . '.' . $ext;
-                $filepath = $uploadDir . $filename;
-
-                if (file_put_contents($filepath, $imgData)) {
-                    $profile_pic = 'uploads/' . $role . '_profiles/' . $filename;
+    // ===== ROLE-SPECIFIC VALIDATION =====
+    switch ($role) {
+        case 'student':
+            $studentFields = ['student_id', 'student_gender', 'student_department', 'course'];
+            foreach ($studentFields as $f) {
+                if (empty($data[$f])) {
+                    return json_encode(['status' => 0, 'message' => "Missing student field: $f"]);
                 }
             }
+            break;
+
+        case 'faculty':
+            $facultyFields = ['employee_id', 'faculty_gender', 'faculty_department'];
+            foreach ($facultyFields as $f) {
+                if (empty($data[$f])) {
+                    return json_encode(['status' => 0, 'message' => "Missing faculty field: $f"]);
+                }
+            }
+            break;
+
+        case 'visitor':
+            $visitorFields = ['visitor_gender', 'schoolname'];
+            foreach ($visitorFields as $f) {
+                if (empty($data[$f])) {
+                    return json_encode(['status' => 0, 'message' => "Missing visitor field: $f"]);
+                }
+            }
+            break;
+
+        case 'admin_office':
+            if (empty($data['admin_employee_id'])) {
+                return json_encode(['status' => 0, 'message' => "Missing admin field: admin_employee_id"]);
+            }
+            break;
+    }
+
+    // ===== PASSWORD CHECK =====
+    if ($data['password'] !== $data['confirm_password']) {
+        return json_encode(['status' => 0, 'message' => 'Confirm password does not match']);
+    }
+
+    // ===== CHECK DUPLICATES =====
+    try {
+        // Check email duplication
+        $stmt = $this->db->prepare("SELECT COUNT(*) FROM user WHERE JSON_EXTRACT(authentication_data, '$.email') = ?");
+        $stmt->execute([$data['email']]);
+        if ($stmt->fetchColumn() > 0) {
+            return json_encode(['status' => 0, 'message' => 'Email already registered']);
         }
 
-        $account_id = 'lib-' . str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-
-        // ===== BUILD PERSONAL DATA JSON (DYNAMIC) =====
-        $personal_details = [
-            'library_id' => $account_id,
-            'firstname' => $data['firstname'],
-            'lastname' => $data['lastname'],
-            'middlename' => $data['middlename'] ?? '',
-            'suffix' => $data['suffix'] ?? '',
-            'profile_pic' => $profile_pic,
-        ];
-
-        // Attach fields based on role
+        // Role-specific unique IDs
         if ($role === 'student') {
-            $personal_details['student_id'] = $data['student_id'];
-            $personal_details['gender'] = $data['student_gender'];
-            $personal_details['department'] = $data['student_department'];
-            $personal_details['course'] = $data['course'];
+            $stmt = $this->db->prepare("SELECT COUNT(*) FROM user WHERE JSON_EXTRACT(personal_details, '$.student_id') = ?");
+            $stmt->execute([$data['student_id']]);
+            if ($stmt->fetchColumn() > 0) {
+                return json_encode(['status' => 0, 'message' => 'Student ID already registered']);
+            }
         }
 
-        if ($role === 'faculty') {
-            $personal_details['employee_id'] = $data['employee_id'];
-            $personal_details['gender'] = $data['faculty_gender'];
-            $personal_details['department'] = $data['faculty_department'];
+        if ($role === 'faculty' || $role === 'admin_office') {
+            $uniqueId = $role === 'faculty' ? $data['employee_id'] : $data['admin_employee_id'];
+            $stmt = $this->db->prepare("SELECT COUNT(*) FROM user WHERE JSON_EXTRACT(personal_details, '$.employee_id') = ?");
+            $stmt->execute([$uniqueId]);
+            if ($stmt->fetchColumn() > 0) {
+                return json_encode(['status' => 0, 'message' => 'Employee ID already registered']);
+            }
         }
 
         if ($role === 'visitor') {
-            $personal_details['gender'] = $data['visitor_gender'];
-            $personal_details['schoolname'] = $data['schoolname'];
+            // For visitors, maybe combine name + schoolname as unique check
+            $stmt = $this->db->prepare("SELECT COUNT(*) FROM user WHERE JSON_EXTRACT(personal_details, '$.firstname') = ? AND JSON_EXTRACT(personal_details, '$.lastname') = ? AND JSON_EXTRACT(personal_details, '$.schoolname') = ?");
+            $stmt->execute([$data['firstname'], $data['lastname'], $data['schoolname']]);
+            if ($stmt->fetchColumn() > 0) {
+                return json_encode(['status' => 0, 'message' => 'Visitor already registered']);
+            }
         }
 
-        if ($role === 'admin_office') {
-            $personal_details['employee_id'] = $data['admin_employee_id'];
-            $personal_details['admin_gender'] = $data['admin_gender'];
-            $personal_details['admin_offices'] = $data['admin_offices'];
-            $personal_details['admin_gender'] = $data['admin_gender'];
-        }
-        $access_role = in_array($role, ['visitor', 'student']) ? 'student' : 'faculty';
-
-        $auth_data = [
-            'email' => $data['email'],
-            'password' => $hashed_password,
-            'account_role' => $role,
-            'user_role' => 'student', //this is have 2 access, for faculty and student
-            'account_status' => 'Pending'
-        ];
-
-        // ===== INSERT INTO DATABASE =====
-        try {
-            $stmt = $this->db->prepare("
-                INSERT INTO user (personal_details, authentication_data)
-                VALUES (?, ?)
-            ");
-            $stmt->execute([
-                json_encode($personal_details),
-                json_encode($auth_data)
-            ]);
-
-            return json_encode(['status' => 1, 'message' => ucfirst($role) . ' registered successfully']);
-
-        } catch (PDOException $e) {
-            return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
-        }
-
+    } catch (PDOException $e) {
+        return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
     }
+
+    $hashed_password = password_hash($data['password'], PASSWORD_BCRYPT);
+
+    // ===== HANDLE PROFILE PICTURE =====
+    $profile_pic = 'assets/default-profile.png';
+    if (!empty($data['profile_pic'])) {
+        $uploadDir = __DIR__ . '/uploads/' . $role . '_profiles/';
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+        if (preg_match('/^data:image\/(\w+);base64,/', $data['profile_pic'], $type)) {
+            $imgData = base64_decode(substr($data['profile_pic'], strpos($data['profile_pic'], ',') + 1));
+            $ext = strtolower($type[1]);
+            if (!in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+                return json_encode(['status' => 0, 'message' => 'Invalid image type']);
+            }
+            $filename = uniqid($role . '_') . '.' . $ext;
+            $filepath = $uploadDir . $filename;
+            if (file_put_contents($filepath, $imgData)) {
+                $profile_pic = 'uploads/' . $role . '_profiles/' . $filename;
+            }
+        }
+    }
+
+    $account_id = 'lib-' . str_pad(random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+    $personal_details = [
+        'library_id' => $account_id,
+        'firstname' => $data['firstname'],
+        'lastname' => $data['lastname'],
+        'middlename' => $data['middlename'] ?? '',
+        'suffix' => $data['suffix'] ?? '',
+        'profile_pic' => $profile_pic,
+    ];
+
+    if ($role === 'student') {
+        $personal_details['student_id'] = $data['student_id'];
+        $personal_details['gender'] = $data['student_gender'];
+        $personal_details['department'] = $data['student_department'];
+        $personal_details['course'] = $data['course'];
+    }
+    if ($role === 'faculty') {
+        $personal_details['employee_id'] = $data['employee_id'];
+        $personal_details['gender'] = $data['faculty_gender'];
+        $personal_details['department'] = $data['faculty_department'];
+    }
+    if ($role === 'visitor') {
+        $personal_details['gender'] = $data['visitor_gender'];
+        $personal_details['schoolname'] = $data['schoolname'];
+    }
+    if ($role === 'admin_office') {
+        $personal_details['employee_id'] = $data['admin_employee_id'];
+        $personal_details['admin_gender'] = $data['admin_gender'];
+        $personal_details['admin_offices'] = $data['admin_offices'];
+    }
+
+    $auth_data = [
+        'email' => $data['email'],
+        'password' => $hashed_password,
+        'account_role' => $role,
+        'user_role' => in_array($role, ['visitor', 'student']) ? 'student' : 'faculty',
+        'account_status' => 'Pending'
+    ];
+
+    try {
+        $stmt = $this->db->prepare("INSERT INTO user (personal_details, authentication_data) VALUES (?, ?)");
+        $stmt->execute([
+            json_encode($personal_details),
+            json_encode($auth_data)
+        ]);
+        return json_encode(['status' => 1, 'message' => ucfirst($role) . ' registered successfully']);
+    } catch (PDOException $e) {
+        return json_encode(['status' => 0, 'message' => 'Database error: ' . $e->getMessage()]);
+    }
+}
+
 
 
     function readUserDetails()
@@ -1620,15 +1638,15 @@ class Action
                     $metadata = $file['metadata'] ?? [];
 
                     // Flatten searchable fields
-                    $title = $metadata['dc:title'] ?? $metadata['Title'] ?? '';
+                    $title = $metadata['dc:title'] ?? $metadata['title'] ??  $metadata['Title'] ?? '';
                     if (is_array($title))
                         $title = implode(' ', $title);
 
-                    $author = $metadata['dc:creator'] ?? $metadata['Author'] ?? '';
+                    $author = $metadata['dc:creator'] ?? $metadata['Author'] ?? $metadata['author'] ?? '';
                     if (is_array($author))
                         $author = implode(', ', $author);
 
-                    $isbn = $metadata['prism:isbn'] ?? $metadata['isbn'] ?? $metadata['dc:identifier'] ?? '';
+                    $isbn = $metadata['prism:isbn'] ?? $metadata['isbn'] ?? $metadata['Isbn'] ?? $metadata['ISBN'] ?? $metadata['dc:identifier'] ?? '';
                     if (is_array($isbn))
                         $isbn = implode(' ', $isbn);
 
@@ -3078,9 +3096,16 @@ class Action
                 ]);
             }
 
-            // --- API Setup ---
-            //AIzaSyAAX6dfAyyF-fQt9KMRzSRzUE64O92Krv8
-            $apiKey = 'AIzaSyAAX6dfAyyF-fQt9KMRzSRzUE64O92Krv8';
+           // Fetch admin_book_data
+            $stmt = $this->db->query("SELECT admin_book_data FROM admin");
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Decode JSON
+            $data = $row ? json_decode($row['admin_book_data'], true) : [];
+
+            // Get API key
+            $apiKey = $data['api'] ?? null;
+            
             $model = 'gemini-2.5-flash';
             $url = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey";
 
@@ -3106,6 +3131,7 @@ class Action
             $systemPrompt = "
                 You are a professional and polite Zamboanga Peninsula Polytechnic State University digital librarian assistant. 
                 Your goal is to help users explore the library and the research journey, recommend books, authors, or topics, and guide users in finding reliable information online.
+                make it short the responce only the important matters.
                 You have secure access to the following books metadata:
 
                 $booksJSON

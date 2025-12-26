@@ -554,7 +554,7 @@ $(document).ready(function () {
         ) {
           res.data.forEach((book) => {
             const title =
-              book.metadata["dc:title"] || book.metadata.Title || book.filename;
+              book.metadata["dc:title"] || book.metadata.Title || book.metadata.title || " ";
             const author = book.metadata["dc:creator"]
               ? Array.isArray(book.metadata["dc:creator"])
                 ? book.metadata["dc:creator"].join(", ")
