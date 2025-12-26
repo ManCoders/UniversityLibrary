@@ -17,14 +17,12 @@
         </div>
     </div>
     <div class="overflow-x-auto max-h-[400px]">
-        <table id="userReferenceTable" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
+        <table id="userReferenceTable"
+            class="min-w-full text-center divide-y divide-gray-200 dark:divide-gray-700 text-sm">
             <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
                 <tr>
                     <th
-                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        #</th>
-                    <th
-                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        class="px-4 py-5 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         FullNAME</th>
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -36,7 +34,7 @@
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Gender</th>
 
-                    
+
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                         Time used</th>
@@ -74,9 +72,7 @@
         <table id="bookReferenceTable" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700 text-sm">
             <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0 z-10">
                 <tr>
-                    <th
-                        class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                        #</th>
+
 
                     <th
                         class="px-4 py-2 text-left font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -121,8 +117,10 @@
             autoWidth: false,
             order: [[0, 'asc']],
             columnDefs: [
-                { targets: 0, width: '50px' },
-                { targets: [4, 5], className: 'text-center' }
+                {
+                    targets: 5, // Books Count
+                    className: 'text-center'
+                }
             ],
             language: {
                 search: "Filter users:",
@@ -134,6 +132,7 @@
             }
         });
 
+
         // === Books Table ===
         const bookTable = $('#bookReferenceTable').DataTable({
             pageLength: 10,
@@ -142,7 +141,6 @@
             autoWidth: false,
             order: [[0, 'asc']],
             columnDefs: [
-                { targets: 0, width: '50px' },
                 { targets: 4, className: 'text-center' }
             ],
             language: {
@@ -160,48 +158,60 @@
 
         function fetchDetailedReport() {
             $.post(`${base_url}auth/action.php?action=getDetailedReport`, {}, res => {
-                if (!res.status || !res.data) return console.warn("No detailed report data found.");
+                if (!res.status || !res.data?.length) {
+                    userTable.clear().draw();
+                    return;
+                }
+
                 detailedReportData = res.data;
 
                 userTable.clear();
-                res.data.forEach((record, index) => {
+
+                res.data.forEach(record => {
                     userTable.row.add([
-                        index + 1,
-                        truncate(record.fullname, 20),
-                        truncate(record.department, 20),
-                        truncate(record.course, 20),
-                        truncate(record.gender, 20),
-                        record.total_read_time_formatted ?? '-',
-                        record.count_access ?? 0,
-                        record.remark ?? '-'
+                        `<div class="text-left">${truncate(record.fullname, 20)}</div>`,
+                        `<div class="text-left">${truncate(record.department, 20)}</div>`,
+                        `<div class="text-left">${truncate(record.course, 20)}</div>`,
+                        `<div class="text-left">${truncate(record.gender, 20)}</div>`,
+                        `<div class="text-left">${record.total_read_time_formatted ?? '-'}</div>`,
+                        `<div class="text-center font-semibold">${record.count_access ?? 0}</div>`,
+                        `<div class="text-center">${record.remark ?? '-'}</div>`
                     ]);
                 });
-                userTable.draw();
+
+                userTable.draw(false);
             }, 'json').fail(() => console.error("Failed to load detailed report"));
         }
+
 
         // Fetch Books List
         fetchBooks();
 
         function fetchBooks() {
-            $.post(`${base_url}auth/action.php?action=getMetadata`, {}, function (res) {
-                if (!res.status || !res.data) return console.warn("No books found.");
-                allBooksData = res.data;
+            $.post(`${base_url}auth/action.php?action=getMetadata`, {}, res => {
+                if (!res.status || !res.data?.length) {
+                    bookTable.clear().draw();
+                    return;
+                }
 
+                allBooksData = res.data;
                 bookTable.clear();
-                res.data.forEach((book, index) => {
-                    const totalCount = (book.readinglog || []).reduce((sum, log) => sum + (log.count_user || 0), 0);
+
+                res.data.forEach(book => {
+                    const totalCount = (book.readinglog || [])
+                        .reduce((sum, log) => sum + (log.count_user || 0), 0);
+
                     bookTable.row.add([
-                        index + 1,
-                        book.author,
-                        truncate(book.title, 40),
-                        book.copyright?.trim().match(/\d{4}/)?.[0] || '—', //item.copyright?.trim().match(/\d{4}/)?.[0] || '—';
-                        book.isbn,
-                        totalCount
+                        `<div class="text-left">${book.author}</div>`,
+                        `<div class="text-left">${truncate(book.title, 40)}</div>`,
+                        `<div class="text-left">${book.copyright?.match(/\d{4}/)?.[0] || '—'}</div>`,
+                        `<div class="text-left">${book.isbn}</div>`,
+                        `<div class="text-center font-semibold">${totalCount}</div>`
                     ]);
                 });
-                bookTable.draw();
-            }, 'json').fail(() => console.error("Failed to load books."));
+
+                bookTable.draw(false);
+            }, 'json').fail(() => console.error("Failed to load books"));
         }
 
         // Truncate helper
@@ -213,11 +223,10 @@
         // === Exports ===
         window.exportDetailedReportCSV = function () {
             if (!detailedReportData.length) return console.warn("No data to export.");
-            const headers = ["#", "Name", "Book Title", "Date/Time", "Time Used", "USED Count", "Remark"];
+            const headers = ["Name", "Book Title", "Date/Time", "Time Used", "USED Count", "Remark"];
             let csv = headers.join(",") + "\n";
             detailedReportData.forEach((r, i) => {
                 const row = [
-                    i + 1,
                     r.fullname,
                     r.book_title,
                     r.start_time ?? '',
@@ -237,9 +246,8 @@
             if (!detailedReportData.length) return console.warn("No data to export.");
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'pt', 'a4');
-            const columns = ["#", "Name", "Book Title", "Date/Time", "Time Used", "USED Count", "Remark"];
+            const columns = ["Name", "Book Title", "Date/Time", "Time Used", "USED Count", "Remark"];
             const rows = detailedReportData.map((r, i) => [
-                i + 1,
                 truncate(r.fullname, 20),
                 truncate(r.book_title, 25),
                 r.start_time ?? '-',
@@ -255,7 +263,7 @@
         window.exportBooksCSV = function () {
             if (!allBooksData.length) return console.warn("No data to export.");
 
-            const headers = ["#", "Author", "Title", "Year", "ISBN", "Visited"];
+            const headers = ["Author", "Title", "Year", "ISBN", "Visited"];
             let csv = headers.join(",") + "\n";
 
             allBooksData.forEach((book, i) => {
@@ -265,7 +273,6 @@
                 const year = book.copyright?.trim().match(/\d{4}/)?.[0] || '—';
 
                 const row = [
-                    i + 1,
                     book.author,
                     book.title,
                     year,
@@ -288,7 +295,7 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'pt', 'a4');
 
-            const columns = ["#", "Author", "Title", "Copyright", "ISBN", "Visited"];
+            const columns = ["Author", "Title", "Copyright", "ISBN", "Visited"];
             const rows = allBooksData.map((book, i) => {
                 const totalCount = (book.readinglog || []).reduce(
                     (sum, log) => sum + (log.count_user || 0), 0
@@ -296,7 +303,6 @@
                 const year = book.copyright?.trim().match(/\d{4}/)?.[0] || '—';
 
                 return [
-                    i + 1,
                     book.author,
                     truncate(book.title, 40),
                     year,
