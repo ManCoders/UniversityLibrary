@@ -316,7 +316,7 @@ class Action
                 OR JSON_UNQUOTE(JSON_EXTRACT(personal_details, '$.employee_id')) = ?
             LIMIT 1
                 ");
-            $stmt->execute([$username, $username,$username,$username]);
+            $stmt->execute([$username, $username, $username, $username]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if (!$user) {
@@ -3096,16 +3096,9 @@ class Action
                 ]);
             }
 
-           // Fetch admin_book_data
-            $stmt = $this->db->query("SELECT admin_book_data FROM admin");
-            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            // Decode JSON
-            $data = $row ? json_decode($row['admin_book_data'], true) : [];
-
-            // Get API key
-            $apiKey = $data['api'] ?? null;
-            
+            // --- API Setup ---
+            //AIzaSyAAX6dfAyyF-fQt9KMRzSRzUE64O92Krv8
+            $apiKey = 'AIzaSyAAX6dfAyyF-fQt9KMRzSRzUE64O92Krv8';
             $model = 'gemini-2.5-flash';
             $url = "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent?key=$apiKey";
 
@@ -3130,6 +3123,7 @@ class Action
             // Define AI system prompt with metadata access
             $systemPrompt = "
                 You are a professional and polite Zamboanga Peninsula Polytechnic State University digital librarian assistant. 
+                make it short the responce only the important matters,
                 Your goal is to help users explore the library and the research journey, recommend books, authors, or topics, and guide users in finding reliable information online.
                 make it short the responce only the important matters.
                 You have secure access to the following books metadata:
@@ -3436,38 +3430,38 @@ class Action
 
             $logs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$formattedLogs = array_map(function ($log, $index) {
-    $fullname = trim(
-        $log['lastname'] . ' ' .
-        $log['firstname'] . ' ' .
-        ($log['middlename'] ?? '')
-    );
+            $formattedLogs = array_map(function ($log, $index) {
+                $fullname = trim(
+                    $log['lastname'] . ' ' .
+                    $log['firstname'] . ' ' .
+                    ($log['middlename'] ?? '')
+                );
 
-    return [
-        'user_id' => $log['user_id'],
-        'fullname' => $fullname,
-        'student_id' => $log['student_id'],
-        'email' => $log['email'],
-        'course' => $log['course'],
-        'department' => $log['department'],
-        'gender' => $log['gender'],
-        'count_access'=>$log['count_access'],
-        // Aggregated results
-        'book_count' => $log['book_count'],                 // ✅ different books only
-        'total_read_time' => $log['total_read_time'],
-        'total_read_time_formatted' => $this->formatDuration($log['total_read_time']),
-        'last_read_time' => $log['last_read_time'],
+                return [
+                    'user_id' => $log['user_id'],
+                    'fullname' => $fullname,
+                    'student_id' => $log['student_id'],
+                    'email' => $log['email'],
+                    'course' => $log['course'],
+                    'department' => $log['department'],
+                    'gender' => $log['gender'],
+                    'count_access' => $log['count_access'],
+                    // Aggregated results
+                    'book_count' => $log['book_count'],                 // ✅ different books only
+                    'total_read_time' => $log['total_read_time'],
+                    'total_read_time_formatted' => $this->formatDuration($log['total_read_time']),
+                    'last_read_time' => $log['last_read_time'],
 
-        // Ranking
-        'remark' => 'TOP ' . ($index + 1)
-    ];
-}, $logs, array_keys($logs));
+                    // Ranking
+                    'remark' => 'TOP ' . ($index + 1)
+                ];
+            }, $logs, array_keys($logs));
 
 
             return json_encode([
                 'status' => 1,
                 'data' => $formattedLogs,
-                
+
             ]);
         } catch (Exception $e) {
             return json_encode([
