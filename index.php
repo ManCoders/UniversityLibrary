@@ -550,7 +550,7 @@
                     <!-- ROLE SELECTOR -->
                     <div class="flex gap-3 justify-center mb-2">
                         <label class="flex items-center gap-2">
-                            <input type="radio" name="role" value="student" active class="accent-[#b03060]"> Student
+                            <input type="radio" checked name="role" value="student"  active class="accent-[#b03060]"> Student
                         </label>
                          <label class="flex items-center gap-2">
                             <input type="radio" name="role" value="faculty" class="accent-[#b03060]"> Faculty
